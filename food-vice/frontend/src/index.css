@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+
+
+.right-diagonal-split {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
+
+    }
+
+    .left-diagonal-split {
+      clip-path: polygon(0 0, 100% 0, 75% 100%, 0% 100%);
+
+    }
+
+    .slideOutLeft {
+      animation: slideOutLeft 0.6s reverse ease-in-out;
+    }
+
+    .slideOutRight {
+      animation: slideOutRight 0.6s reverse ease-in-out;
+    }
+
+   
+    
+
+    @keyframes slideOutLeft {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateX(-100%);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateX(100%);
+        opacity: 0.5;
+      }
+    }
+
+
+
+    @media (max-width: 1024px) {
+
+      .right-diagonal-split,
+      .left-diagonal-split {
+        clip-path: none;
+      }
+    }
