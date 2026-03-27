@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import google from '../assets/google.svg'
-import apple from '../assets/apple.svg'
+import google from '../../assets/google.svg'
+import apple from '../../assets/apple.svg'
+import '../../index.css'
 export function SigninPage() {
 
     const [emailInput,setEmailInput]=useState<string>("")

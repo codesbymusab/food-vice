@@ -25,6 +25,7 @@ export function SignupPage() {
     }
 
     function onSignUpClick() {
+        
         navigate('/login')
     }
 
