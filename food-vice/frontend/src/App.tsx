@@ -3,7 +3,9 @@ import { SigninPage } from "./components/Pages/SigninPage"
 import { SignupPage } from "./components/Pages/SignupPage"
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
-
+import { HomePage } from "./components/Pages/Home/HomePage";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -44,9 +46,15 @@ function AnimatedRoutes() {
 function App() {
 
   return (
-
-
-    <AnimatedRoutes />
+    <>
+      <AnimatedRoutes />
+      <Header />
+      <Routes>
+        <Route path="home" element={<HomePage />}/>
+      </Routes>
+      <Footer />
+    </>
+    
 
   )
 }
