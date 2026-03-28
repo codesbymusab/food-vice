@@ -7,7 +7,7 @@ export function Reels() {
                 <div className="flex items-center gap-2 mb-8">
                     <span className="material-symbols-outlined text-primary text-3xl">play_circle</span>
                     <h3 className="text-2xl font-bold">Food Reels</h3>
-                    <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Live Now</span>
+                    <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Trending</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <ReelCard />

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { HomePage } from "./components/Pages/Home/HomePage";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -51,6 +52,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="home" element={<HomePage />}/>
+        <Route path="profile/:id" element={<UserProfilePage />} />
       </Routes>
       <Footer />
     </>
