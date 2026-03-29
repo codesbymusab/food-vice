@@ -36,6 +36,7 @@ function AnimatedRoutes() {
       }}
     >
       <Routes>
+        <Route index element={<SigninPage />} />
         <Route path="login" element={<SigninPage />} />
         <Route path="signup" element={<SignupPage />} />
       </Routes>
@@ -52,7 +53,7 @@ function App() {
       <AnimatedRoutes />
       <Header />
       <Routes>
-        <Route index element={<SigninPage />} />
+
         <Route path="home" element={<HomePage />}/>
         <Route path="profile/:id" element={<UserProfilePage />} />
         <Route path="reels" element={<ReelsPage />} />
