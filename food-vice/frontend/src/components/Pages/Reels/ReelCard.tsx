@@ -1,6 +1,6 @@
 export function ReelCard() {
     return (
-        <div className="max-w-[500px] mx-auto mb-12 snap-start">
+        <div className="max-w-[500px] mx-auto my-12 snap-start">
             <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl">
                 <div className="absolute inset-0 bg-cover bg-center opacity-90"
                     data-alt="Close up of sizzling steak in a pan"

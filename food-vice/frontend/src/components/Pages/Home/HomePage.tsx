@@ -10,7 +10,7 @@ import { Trending } from './Sections/Trending'
 
 export function HomePage() {
     return (
-        <main className="max-w-7xl mx-auto pb-20">
+        <main className="max-w-7xl mx-auto pb-20 pt-8">
 
             <Hero />
 
