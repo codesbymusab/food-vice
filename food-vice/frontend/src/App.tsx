@@ -8,6 +8,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
+import {CommunityPage } from "./components/Pages/Threads/CommunityPage";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -57,6 +58,7 @@ function App() {
         <Route path="home" element={<HomePage />}/>
         <Route path="profile/:id" element={<UserProfilePage />} />
         <Route path="reels" element={<ReelsPage />} />
+        <Route path="community" element={<CommunityPage />} /> 
 
       </Routes>
       <Footer />

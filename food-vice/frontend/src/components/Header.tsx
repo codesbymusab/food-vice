@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-50 bg-white dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 lg:px-10 py-3 mb-8 border-b-primary/50 border-b-2">
+        <header className="sticky top-0 z-50 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 <div className="flex items-center gap-8">
                     <NavLink to="home">
@@ -15,7 +15,7 @@ export function Header() {
                     <nav className="hidden md:flex items-center gap-6">
                         <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="home">Explore</NavLink>
                         <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="reels">Reels</NavLink>
-                        <a className="text-sm font-semibold hover:text-primary transition-colors" href="#">Discussions</a>
+                        <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="community">Community</NavLink>
                     </nav>
                 </div>
                 <div className="flex-1 max-w-md hidden lg:block">
