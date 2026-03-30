@@ -59,6 +59,7 @@ function App() {
         <Route path="profile/:id" element={<UserProfilePage />} />
         <Route path="reels" element={<ReelsPage />} />
         <Route path="community" element={<CommunityPage />} /> 
+        
 
       </Routes>
       <Footer />

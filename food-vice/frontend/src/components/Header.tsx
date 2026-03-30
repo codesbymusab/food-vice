@@ -13,7 +13,7 @@ export function Header() {
                     </NavLink>
 
                     <nav className="hidden md:flex items-center gap-6">
-                        <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="home">Explore</NavLink>
+                        <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="explore">Explore</NavLink>
                         <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="reels">Reels</NavLink>
                         <NavLink className="text-sm font-semibold hover:text-primary transition-colors" to="community">Community</NavLink>
                     </nav>
