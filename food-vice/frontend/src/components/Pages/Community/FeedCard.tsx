@@ -1,4 +1,11 @@
+import { useNavigate } from "react-router"
+
 export function FeedCard() {
+    const navigate=useNavigate()
+
+    function goToDetailsPage(){
+        navigate('name/1')
+    }
     return (
         <article
             className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -24,7 +31,9 @@ export function FeedCard() {
                                 className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Recipes</span>
                         </span>
                     </div>
-                    <h2 className="text-xl font-bold mb-2 hover:text-primary cursor-pointer transition-colors">Rate my first
+                    <h2 className="text-xl font-bold mb-2 hover:text-primary cursor-pointer transition-colors" onClick={
+                        ()=>goToDetailsPage()
+                    }>Rate my first
                         attempt at sourdough bread!</h2>
                     <div className="w-full aspect-video rounded-xl bg-center bg-cover my-4"
                         data-alt="Close up of a freshly baked sourdough loaf with golden crust"
@@ -36,7 +45,7 @@ export function FeedCard() {
                     </p>
                     <div className="flex items-center gap-6">
                         <button
-                            className="flex items-center gap-2 text-slate-500 hover:text-primary text-sm font-medium transition-colors">
+                            className="flex items-center gap-2 text-slate-500 hover:text-primary text-sm font-medium transition-colors" onClick={()=>goToDetailsPage()}>
                             <span className="material-symbols-outlined text-lg">chat_bubble_outline</span> 112 Comments
                         </button>
                         <button
