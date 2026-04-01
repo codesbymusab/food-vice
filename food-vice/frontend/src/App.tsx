@@ -10,6 +10,7 @@ import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
 import {CommunityPage } from "./components/Pages/Community/CommunityPage";
 import { CommunityDetailPage } from "./components/Pages/Community/DetailsPage/CommunityDetailPage";
+import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -61,7 +62,7 @@ function App() {
         <Route path="reels" element={<ReelsPage />} />
         <Route path="community" element={<CommunityPage />} /> 
         <Route path="community/:name/:id" element={<CommunityDetailPage />} />
-        
+        <Route path="restaurant/:id" element={<RestaurantDeatilPage />} />
         
 
       </Routes>
