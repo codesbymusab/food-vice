@@ -40,7 +40,9 @@ export function UserProfilePage() {
                         </button>
                             <button className="inline-flex items-center gap-2 px-5 py-2 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                                 <span className="material-symbols-outlined text-sm">edit</span> Edit Profile
-                            </button></div>
+                            </button>
+                            
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-3 min-w-[120px]">
