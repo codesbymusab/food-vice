@@ -15,13 +15,13 @@ export function CommunityPage() {
 
                     <div className="flex flex-col gap-3">
                         <button
-                            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-primary text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110 transition-all shadow-lg shadow-primary/20">
+                            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-primary text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:border-slate-800 hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                             <span className="material-symbols-outlined">add_circle</span>
                             <span>Start a Community</span>
                         </button>
 
                         <button
-                            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 border-2 border-primary text-primary bg-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110 transition-all shadow-lg shadow-primary/20">
+                            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 border-2 border-primary text-primary bg-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:bg-slate-300/5 hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                             <span className="material-symbols-outlined">add</span>
                             <span>Create Thread</span>
                         </button>

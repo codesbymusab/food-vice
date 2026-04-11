@@ -1,14 +1,24 @@
+import { useEffect, useState } from "react";
+import { AddReviewForm } from "./AddReviewForm";
 import { RatingSummaryCard } from "./RatingSummaryCard";
 import { ReviewTile } from "./ReviewTile";
 
-export function RestaurantDeatilPage(){
-    return(
+export function RestaurantDeatilPage() {
+
+    const [showReviewForm, setShowReviewForm] = useState<boolean>(false)
+    useEffect(() => {
+        if (!showReviewForm) {
+            window.scrollTo(0, 580);
+        }
+    }, [showReviewForm]);
+
+    return (
         <main className="flex-1">
-           
+
             <div className="relative h-[400px] w-full @container">
                 <div className="absolute inset-0 bg-cover bg-center"
                     data-alt="Elegant restaurant interior with warm lighting and wooden tables"
-                    style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvLslAqT3wfDgfn381_3dpcKq_VxCZWPTXdaW2YONEcXNrrUrd-hE_A8Z-hHDzIoCxDi7kfomQRDUmLHb1sXPmTYMKRk6y2WEgJxtokRivIJfiOQKwW3H32YbKrHEdvez69BSVyY9bH5cQbt9gN0dgQ2WFWsNr2_6P5XFpvZ7ltAjWj4LMPqnVIcM0M-zi9EBS3fsOYQCHl-uwQ7QxDlbPlQX52AOJ8_Z7RY7zD8CqJGeHBxHgPaIWW3-0r2coBzAiPkbL2CvfTUI')"}}>
+                    style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvLslAqT3wfDgfn381_3dpcKq_VxCZWPTXdaW2YONEcXNrrUrd-hE_A8Z-hHDzIoCxDi7kfomQRDUmLHb1sXPmTYMKRk6y2WEgJxtokRivIJfiOQKwW3H32YbKrHEdvez69BSVyY9bH5cQbt9gN0dgQ2WFWsNr2_6P5XFpvZ7ltAjWj4LMPqnVIcM0M-zi9EBS3fsOYQCHl-uwQ7QxDlbPlQX52AOJ8_Z7RY7zD8CqJGeHBxHgPaIWW3-0r2coBzAiPkbL2CvfTUI')" }}>
                     <div
                         className="absolute inset-0 bg-gradient-to-t from-background-dark/90 via-background-dark/40 to-transparent">
                     </div>
@@ -51,7 +61,7 @@ export function RestaurantDeatilPage(){
                     </div>
                 </div>
             </div>
-     
+
             <div
                 className="sticky top-[65px] z-40 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
                 <div className="mx-auto max-w-7xl px-4 md:px-10">
@@ -61,16 +71,16 @@ export function RestaurantDeatilPage(){
                             href="#">Reviews</a>
                         <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
                             href="#">Photos</a>
-                       
+
                     </div>
                 </div>
             </div>
-       
+
             <div className="mx-auto max-w-7xl px-4 md:px-10 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     <div className="lg:col-span-2 space-y-10">
-                       
+
                         <section>
                             <h3 className="text-xl font-bold mb-4">About the Restaurant</h3>
                             <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
@@ -112,7 +122,7 @@ export function RestaurantDeatilPage(){
                                 </div>
                             </div>
                         </section>
-                        
+
                         <section
                             className="p-6 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                             <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -130,25 +140,34 @@ export function RestaurantDeatilPage(){
                                 <RatingSummaryCard />
                             </div>
                         </section>
-                       
-                        <section>
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold">Recent Reviews</h3>
-                                <button className="flex items-center gap-2 text-primary font-bold text-sm hover:underline">
-                                    <span className="material-symbols-outlined text-lg">edit</span> Write a Review
-                                </button>
-                            </div>
-                            <div className="space-y-8">
-                              
-                               <ReviewTile />
-                               <ReviewTile />
 
-                            </div>
+                        <section>
+
+                            {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} />
+
+                                : (<>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-bold">Recent Reviews</h3>
+                                        <button className="flex items-center justify-center gap-2 text-primary font-bold text-sm hover:scale-110" onClick={() => { setShowReviewForm((prev) => !prev) }}>
+                                            <span className="material-symbols-outlined text-lg">edit</span> <span className="hover:underline underline-offset-4">Write a Review</span>
+                                        </button>
+                                    </div>
+
+
+                                    <div className="space-y-8">
+
+                                        <ReviewTile />
+                                        <ReviewTile />
+
+                                    </div>
+                                </>
+                                )
+                            }
                         </section>
                     </div>
-                    
+
                     <aside className="space-y-8">
-                        
+
                         <div
                             className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
                             <div className="h-48 bg-slate-200 relative">
@@ -182,7 +201,7 @@ export function RestaurantDeatilPage(){
                                     Directions</button>
                             </div>
                         </div>
-                    
+
                         <div
                             className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                             <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -219,11 +238,11 @@ export function RestaurantDeatilPage(){
                                 </div>
                             </div>
                         </div>
-                       
+
                         <div>
                             <h4 className="text-lg font-bold mb-4">People Also Liked</h4>
                             <div className="space-y-4">
-                               
+
                                 <a className="flex gap-4 group" href="#">
                                     <div className="size-20 rounded-lg overflow-hidden flex-shrink-0">
                                         <img alt="Restaurant 1"
@@ -241,7 +260,7 @@ export function RestaurantDeatilPage(){
                                         <p className="text-xs text-slate-500">1.2 miles away</p>
                                     </div>
                                 </a>
-                             
+
                                 <a className="flex gap-4 group" href="#">
                                     <div className="size-20 rounded-lg overflow-hidden flex-shrink-0">
                                         <img alt="Restaurant 2"
@@ -259,7 +278,7 @@ export function RestaurantDeatilPage(){
                                         <p className="text-xs text-slate-500">0.5 miles away</p>
                                     </div>
                                 </a>
-                               
+
                                 <a className="flex gap-4 group" href="#">
                                     <div className="size-20 rounded-lg overflow-hidden flex-shrink-0">
                                         <img alt="Restaurant 3"

@@ -3,15 +3,19 @@ import { ReelCard } from "../Home/Cards/ReelCard";
 import { AchievementBadge, AchievementBadgeAlt } from "./AchievementBadge";
 import { PostedReview } from "./PostedReview";
 import { SavedRestaurant } from "./SavedRestaurant";
+import { useNavigate } from "react-router";
 
 export function UserProfilePage() {
 
+    const navigate=useNavigate()
     const [selectedTab, setSelectedTab] = useState<string>('restaurants')
 
     function changeTab(tab: string): void {
         setSelectedTab(tab)
     }
-
+    function editProfile(){
+        navigate('edit')
+    }
     return (
         <main className="max-w-4xl mx-auto px-4 py-10">
 
@@ -38,7 +42,7 @@ export function UserProfilePage() {
                         <div className="flex flex-wrap justify-center md:justify-start gap-4"><button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
                             <span className="material-symbols-outlined text-sm">person_add</span> Follow
                         </button>
-                            <button className="inline-flex items-center gap-2 px-5 py-2 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <button className="shadow-xl shadow-orange-500/5 inline-flex items-center gap-2 px-5 py-2 border border-slate-300 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" onClick={()=>editProfile()}>
                                 <span className="material-symbols-outlined text-sm">edit</span> Edit Profile
                             </button>
                             

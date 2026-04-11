@@ -7,7 +7,7 @@ export function Header() {
     const [showNotif, setShowNotif] = useState<boolean>(false)
 
     return (
-        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2">
+        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2 shadow-lg shadow-primary/20">
             <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-4">
                 <div className="flex items-center gap-8">
                     <NavLink to="home" >
@@ -19,17 +19,17 @@ export function Header() {
 
                     <nav className="hidden md:flex items-center gap-6">
                         <NavLink className={({ isActive }) =>
-                            `${isActive ? 'underline underline-offset-2 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
+                            `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
                         } to="explore">
                             Explore
                         </NavLink>
                         <NavLink className={({ isActive }) =>
-                            `${isActive ? 'underline underline-offset-2  font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
+                            `${isActive ? 'underline underline-offset-4  font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
                         } to="reels" >
                             Reels
                         </NavLink>
                         <NavLink className={({ isActive }) =>
-                            `${isActive ? 'underline underline-offset-2 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
+                            `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
                         } to="community">
                             Community
                         </NavLink>
@@ -51,7 +51,7 @@ export function Header() {
                         </NavLink>
                     </div>
 
-                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-300 dark:hover:bg-slate-800 transition-colors">
+                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-400 dark:hover:bg-slate-800 transition-colors">
                         <span className="material-symbols-outlined text-sm text-primary">logout</span> Sign Out
                     </button>
                 </div>

@@ -13,7 +13,14 @@ export function ReelsPage() {
     }
     return (
         <main className="flex flex-1 max-w-[1440px] mx-auto w-full">
-            <aside className="bg-white hidden lg:flex w-64 flex-col border-r border-slate-200 dark:border-slate-800 p-4 sticky top-[65px] h-[calc(100vh-65px)]">
+            <aside className="bg-white hidden lg:flex w-64 flex-col border-slate-200 dark:border-slate-800 p-4 sticky top-[65px] h-[calc(100vh-65px)]">
+
+                 <button
+                            className="my-5 flex w-full full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-primary text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110 transition-all shadow-lg shadow-primary/20">
+                            <span className="material-symbols-outlined">upload</span>
+                            <span>Upload Reel</span>
+                        </button>
+
                 <div className="flex flex-col gap-1">
                     <button className={`flex items-center gap-3 px-3 py-3 ${reelsMode==='for-you' ? 'border-b-2 border-primary text-primary bg-primary/5': 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}  
                         onClick={()=>changeMode('for-you')}>
@@ -64,8 +71,8 @@ export function ReelsPage() {
                     <ReelCard />
 
                 </div>
-                <div className="mr-10 mt-6 hidden xl:flex w-[380px] flex-col rounded-2xl border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark overflow-y-auto sticky top-[0px] h-min">
-                    
+                <div className="mr-10 mt-6 hidden xl:flex w-[380px] flex-col gap-10 rounded-2xl border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark overflow-y-auto sticky top-[0px] h-min">
+                   
                     <div className="p-6 rounded-2xl bg-primary text-white">
                         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                             <span className="material-symbols-outlined text-white">tag</span>
