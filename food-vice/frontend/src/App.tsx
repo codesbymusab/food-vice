@@ -12,6 +12,8 @@ import {CommunityPage } from "./components/Pages/Community/CommunityPage";
 import { CommunityDetailPage } from "./components/Pages/Community/DetailsPage/CommunityDetailPage";
 import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
+import ExplorePage from "./components/Pages/Explore/ExplorePage";
+import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -63,6 +65,8 @@ function App() {
 
        
         <Route path="home" element={<HomePage />}/>
+        <Route path="explore" element={<ExplorePage />} />
+        <Route path="explore/map" element={<ExploreMapView />} />
         <Route path="profile/:id" element={<UserProfilePage />} />
         <Route path="reels" element={<ReelsPage />} />
         <Route path="community" element={<CommunityPage />} /> 
