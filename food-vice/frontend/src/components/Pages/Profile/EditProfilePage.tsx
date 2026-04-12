@@ -25,7 +25,7 @@ export function EditProfilePage() {
                             <button className="w-full py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
                                 Save All Changes
                             </button>
-                            <button className="w-full py-4 rounded-xl border-2 border-stone-100 text-stone-500 font-black uppercase tracking-widest text-xs hover:bg-red-200/70 transition-all" onClick={()=>navigate('/profile/1')}>
+                            <button className="w-full py-4 rounded-xl border-2 border-stone-100 text-stone-500 font-black uppercase tracking-widest text-xs hover:bg-red-200/70 hover:scale-[1.02] active:scale-95 transition-all" onClick={()=>navigate('/profile/1')}>
                                 Cancel
                             </button>
                         </div>

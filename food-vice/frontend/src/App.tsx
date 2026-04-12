@@ -12,6 +12,7 @@ import {CommunityPage } from "./components/Pages/Community/CommunityPage";
 import { CommunityDetailPage } from "./components/Pages/Community/DetailsPage/CommunityDetailPage";
 import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
+import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunityPage";
 import ExplorePage from "./components/Pages/Explore/ExplorePage";
 import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
 function AnimatedRoutes() {
@@ -73,7 +74,7 @@ function App() {
         <Route path="community/:name/:id" element={<CommunityDetailPage />} />
         <Route path="restaurant/:id" element={<RestaurantDeatilPage />} />
         <Route path="profile/:id/edit" element={<EditProfilePage/>}/>
-
+        <Route path="community/create" element={<CreateCommunityPage />} />
       </Routes>
       <Footer />
      
