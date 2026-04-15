@@ -3,7 +3,20 @@ import { SigninPage } from "./components/Pages/SigninPage"
 import { SignupPage } from "./components/Pages/SignupPage"
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
-
+import { HomePage } from "./components/Pages/Home/HomePage";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
+import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
+import {CommunitiesPage} from "./components/Pages/Community/CommunitiesPage";
+import { ThreadDetailPage } from "./components/Pages/Community/Threads/ThreadDetailPage";
+import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
+import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
+import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunityPage";
+import ExplorePage from "./components/Pages/Explore/ExplorePage";
+import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
+import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
+import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -30,9 +43,11 @@ function AnimatedRoutes() {
 
 
       }}
-    >
+    > 
+    
       <Routes>
-        <Route path="login" element={<SigninPage />} />
+       
+        <Route index path="login" element={<SigninPage />} />
         <Route path="signup" element={<SignupPage />} />
       </Routes>
     </div>
@@ -44,9 +59,31 @@ function AnimatedRoutes() {
 function App() {
 
   return (
+    <>
+      <AnimatedRoutes />
+      <Header />
 
+      
+      <Routes>
 
-    <AnimatedRoutes />
+       
+        <Route path="home" element={<HomePage />}/>
+        <Route path="explore" element={<ExplorePage />} />
+        <Route path="explore/map" element={<ExploreMapView />} />
+        <Route path="profile/:id" element={<UserProfilePage />} />
+        <Route path="reels" element={<ReelsPage />} />
+        <Route path="community" element={<CommunitiesPage />} /> 
+        <Route path="community/:name" element={<CommunityDetailPage />} />
+        <Route path="community/:name/:id" element={<ThreadDetailPage/>} />
+        <Route path="restaurant/:id" element={<RestaurantDeatilPage />} />
+        <Route path="profile/:id/edit" element={<EditProfilePage/>}/>
+        <Route path="community/create" element={<CreateCommunityPage />} />
+        <Route path="community/:name/create" element={<CreateThreadPage />} />
+      </Routes>
+      <Footer />
+     
+    </>
+    
 
   )
 }
