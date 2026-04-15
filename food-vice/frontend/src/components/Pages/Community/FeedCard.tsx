@@ -4,7 +4,7 @@ export function FeedCard() {
     const navigate=useNavigate()
 
     function goToDetailsPage(){
-        navigate('name/1')
+        navigate('/community/name/1')
     }
     return (
         <article

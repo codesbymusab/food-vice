@@ -8,13 +8,15 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
-import {CommunityPage } from "./components/Pages/Community/CommunityPage";
-import { CommunityDetailPage } from "./components/Pages/Community/DetailsPage/CommunityDetailPage";
+import {CommunitiesPage} from "./components/Pages/Community/CommunitiesPage";
+import { ThreadDetailPage } from "./components/Pages/Community/Threads/ThreadDetailPage";
 import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
 import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunityPage";
 import ExplorePage from "./components/Pages/Explore/ExplorePage";
 import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
+import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
+import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -70,11 +72,13 @@ function App() {
         <Route path="explore/map" element={<ExploreMapView />} />
         <Route path="profile/:id" element={<UserProfilePage />} />
         <Route path="reels" element={<ReelsPage />} />
-        <Route path="community" element={<CommunityPage />} /> 
-        <Route path="community/:name/:id" element={<CommunityDetailPage />} />
+        <Route path="community" element={<CommunitiesPage />} /> 
+        <Route path="community/:name" element={<CommunityDetailPage />} />
+        <Route path="community/:name/:id" element={<ThreadDetailPage/>} />
         <Route path="restaurant/:id" element={<RestaurantDeatilPage />} />
         <Route path="profile/:id/edit" element={<EditProfilePage/>}/>
         <Route path="community/create" element={<CreateCommunityPage />} />
+        <Route path="community/:name/create" element={<CreateThreadPage />} />
       </Routes>
       <Footer />
      

@@ -1,4 +1,4 @@
-import type { SelectedTopic } from "./CommunityPage";
+import type { SelectedTopic } from "./CommunitiesPage";
 
 export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSelectedTopic}:{selectedTopic:SelectedTopic,setSelectedTopic:React.Dispatch<React.SetStateAction<SelectedTopic>>}) {
     

@@ -5,10 +5,11 @@ import { ReviewTile } from "./ReviewTile";
 
 export function RestaurantDeatilPage() {
 
+    
     const [showReviewForm, setShowReviewForm] = useState<boolean>(false)
     useEffect(() => {
         if (!showReviewForm) {
-            window.scrollTo(0, 580);
+            window.scrollTo(0, 0);
         }
     }, [showReviewForm]);
 

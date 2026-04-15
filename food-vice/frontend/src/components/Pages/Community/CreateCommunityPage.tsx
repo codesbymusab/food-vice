@@ -4,8 +4,8 @@ export function CreateCommunityPage() {
 
     const navigate=useNavigate()
     return (
-        <main className="pt-28 pb-20 px-4 min-h-screen">
-            <div className="max-w-3xl mx-auto bg-white p-12 rounded-xl">
+        <main className="pt-20 pb-20 px-4 min-h-screen">
+            <div className="max-w-3xl mx-auto bg-slate-800 text-white p-8 rounded-xl">
                 <header className="mb-12 text-center">
                     <h1 className="text-5xl md:text-6xl font-black tracking-tight text-on-surface mb-4">
                         Start your own <span className="text-primary">Community.</span>
@@ -13,7 +13,7 @@ export function CreateCommunityPage() {
                     <p className="text-on-surface-variant text-lg underline underline-offset-2">Build a space to connect, share, and feast.</p>
                 </header>
                 <div className="bg-slate-50 rounded-xl shadow-2xl shadow-orange-500/5 p-8 md:p-12 border-2 border-gray-200">
-                    <form className="space-y-10">
+                    <form className="space-y-10 text-black">
                         <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                 <span className="p-2 bg-accent-cyan/20 text-accent-cyan text-secondary rounded-xl">
