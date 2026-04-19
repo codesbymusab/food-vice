@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router"
 
 export function EditProfilePage() {
-
+    
     const navigate=useNavigate()
 
     return (
