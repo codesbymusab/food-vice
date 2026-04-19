@@ -6,7 +6,10 @@ export function SignupPage() {
     const [emailInput, setEmailInput] = useState<string>("")
     const [passwordInput, setPasswordInput] = useState<string>("")
     const [confPasswordInput, setConfPasswordInput] = useState<string>("")
+    const [nameInput, setNameInput] = useState<string>("")
+    const [usernameInput, setUsernameInput] = useState<string>("")
 
+    
     const navigate = useNavigate()
 
     function onEmailInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -24,10 +27,42 @@ export function SignupPage() {
 
     }
 
-    function onSignUpClick() {
-        
-        navigate('/login')
+     function onNameInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setNameInput(event.target.value)
+
     }
+
+     function onUsernameInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setUsernameInput(event.target.value)
+
+    }
+
+    async function onSignUpClick() {
+
+        try {
+            const res = await fetch("http://localhost:3000/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    name:nameInput,
+                    username:usernameInput, 
+                    email: emailInput,
+                    password: passwordInput,
+                    confirmPassword:confPasswordInput
+                }),
+                credentials: "include"
+
+            });
+           if(res.ok){
+                navigate('/home')
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+       
+    }
+
 
     return (
 
@@ -47,7 +82,7 @@ export function SignupPage() {
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 bg-background-light dark:bg-background-dark">
+            <div className="flex-1 flex flex-col justify-center items-start p-8 lg:p-16 bg-background-light dark:bg-background-dark">
 
 
 
@@ -63,7 +98,22 @@ export function SignupPage() {
                         <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-3" >Get Started</h2>
                         <p className="text-slate-500 dark:text-slate-400" >Discover. Review. Share food you love.</p>
                     </div>
-                    <form className="space-y-5">
+                    <form className="space-y-5" onSubmit={async (e: React.SubmitEvent<HTMLFormElement>) => {
+                        e.preventDefault(); 
+                        await onSignUpClick();}}>
+
+                        <div className="flex flex-row gap-4 ">
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2" >Full Name</label>
+                                <input className="w-full h-12 px-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"  value={nameInput} onChange={onNameInputChange} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2" >Username</label>
+                                <input className="w-full h-12 px-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"  value={usernameInput} onChange={onUsernameInputChange} />
+                            
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2" >Email Address</label>
                             <input className="w-full h-12 px-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="name@example.com" type="email" value={emailInput} onChange={onEmailInputChange} />
@@ -87,7 +137,7 @@ export function SignupPage() {
                                 <label className="ml-2 text-sm text-slate-600 dark:text-slate-400 font-medium" >I agree to <Link to="/" className="hover:cursor-pointer hover:text-cyan-600  text-accent-cyan underline">Terms & Conditions</Link></label>
                         </div>
 
-                        <button className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-4" type="submit" onClick={onSignUpClick}>
+                        <button className="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-4" type="submit">
                             Sign Up
                             <span className="material-symbols-outlined text-xl" >arrow_forward</span>
                         </button>
