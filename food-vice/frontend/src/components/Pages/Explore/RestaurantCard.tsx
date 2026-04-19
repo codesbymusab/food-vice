@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router"
+
 export function RestaurantCard() {
+    const navigate= useNavigate()
     return (
-        <div className="group relative flex flex-col rounded-xl border border-primary/5 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden hover:shadow-xl transition-all">
+        <div className="group relative flex flex-col rounded-xl border border-primary/5 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden hover:shadow-xl transition-all" onClick={()=>navigate('/restaurant/1')}>
             <div
                 className="h-48 w-full bg-cover bg-center overflow-hidden"
                 data-alt="Close up of a gourmet juicy beef burger"

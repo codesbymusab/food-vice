@@ -8,7 +8,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
-import {CommunitiesPage} from "./components/Pages/Community/CommunitiesPage";
+import { CommunitiesPage } from "./components/Pages/Community/CommunitiesPage";
 import { ThreadDetailPage } from "./components/Pages/Community/Threads/ThreadDetailPage";
 import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
@@ -17,6 +17,9 @@ import ExplorePage from "./components/Pages/Explore/ExplorePage";
 import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
 import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
 import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
+import { PublicRoute } from "./components/PublicRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+
 function AnimatedRoutes() {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
@@ -24,9 +27,7 @@ function AnimatedRoutes() {
 
   useEffect(() => {
     if (location !== displayLocation) {
-      
       if (displayLocation.pathname === "/login" && location.pathname === "/signup") {
-
         setTransitionStage("slideOutLeft");
       } else if (displayLocation.pathname === "/signup" && location.pathname === "/login") {
         setTransitionStage("slideOutRight");
@@ -37,53 +38,63 @@ function AnimatedRoutes() {
   return (
     <div
       className={`page ${transitionStage}`}
-      onAnimationEnd={() => {
-
-        setDisplayLocation(location);
-
-
-      }}
-    > 
-    
-      <Routes>
-       
-        <Route index path="login" element={<SigninPage />} />
-        <Route path="signup" element={<SignupPage />} />
+      onAnimationEnd={() => setDisplayLocation(location)}
+    >
+      <Routes location={displayLocation}>
+        
+        <Route index element={<SigninPage />} />
+        <Route path="/login" element={<SigninPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+  
       </Routes>
     </div>
   );
 }
 
+function MainLayout() {
+  const location = useLocation();
+  return (
+    <>
+      <Header />
+      <Routes location={location}>
+        
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/explore/map" element={<ExploreMapView />} />
+        <Route path="/profile/:id" element={<UserProfilePage />} />
+        <Route path="/reels" element={<ReelsPage />} />
+        <Route path="/community" element={<CommunitiesPage />} />
+        <Route path="/community/:name" element={<CommunityDetailPage />} />
+        <Route path="/community/:name/:id" element={<ThreadDetailPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDeatilPage />} />
+        <Route path="/profile/:id/edit" element={<EditProfilePage />} />
+        <Route path="/community/create" element={<CreateCommunityPage />} />
+        <Route path="/community/:name/create" element={<CreateThreadPage />} />
 
+      </Routes>
+      <Footer />
+    </>
+
+  )
+}
 
 function App() {
 
   return (
-    <>
-      <AnimatedRoutes />
-      <Header />
+
+    <Routes >
 
       
-      <Routes>
 
-       
-        <Route path="home" element={<HomePage />}/>
-        <Route path="explore" element={<ExplorePage />} />
-        <Route path="explore/map" element={<ExploreMapView />} />
-        <Route path="profile/:id" element={<UserProfilePage />} />
-        <Route path="reels" element={<ReelsPage />} />
-        <Route path="community" element={<CommunitiesPage />} /> 
-        <Route path="community/:name" element={<CommunityDetailPage />} />
-        <Route path="community/:name/:id" element={<ThreadDetailPage/>} />
-        <Route path="restaurant/:id" element={<RestaurantDeatilPage />} />
-        <Route path="profile/:id/edit" element={<EditProfilePage/>}/>
-        <Route path="community/create" element={<CreateCommunityPage />} />
-        <Route path="community/:name/create" element={<CreateThreadPage />} />
-      </Routes>
-      <Footer />
-     
-    </>
-    
+      <Route element={<PublicRoute />}>
+        <Route path="/auth/*" element={<AnimatedRoutes />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/*" element={<MainLayout />} />
+      </Route>
+
+    </Routes>
 
   )
 }

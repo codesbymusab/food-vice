@@ -1,0 +1,91 @@
+src/
+│
+├── domain/                 # 🔴 CORE (pure logic)
+│   ├── entities/
+│   │   ├── User.js
+│   │   ├── Restaurant.js
+│   │   ├── Review.js
+│   │   └── Reel.js
+│   │
+│   ├── valueObjects/       # optional (Rating, Location etc.)
+│   │   ├── Rating.js
+│   │   └── Location.js
+│   │
+│   └── services/           # business logic
+│       ├── RecommendationService.js
+│       └── ReputationService.js
+│
+│
+├── application/            # 🟡 USE CASES
+│   ├── use-cases/
+│   │   ├── user/
+│   │   │   ├── RegisterUser.js
+│   │   │   ├── LoginUser.js
+│   │   │   └── FollowUser.js
+│   │   │
+│   │   ├── review/
+│   │   │   ├── CreateReview.js
+│   │   │   └── EditReview.js
+│   │   │
+│   │   ├── restaurant/
+│   │   │   └── GetNearbyRestaurants.js
+│   │   │
+│   │   └── reel/
+│   │       └── UploadReel.js
+│   │
+│   └── ports/              # 🟣 INTERFACES
+│       ├── repositories/
+│       │   ├── UserRepository.js
+│       │   ├── RestaurantRepository.js
+│       │   └── ReviewRepository.js
+│       │
+│       └── services/
+│           ├── AuthService.js
+│           └── NotificationService.js
+│
+│
+├── infrastructure/         # 🔵 ADAPTERS (external world)
+│   ├── database/
+│   │   ├── mongodb/
+│   │   │   ├── s/     # mongoose schemas
+│   │   │   │   ├── User.js
+│   │   │   │   ├── Review.js
+│   │   │   │   └── Restaurant.js
+│   │   │   │
+│   │   │   └── repositories/  # implementation of ports
+│   │   │       ├── UserRepoImpl.js
+│   │   │       ├── ReviewRepoImpl.js
+│   │   │       └── RestaurantRepoImpl.js
+│   │
+│   ├── services/           # external services
+│   │   ├── JwtService.js
+│   │   └── EmailService.js
+│   │
+│   └── config/
+│       └── db.js
+│
+│
+├── interfaces/             # 🟢 DELIVERY LAYER
+│   ├── controllers/
+│   │   ├── UserController.js
+│   │   ├── ReviewController.js
+│   │   └── RestaurantController.js
+│   │
+│   ├── routes/
+│   │   ├── userRoutes.js
+│   │   ├── reviewRoutes.js
+│   │   └── restaurantRoutes.js
+│   │
+│   └── middlewares/
+│       ├── authMiddleware.js
+│       └── errorHandler.js
+│
+│
+├── shared/                 # ⚪ COMMON UTILS
+│   ├── utils/
+│   ├── constants/
+│   └── errors/
+│
+│
+├── app.js                  # express app
+└── server.js               # entry point

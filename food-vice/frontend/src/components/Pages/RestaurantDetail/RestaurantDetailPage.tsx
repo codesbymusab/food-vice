@@ -72,7 +72,8 @@ export function RestaurantDeatilPage() {
                             href="#">Reviews</a>
                         <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
                             href="#">Photos</a>
-
+                        <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
+                            href="#">Reels</a>
                     </div>
                 </div>
             </div>
