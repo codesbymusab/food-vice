@@ -10,11 +10,10 @@ import { UserProfilePage } from "./components/Pages/Profile/UserProfilePage";
 import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
 import { CommunitiesPage } from "./components/Pages/Community/CommunitiesPage";
 import { ThreadDetailPage } from "./components/Pages/Community/Threads/ThreadDetailPage";
-import { RestaurantDeatilPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
+import { RestaurantDetailPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
 import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
 import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunityPage";
 import ExplorePage from "./components/Pages/Explore/ExplorePage";
-import ExploreMapView from "./components/Pages/Explore/ExploreMapView";
 import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
 import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
 import { PublicRoute } from "./components/PublicRoute";
@@ -27,9 +26,9 @@ function AnimatedRoutes() {
 
   useEffect(() => {
     if (location !== displayLocation) {
-      if (displayLocation.pathname === "/login" && location.pathname === "/signup") {
+      if (displayLocation.pathname === "/auth/login" && location.pathname === "/auth/signup") {
         setTransitionStage("slideOutLeft");
-      } else if (displayLocation.pathname === "/signup" && location.pathname === "/login") {
+      } else if (displayLocation.pathname === "/auth/signup" && location.pathname === "/auth/login") {
         setTransitionStage("slideOutRight");
       }
     }
@@ -60,13 +59,12 @@ function MainLayout() {
         
         <Route path="/home" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/explore/map" element={<ExploreMapView />} />
         <Route path="/profile/:id" element={<UserProfilePage />} />
         <Route path="/reels" element={<ReelsPage />} />
         <Route path="/community" element={<CommunitiesPage />} />
         <Route path="/community/:name" element={<CommunityDetailPage />} />
         <Route path="/community/:name/:id" element={<ThreadDetailPage />} />
-        <Route path="/restaurant/:id" element={<RestaurantDeatilPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} />
         <Route path="/profile/:id/edit" element={<EditProfilePage />} />
         <Route path="/community/create" element={<CreateCommunityPage />} />
         <Route path="/community/:name/create" element={<CreateThreadPage />} />

@@ -3,13 +3,16 @@ import { ReelCard } from "../Home/Cards/ReelCard";
 import { AchievementBadge, AchievementBadgeAlt } from "./AchievementBadge";
 import { PostedReview } from "./PostedReview";
 import { SavedRestaurant } from "./SavedRestaurant";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { useAuth } from "../../../context/AuthContext";
 
 export function UserProfilePage() {
 
     const navigate=useNavigate()
     const [selectedTab, setSelectedTab] = useState<string>('restaurants')
-
+    const {user}=useAuth()
+    const params=useParams()
+    
     function changeTab(tab: string): void {
         setSelectedTab(tab)
     }
@@ -25,7 +28,7 @@ export function UserProfilePage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                         <div className="relative size-32 md:size-40 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
-                            <img className="w-full h-full object-cover" data-alt="High resolution portrait of Alex Rivera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4cl4m11HMIS8aHWn5BWCaIftOiUW2UbJQM_cMqdtb02Oh4G9hk-uyIziNUlBS92JInrrBd7ydsxcrgI-RvGIZh6f4bsK85wPi07-2yMqf7KbkiPqhzsMDPoptYYZUfhHZAy7H6dm9psx9mw9UNLIzhKTdCp0eTqKF9xTUowbwVpGC4bbs83owtnlhoWC6fj_YCDyCLe7BkK9ZGIqh2WSJ0PB_GLj-7B6JUMM0g7s0lAiliOtD4869BhJoSlNPNGkH54XC_eib6xk" />
+                            <img className="w-full h-full object-cover"  src={user?.profilePhoto} />
                         </div>
                         <div className="absolute bottom-2 right-2 bg-accent text-white p-1.5 rounded-full border-4 border-white dark:border-slate-800 shadow-lg">
                             <span className="material-symbols-outlined text-sm block">verified</span>
@@ -34,18 +37,23 @@ export function UserProfilePage() {
 
                     <div className="flex-1 text-center md:text-left space-y-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Alex Rivera</h1>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{user?.name}</h1>
                             <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
-                                <span className="material-symbols-outlined text-sm">location_on</span> San Francisco, CA • Food Enthusiast since 2021
+                                <span className="material-symbols-outlined text-sm">location_on</span> {user?.address}
                             </p>
                         </div>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-4"><button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
+                        <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                            
+                        { params.id===user?.userId ? (<button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
                             <span className="material-symbols-outlined text-sm">person_add</span> Follow
+                        
                         </button>
-                            <button className="shadow-xl shadow-orange-500/5 inline-flex items-center gap-2 px-5 py-2 border border-slate-300 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" onClick={()=>editProfile()}>
+                        )
+                        :
+                        (<button className="shadow-xl shadow-orange-500/5 inline-flex items-center gap-2 px-5 py-2 border border-slate-300 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" onClick={()=>editProfile()}>
                                 <span className="material-symbols-outlined text-sm">edit</span> Edit Profile
                             </button>
-                            
+                        )} 
                         </div>
                     </div>
 
@@ -71,7 +79,7 @@ export function UserProfilePage() {
                         </div>
                         <div className="text-right">
                             <span className="inline-flex items-center gap-1 bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold">
-                                <span className="material-symbols-outlined text-xs">auto_awesome</span> EXPERT LEVEL
+                                <span className="material-symbols-outlined text-xs">auto_awesome</span> LEVEL {user?.level}
                             </span>
                         </div>
                     </div>

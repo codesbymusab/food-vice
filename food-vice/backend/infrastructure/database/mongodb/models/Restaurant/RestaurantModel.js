@@ -6,7 +6,7 @@ const RestaurantSchema = new mongoose.Schema({
   website: String,
   description: String,
   priceCategory: String,
-  locationId: { type: Schema.Types.ObjectId, ref: 'Location' }
+  locationId: { type:mongoose.Schema.Types.ObjectId, ref: 'Location' }
 });
 
 module.exports = mongoose.model('Restaurant', RestaurantSchema);

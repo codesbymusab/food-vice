@@ -7,7 +7,8 @@ export function Header() {
 
     const [showNotif, setShowNotif] = useState<boolean>(false)
     const navigate=useNavigate()
-    const {setUser}=useAuth()
+    const {user,setUser}=useAuth()
+
     async function onSignOutClick() {
         
         try {
@@ -27,8 +28,8 @@ export function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2 shadow-lg shadow-primary/20">
-            <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2 shadow-sm shadow-primary/20">
+            <div className="relative  flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-8">
                     <NavLink to="/home" >
                         <div className="flex items-center gap-2 text-primary">
@@ -37,7 +38,7 @@ export function Header() {
                         </div>
                     </NavLink>
 
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="flex items-center gap-6">
                         <NavLink className={({ isActive }) =>
                             `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
                         } to="/explore">
@@ -63,10 +64,11 @@ export function Header() {
                         <span className="material-symbols-outlined">notifications</span>
                         <span className="absolute top-3 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background-light"></span>
                     </button>
-                    <div className="h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
-                        <NavLink to="/profile/1">
+                    <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
+                        <NavLink to={`/profile/${user?.userId}`}>
 
-                            <img alt="Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgnm2tnCroCcH8dVdz_ddAmq6XVHiDf1KqLzc9Z2ydIEDw83rkwra5EBoN2607TpwytYDlY4DeOcekeU2sqer_l_ePRxDp3UHs41I-pC8B-uI15CfBI68xyGzV9MDgRuauLe4Byia9wuPQym_lS0bZZgzaBR5cvEbDDK5u4Kqtm_7ULLQHbM85NrLrDYFn6djnEZON5iv724PjlbGqplMK60LAnFL8LF_IgetW071ifVh9KxJH54gT5s6mmH8te-VcKVc-9jabLGY" />
+                            {user?.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={user?.profilePhoto}/> : <h3>{user?.name?.charAt(0)}</h3>}
+                            
 
                         </NavLink>
                     </div>

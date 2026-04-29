@@ -16,12 +16,12 @@ const MediaSchema = new mongoose.Schema({
   },
 
   ownerId: { 
-    type: Schema.Types.ObjectId, 
+    type:mongoose.Schema.Types.ObjectId, 
     required: true 
   },
 
   uploadedBy: { 
-    type: Schema.Types.ObjectId, 
+    type:mongoose.Schema.Types.ObjectId, 
     ref: 'User' 
   }
 

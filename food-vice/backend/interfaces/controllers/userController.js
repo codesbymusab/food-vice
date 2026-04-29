@@ -12,7 +12,7 @@ exports.getUser=async (req,res)=>{
         const user=await getUser.execute({userId:req.userId})
 
         if(user){
-            res.status(200).json(user);
+            res.status(200).json({user:user});
         }
 
         res.status(400).json({ message: 'User not logged in' });

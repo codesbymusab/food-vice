@@ -1,6 +1,6 @@
 export function FiltersSidebar() {
     return (
-        <aside className="hidden lg:flex w-72 flex-col border-r border-primary/10 bg-background-light dark:bg-background-dark p-6 gap-8 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
+        <aside className="hidden lg:flex w-72 flex-col border-r border-primary/10 bg-white dark:bg-background-dark p-6 gap-8 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-bold text-lg">Filters</h3>

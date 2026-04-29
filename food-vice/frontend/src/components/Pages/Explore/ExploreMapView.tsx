@@ -1,37 +1,81 @@
-import { Link } from 'react-router'
-import { FiltersSidebar } from './FiltersSidebar';
+import GoogleMapReact from "google-map-react";
+import { useNavigate } from "react-router";
+import type { TopRatedRestaurant } from "./RestaurantCard";
+import { useState } from "react";
 
-function ExploreMapView() {
+interface MarkerProps {
+  restaurant: TopRatedRestaurant;
+  lat: number;
+  lng: number;
+}
+
+export function Marker({ restaurant }: MarkerProps) {
+  const [showDetails, setShowDetails] = useState(false);
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className="absolute -translate-x-1/2 -translate-y-full cursor-pointer"
+      onClick={() => setShowDetails(!showDetails)}
+
+    >
+
+      <div className="relative flex flex-col items-center">
+        <span className={`absolute -top-4 ${showDetails ? 'left-20' : 'left-8'} w-20 text-blue-900 text-[0.8rem] font-extrabold`} onClick={() => setShowDetails(!showDetails)}
+        >{restaurant.name}</span>
+
+        <div className="w-6 h-6 bg-primary rounded-full shadow-md border border-white"></div>
+        <div className="w-0 h-0 border-l-3 border-r-3 border-t-6 border-transparent border-t-primary mx-auto"></div>
+      </div>
+
+      {showDetails && (
+        <div
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-24 rounded-full border border-primary/10 bg-white dark:bg-slate-800 shadow-lg p-3"
+          onMouseLeave={() => setShowDetails(!showDetails)}
+          onClick={() => navigate(`/restaurant/${restaurant._id}`)}
+        >
+          <div
+            className="h-20 bg-cover mb-2 rounded-full"
+            style={{ backgroundImage: `url(${restaurant.media?.url})` }}
+          />
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-slate-400">{restaurant.priceCategory}</span>
+          </div>
+          <p className="text-xs text-slate-500 truncate mb-1">{restaurant.cuisines}</p>
+          <div className="flex-col justify-between text-xs text-slate-600 dark:text-slate-400">
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm text-accent">location_pin</span>
+              {restaurant.distKm.toFixed(1)} Km
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm text-accent">schedule</span>
+              {restaurant.isOpen ? "Open Now" : `Opens ${restaurant.openingTime}`}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants: TopRatedRestaurant[], location: [number, number] }) {
   return (
 
-    <main className="flex flex-1">
-      
-      <FiltersSidebar />
+    <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-3xl flex items-center justify-center">
+      <GoogleMapReact
+        bootstrapURLKeys={{ key: "AIzaSyBfVwHE1g9wDMtM_1n8aus-TyX_Y5fnfwY" }}
+        defaultZoom={13}
+        defaultCenter={{ lat: location[0], lng: location[1] }}>
+        {
+          topRatedRestaurants.map((restaurant) => {
+            return <Marker key={restaurant._id} lat={restaurant.latitude} lng={restaurant.longitude} restaurant={restaurant} />
+          })
+        }
 
-      <section className="flex-1 flex flex-col p-6 lg:p-10 gap-8 overflow-y-auto max-w-[1200px] mx-auto w-full">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Discover Delicious on Map</h1>
-            <p className="text-slate-500 font-medium">Top picks for your cravings in Downtown Area</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/explore" className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
-              <span className="material-symbols-outlined text-xl">list</span>
-              <span>View List</span>
-            </Link>
-          </div>
-        </div>
+      </GoogleMapReact>
+    </div>
 
-        {/* Map Placeholder */}
-        <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <span className="material-symbols-outlined text-6xl text-slate-400">map</span>
-            <p className="text-slate-500 mt-4">Interactive Map View</p>
-            <p className="text-sm text-slate-400">Map integration would go here (e.g., Google Maps, Mapbox)</p>
-          </div>
-        </div>
-      </section>
-    </main>
+
 
   )
 }

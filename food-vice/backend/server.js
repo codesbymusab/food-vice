@@ -4,8 +4,10 @@ const cors = require('cors')
 const mongodbConfig = require('./infrastructure/database/mongodb/config/db')
 const authRoute = require('./interfaces/routes/authRoute')
 const userRoute = require('./interfaces/routes/userRoute')
+const restRoute = require('./interfaces/routes/restaurantRoute')
 const { verifyAuth } = require('./interfaces/middlewares/authMiddleware')
 const cookieParser = require('cookie-parser');
+
 
 dotenv.config()
 
@@ -25,3 +27,4 @@ mongodbConfig.connectDB()
 
 app.use('/auth', authRoute)
 app.use('/user', userRoute)
+app.use('/restaurant', restRoute)

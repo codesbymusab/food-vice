@@ -1,8 +1,8 @@
 const mongoose=require('mongoose')
 
 const ThreadCommentSchema = new mongoose.Schema({
-  uid: { type: Schema.Types.ObjectId, ref: 'User' },
-  threadId: { type: Schema.Types.ObjectId, ref: 'Thread' },
+  uid: { type:mongoose.Schema.Types.ObjectId, ref: 'User' },
+  threadId: { type:mongoose.Schema.Types.ObjectId, ref: 'Thread' },
   content: String
 }, { timestamps: true });
 
