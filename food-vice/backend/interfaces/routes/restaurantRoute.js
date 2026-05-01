@@ -7,5 +7,6 @@ router.get('/toprated',restCntrl.topRatedRest)
 router.get('/nearby',restCntrl.nearbyRest)
 router.get('/details/:id',restCntrl.restDetails)
 router.get('/similar/:id',restCntrl.similarRest)
+router.get('/cuisines/',restCntrl.restCuisines)
 
 module.exports=router

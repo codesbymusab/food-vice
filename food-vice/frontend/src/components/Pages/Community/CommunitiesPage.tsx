@@ -12,7 +12,7 @@ export function CommunitiesPage() {
         <main className="flex-1 px-4 md:px-10 py-8 max-w-7xl mx-auto">
             <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                <aside className="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
+                <aside className="w-full lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
 
 
                     <button

@@ -336,8 +336,8 @@ export function RestaurantDetailPage() {
 
 
                                         </div>
-                                            :
-                                            <div className="mt-24 flex text-xl justify-center items-center text-slate-600 font-bold">
+                                        :
+                                            !restaurantDetails.userReview && <div className="mt-24 flex text-xl justify-center items-center text-slate-600 font-bold">
                                                 Be the first to review this restaurant
                                             </div>
                                         }

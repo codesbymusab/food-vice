@@ -3,14 +3,31 @@ import { FiltersSidebar } from './FiltersSidebar';
 import { useEffect, useState } from 'react';
 import ExploreMapView from './ExploreMapView';
 
+export type Cuisine = {
+  _id: string,
+  name: string
 
-
+}
+export type Filter = {
+  cuisine?: string,
+  price?: string,
+  rating?: number,
+  distance?: number
+}
 function ExplorePage() {
 
   const [topRatedRestaurants, setTopRatedRestaurants] = useState<TopRatedRestaurant[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true)
-  const [location, setLocation] = useState<[number, number] | undefined>(undefined);
+  const [location, setLocation] = useState<[number, number] | null>(null);
   const [mapView, setMapView] = useState<boolean>(false)
+  const [cuisines, setCuisines] = useState<Cuisine[] | null>(null)
+  const [filters, setFilters] = useState<Filter>({
+    cuisine: 'All',
+    price: "",
+    rating: 0,
+    distance: 50,
+
+  })
 
   function fetchLocation() {
     if (!navigator.geolocation) {
@@ -31,21 +48,39 @@ function ExplorePage() {
     );
   }
 
-  async function fetchTopRatedRestaurants(location: [number, number] | undefined) {
+  async function fetchTopRatedRestaurants(location: [number, number] | null) {
     try {
       const res = await fetch(
-        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}`,
+        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}`,
         { credentials: "include" }
       );
       if (res.ok) {
         const { details } = await res.json();
         setTopRatedRestaurants(details);
-        console.log(details)
+
       }
     } catch (error) {
       console.error(error);
     }
   }
+
+
+  async function fetchCuisines() {
+    try {
+      const res = await fetch(
+        'http://localhost:3000/restaurant/cuisines',
+        { credentials: "include" }
+      );
+      if (res.ok) {
+        const cus = await res.json();
+        setCuisines(cus.result);
+
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   useEffect(() => {
     fetchLocation();
@@ -60,6 +95,19 @@ function ExplorePage() {
 
   }, [loading]);
 
+  useEffect(() => {
+
+    fetchCuisines()
+
+
+  }, []);
+
+
+  async function applyFilters(){
+    await fetchTopRatedRestaurants(location)
+  }
+
+  
 
   if (!topRatedRestaurants) {
     return (
@@ -73,7 +121,7 @@ function ExplorePage() {
 
       <main className="flex flex-1">
 
-        <FiltersSidebar />
+        <FiltersSidebar cuisines={cuisines} filters={filters} setFilters={setFilters} applyFilters={applyFilters} />
 
 
         <section className="flex-1 flex flex-col p-4 gap-8 overflow-y-auto max-w-[1200px] mx-auto w-full">
@@ -139,7 +187,7 @@ function ExplorePage() {
             </>
             :
 
-            <ExploreMapView topRatedRestaurants={topRatedRestaurants} location={location}/>
+            <ExploreMapView topRatedRestaurants={topRatedRestaurants} location={location} />
           }
         </section>
 

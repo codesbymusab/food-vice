@@ -28,41 +28,41 @@ export function RatingSummaryCard({ rating }: { rating: Rating }) {
                 <div>
                     <div className="flex justify-between text-sm font-bold mb-1">
                         <span>Food</span>
-                        <span className="text-primary">{rating.foodRating}</span>
+                        <span className="text-primary">{rating.foodRating.toFixed(1)}</span>
                     </div>
                     <div
                         className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary" style={{ width: `${(rating.foodRating * 10).toFixed(0)}%` }}></div>
+                        <div className="h-full bg-primary" style={{ width: `${(rating.foodRating * 10)}%` }}></div>
                     </div>
                 </div>
                 <div>
                     <div className="flex justify-between text-sm font-bold mb-1">
                         <span>Service</span>
-                        <span className="text-primary">{rating.serviceRating}</span>
+                        <span className="text-primary">{rating.serviceRating.toFixed(1)}</span>
                     </div>
                     <div
                         className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary" style={{ width: `${(rating.serviceRating * 10).toFixed(0)}%` }}></div>
+                        <div className="h-full bg-primary" style={{ width: `${(rating.serviceRating * 10)}%` }}></div>
                     </div>
                 </div>
                 <div>
                     <div className="flex justify-between text-sm font-bold mb-1">
                         <span>Ambiance</span>
-                        <span className="text-primary">{rating.ambienceRating}</span>
+                        <span className="text-primary">{rating.ambienceRating.toFixed(1)}</span>
                     </div>
                     <div
                         className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary" style={{ width: `${(rating.ambienceRating * 10).toFixed(0)}%` }}></div>
+                        <div className="h-full bg-primary" style={{ width: `${(rating.ambienceRating * 10)}%` }}></div>
                     </div>
                 </div>
                 <div>
                     <div className="flex justify-between text-sm font-bold mb-1">
                         <span>Value</span>
-                        <span className="text-primary">{rating.valueRating}</span>
+                        <span className="text-primary">{rating.valueRating.toFixed(1)}</span>
                     </div>
                     <div
                         className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary" style={{ width: `${(rating.valueRating * 10).toFixed(0)}%` }}></div>
+                        <div className="h-full bg-primary" style={{ width: `${(rating.valueRating * 10)}%` }}></div>
                     </div>
                 </div>
             </div>

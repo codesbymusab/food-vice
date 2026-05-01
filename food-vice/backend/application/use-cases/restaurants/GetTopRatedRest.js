@@ -17,9 +17,7 @@ class GetTopRatedyRestaurants {
         }
 
 
-
-
-        const result = await this.restaurantRepo.getTopRated(data.location)
+        const result = await this.restaurantRepo.getTopRated(data.location,data.filters)
 
         if (result) {
 

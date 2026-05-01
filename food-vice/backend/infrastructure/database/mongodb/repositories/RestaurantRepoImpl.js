@@ -4,7 +4,8 @@ const OpeningHours = require('../models/Restaurant/OpeningHoursModel')
 const RestaurantCuisines = require('../models/Restaurant/RestaurantCuisineModel')
 const RestaurantLabels = require('../models/Restaurant/RestaurantLabelModel')
 const mongoose = require('mongoose')
-
+const RestaurantCuisineModel = require('../models/Restaurant/RestaurantCuisineModel')
+const CusineModel = require('../models/Restaurant/CusineModel')
 class RestaurantRepoImpl {
 
     async getRecommended(location, filters) {
@@ -12,23 +13,16 @@ class RestaurantRepoImpl {
     }
 
     async getTopRated(location, filters) {
-
         return await Location.aggregate([
-
             {
                 $geoNear: {
-                    near: {
-                        type: "Point",
-                        coordinates: location
-                    },
-
+                    near: { type: "Point", coordinates: location },
                     distanceField: "distKm",
                     spherical: true,
                     distanceMultiplier: 0.001,
-                    maxDistance: 12000
+                    maxDistance: filters.distance * 1000
                 }
             },
-
             {
                 $lookup: {
                     from: "restaurants",
@@ -37,10 +31,7 @@ class RestaurantRepoImpl {
                     as: "restaurant"
                 }
             },
-            {
-                $unwind: "$restaurant"
-            },
-
+            { $unwind: "$restaurant" },
             {
                 $lookup: {
                     from: "reviews",
@@ -49,9 +40,7 @@ class RestaurantRepoImpl {
                     as: "reviews"
                 }
             },
-            {
-                $unwind: "$reviews"
-            },
+            { $unwind: "$reviews" },
             {
                 $lookup: {
                     from: "ratings",
@@ -60,11 +49,7 @@ class RestaurantRepoImpl {
                     as: "ratingDocs"
                 }
             },
-            {
-                $unwind: "$ratingDocs"
-            },
-
-
+            { $unwind: "$ratingDocs" },
             {
                 $lookup: {
                     from: "restaurantcuisines",
@@ -73,9 +58,7 @@ class RestaurantRepoImpl {
                     as: "rc"
                 }
             },
-            {
-                $unwind: "$rc"
-            },
+            { $unwind: "$rc" },
             {
                 $lookup: {
                     from: "cuisines",
@@ -84,9 +67,7 @@ class RestaurantRepoImpl {
                     as: "cuisine"
                 }
             },
-            {
-                $unwind: "$cuisine"
-            },
+            { $unwind: "$cuisine" },
             {
                 $lookup: {
                     from: "openinghours",
@@ -95,45 +76,40 @@ class RestaurantRepoImpl {
                     as: "oh"
                 }
             },
-
-
             {
                 $group: {
                     _id: "$restaurant._id",
-                    name: {
-                        $first: "$restaurant.name"
-                    },
-                    distKm: {
-                        $first: "$distKm"
-                    },
+                    name: { $first: "$restaurant.name" },
+                    distKm: { $first: "$distKm" },
                     avgOverall: { $avg: "$ratingDocs.overall" },
-                    cuisines: {
-                        $addToSet: "$cuisine.name"
-                    },
-                    priceCategory: {
-                        $first: "$restaurant.priceCategory"
-                    },
-                    openingHours: {
-                        $first: "$oh"
-                    }, latitude: {
-                        $first: "$latitude"
-                    },
-                    longitude: {
-                        $first: "$longitude"
-                    }
+                    cuisines: { $addToSet: "$cuisine.name" },
+                    priceCategory: { $first: "$restaurant.priceCategory" },
+                    openingHours: { $first: "$oh" },
+                    latitude: { $first: "$latitude" },
+                    longitude: { $first: "$longitude" }
                 }
             },
-
+            
             {
-                $sort: {
-                    avgOverall: -1
+                $match: {
+                    ...(filters.cuisine && filters.cuisine !== "All"
+                        ? { cuisines: filters.cuisine }
+                        : {}),
+                    ...(filters.price
+                        ? { priceCategory: filters.price }
+                        : {}),
+                    ...(filters.rating && filters.rating > 0
+                        ? { avgOverall: { $gte: filters.rating } }
+                        : {})
                 }
             },
-            {
-                $limit: 10
-            }
-        ]).exec()
+            { $sort: { avgOverall: -1 } },
+            { $limit: 10 }
+        ]).exec();
     }
+
+
+
 
     async getNearby(location, filters) {
         throw new Error('Not Implemented')
@@ -173,22 +149,28 @@ class RestaurantRepoImpl {
 
     }
 
-    async getCuisines(id) {
+    async getCuisines(restId) {
 
-        return await RestaurantCuisines.aggregate([
-            { "$match": { "restaurantId": new mongoose.Types.ObjectId(id) } },
-            {
-                "$lookup": {
-                    "from": "cuisines",
-                    "localField": "cuisineId",
-                    "foreignField": "_id",
-                    "as": "cuisine"
-                }
-            },
-            { "$unwind": "$cuisine" },
-            { "$project": { "_id": 0, "cuisine._id": 1, "cuisine.name": 1 } }
-        ]
-        ).exec()
+        if (restId) {
+            return await RestaurantCuisines.aggregate([
+                { "$match": { "restaurantId": new mongoose.Types.ObjectId(restId) } },
+                {
+                    "$lookup": {
+                        "from": "cuisines",
+                        "localField": "cuisineId",
+                        "foreignField": "_id",
+                        "as": "cuisine"
+                    }
+                },
+                { "$unwind": "$cuisine" },
+                { "$project": { "_id": 0, "cuisine._id": 1, "cuisine.name": 1 } }
+            ]
+            ).exec()
+        }
+        else {
+
+            return CusineModel.find()
+        }
 
     }
 
@@ -209,7 +191,7 @@ class RestaurantRepoImpl {
         ).exec()
     }
 
-   
+
 
     async getSimilarRestaurants(id) {
 
@@ -236,7 +218,7 @@ class RestaurantRepoImpl {
                                 $expr: {
                                     $and: [
                                         { $in: ["$cuisineId", "$$cuisineIds"] },
-                                        { $ne: ["$restaurantId",new mongoose.Types.ObjectId(id)] }
+                                        { $ne: ["$restaurantId", new mongoose.Types.ObjectId(id)] }
                                     ]
                                 }
                             }

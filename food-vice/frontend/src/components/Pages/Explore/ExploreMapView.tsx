@@ -30,7 +30,7 @@ export function Marker({ restaurant }: MarkerProps) {
 
       {showDetails && (
         <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-24 rounded-full border border-primary/10 bg-white dark:bg-slate-800 shadow-lg p-3"
+          className="z-50 absolute -top-32 left-1/2 -translate-x-1/2 w-24 rounded-full border border-primary/10 bg-white dark:bg-slate-800 shadow-lg p-3"
           onMouseLeave={() => setShowDetails(!showDetails)}
           onClick={() => navigate(`/restaurant/${restaurant._id}`)}
         >
@@ -58,12 +58,12 @@ export function Marker({ restaurant }: MarkerProps) {
   );
 }
 
-function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants: TopRatedRestaurant[], location: [number, number] }) {
+function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants: TopRatedRestaurant[], location: [number, number]|null }) {
   return (
 
     <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-3xl flex items-center justify-center">
-      <GoogleMapReact
-        bootstrapURLKeys={{ key: "AIzaSyBfVwHE1g9wDMtM_1n8aus-TyX_Y5fnfwY" }}
+      { location ? <GoogleMapReact
+        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY}}
         defaultZoom={13}
         defaultCenter={{ lat: location[0], lng: location[1] }}>
         {
@@ -73,6 +73,9 @@ function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants
         }
 
       </GoogleMapReact>
+      :
+      <h3 className="text-3xl font-bold">Location not Supported</h3>
+}
     </div>
 
 

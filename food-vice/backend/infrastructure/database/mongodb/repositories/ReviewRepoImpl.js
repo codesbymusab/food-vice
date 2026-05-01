@@ -50,10 +50,11 @@ class ReviewRepoImpl {
         ).exec()
     }
 
-    async getReviews({ restId, userId, limitCount = 5 }) {
+    async getReviews({ restId, userId, limitCount = 5,currentUser=false }) {
         const matchStage = {};
         if (restId) matchStage.restaurantId = new mongoose.Types.ObjectId(restId);
-        if (userId && limitCount===1) matchStage.uid = new mongoose.Types.ObjectId(userId);
+        if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
+        if(userId && !currentUser) matchStage.uid = { $ne: new mongoose.Types.ObjectId(userId) };
 
         return await RestaurantReviews.aggregate([
             { $match: matchStage },

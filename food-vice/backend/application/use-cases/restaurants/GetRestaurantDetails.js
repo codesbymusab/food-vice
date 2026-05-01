@@ -44,23 +44,20 @@ class GetRestaurantDetails {
             labels,
             rating,
             recentReviews,
-            
+            userReview
 
         ] = await Promise.all([
-            this.restaurantRepo.getCuisines(restaurant.id),
+            this.restaurantRepo.getCuisines(restaurant._id),
             this.restaurantRepo.getLocation(restaurant.locationId, currentLocation),
             this.mediaRepo.getByOwnerId(restaurant._id),
             this.restaurantRepo.getOpeningHours(restaurant._id),
             this.restaurantRepo.getLabels(restaurant._id),
             this.reviewRepo.getRestaurantRating(restaurant._id),
             this.reviewRepo.getReviews({restId:restaurant._id,userId:userId}),
-            
+            this.reviewRepo.getReviews({restId:restaurant._id,userId:userId,limitCount:1,currentUser:true})
         ]);
 
-        if(userId){
-            const review=await this.reviewRepo.getReviews({userId:userId,restId:restaurant._id,limitCount:1})
-            if (review[0]) result.userReview=review[0]
-        }
+        
         if (cuisines) result.cuisines = cuisines;
         if (location[0]) result.location = location[0];
         if (media) result.media = media;
@@ -88,7 +85,9 @@ class GetRestaurantDetails {
             result.recentReviews = withCounts;
         }
 
-       
+       if(userReview[0]){
+            result.userReview=userReview[0]
+       }
         result.isOpen = isRestaurantOpen(result.openingHours);
         const time = openingTime(result.openingHours);
         if (time) result.openingTime = time;

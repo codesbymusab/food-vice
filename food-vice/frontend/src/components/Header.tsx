@@ -67,7 +67,7 @@ export function Header() {
                     <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
                         <NavLink to={`/profile/${user?.userId}`}>
 
-                            {user?.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={user?.profilePhoto}/> : <h3>{user?.name?.charAt(0)}</h3>}
+                            {user?.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={user?.profilePhoto}/> : user?.name?.charAt(0)}
                             
 
                         </NavLink>
