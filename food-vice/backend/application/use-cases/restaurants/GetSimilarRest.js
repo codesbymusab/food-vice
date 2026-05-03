@@ -25,7 +25,7 @@ class GetSimilarRestaurants {
                 for (let i = 0; i < restaurants.topSimilarRestaurants.length; i++) {
 
                     const location = await this.restaurantRepo.getLocation(restaurants.topSimilarRestaurants[i].restaurant.locationId, data.location)
-                    const media=await this.mediaRepo.getByOwnerId(restaurants.topSimilarRestaurants[i].restaurant._id)
+                    const media=await this.mediaRepo.getByOwnerId({ownerId:restaurants.topSimilarRestaurants[i].restaurant._id})
         
                     if(media){
                         restaurants.topSimilarRestaurants[i]['media']=media

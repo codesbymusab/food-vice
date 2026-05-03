@@ -6,13 +6,151 @@ const RestaurantLabels = require('../models/Restaurant/RestaurantLabelModel')
 const mongoose = require('mongoose')
 const RestaurantCuisineModel = require('../models/Restaurant/RestaurantCuisineModel')
 const CusineModel = require('../models/Restaurant/CusineModel')
+const SavedRestaurant = require('../models/Saves/SavedRestaurantModel')
+
 class RestaurantRepoImpl {
 
-    async getRecommended(location, filters) {
-        throw new Error('Not Implemented')
+    async getRecommended(location, filters, userId, limitCount = 5) {
+        
+        const savedCuisineIds = await SavedRestaurant.aggregate([
+            { $match: { uid: new mongoose.Types.ObjectId(userId) } },
+            {
+                $lookup: {
+                    from: "restaurantcuisines",
+                    localField: "restaurantId",
+                    foreignField: "restaurantId",
+                    as: "rc"
+                }
+            },
+            { $unwind: "$rc" },
+            { $group: { _id: null, cuisineIds: { $addToSet: "$rc.cuisineId" } } }
+        ]);
+
+        const cuisineIds = savedCuisineIds[0]?.cuisineIds || [];
+
+        
+        return await Location.aggregate([
+            {
+                $geoNear: {
+                    near: { type: "Point", coordinates: location },
+                    distanceField: "distKm",
+                    spherical: true,
+                    distanceMultiplier: 0.001,
+                    maxDistance: filters.distance * 1000
+                }
+            },
+            {
+                $lookup: {
+                    from: "restaurants",
+                    localField: "_id",
+                    foreignField: "locationId",
+                    as: "restaurant"
+                }
+            },
+            { $unwind: "$restaurant" },
+            {
+                $lookup: {
+                    from: "restaurantcuisines",
+                    localField: "restaurant._id",
+                    foreignField: "restaurantId",
+                    as: "rc"
+                }
+            },
+            { $unwind: "$rc" },
+            {
+                $match: {
+                    "rc.cuisineId": { $in: cuisineIds }
+                }
+            },
+            {
+                $lookup: {
+                    from: "cuisines",
+                    localField: "rc.cuisineId",
+                    foreignField: "_id",
+                    as: "cuisine"
+                }
+            },
+            { $unwind: "$cuisine" },
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "restaurant._id",
+                    foreignField: "restaurantId",
+                    as: "reviews"
+                }
+            },
+            { $unwind: "$reviews" },
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "reviews._id",
+                    foreignField: "reviewId",
+                    as: "ratingDocs"
+                }
+            },
+            { $unwind: "$ratingDocs" },
+            {
+                $lookup: {
+                    from: "openinghours",
+                    localField: "restaurant._id",
+                    foreignField: "restaurantId",
+                    as: "oh"
+                }
+            },
+             {
+                $lookup: {
+                    from: "savedrestaurants",
+                    let: { restId: "$restaurant._id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$restaurantId", "$$restId"] },
+                                        { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "savedDocs"
+                }
+            },
+            {
+                $group: {
+                    _id: "$restaurant._id",
+                    name: { $first: "$restaurant.name" },
+                    distKm: { $first: "$distKm" },
+                    avgOverall: { $avg: "$ratingDocs.overall" },
+                    cuisines: { $addToSet: "$cuisine.name" },
+                    priceCategory: { $first: "$restaurant.priceCategory" },
+                    openingHours: { $first: "$oh" },
+                    latitude: { $first: "$latitude" },
+                    longitude: { $first: "$longitude" },
+                    savedDocs: { $first: "$savedDocs" }
+                    
+                }
+            },
+            {
+                $addFields: {
+                    isSaved: { $gt: [{ $size: "$savedDocs" }, 0] }
+                }
+            },
+            {
+                $match: {
+                    ...(filters.price ? { priceCategory: filters.price } : {}),
+                    ...(filters.rating && filters.rating > 0
+                        ? { avgOverall: { $gte: filters.rating } }
+                        : {})
+                }
+            },
+            { $sort: { avgOverall: -1 } },
+            { $limit: limitCount }
+        ]).exec();
     }
 
-    async getTopRated(location, filters) {
+
+    async getTopRated(location, filters, userId, limitCount = 5) {
         return await Location.aggregate([
             {
                 $geoNear: {
@@ -76,6 +214,26 @@ class RestaurantRepoImpl {
                     as: "oh"
                 }
             },
+
+            {
+                $lookup: {
+                    from: "savedrestaurants",
+                    let: { restId: "$restaurant._id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$restaurantId", "$$restId"] },
+                                        { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "savedDocs"
+                }
+            },
             {
                 $group: {
                     _id: "$restaurant._id",
@@ -86,25 +244,29 @@ class RestaurantRepoImpl {
                     priceCategory: { $first: "$restaurant.priceCategory" },
                     openingHours: { $first: "$oh" },
                     latitude: { $first: "$latitude" },
-                    longitude: { $first: "$longitude" }
+                    longitude: { $first: "$longitude" },
+                    savedDocs: { $first: "$savedDocs" }
                 }
             },
-            
+
+            {
+                $addFields: {
+                    isSaved: { $gt: [{ $size: "$savedDocs" }, 0] }
+                }
+            },
             {
                 $match: {
                     ...(filters.cuisine && filters.cuisine !== "All"
                         ? { cuisines: filters.cuisine }
                         : {}),
-                    ...(filters.price
-                        ? { priceCategory: filters.price }
-                        : {}),
+                    ...(filters.price ? { priceCategory: filters.price } : {}),
                     ...(filters.rating && filters.rating > 0
                         ? { avgOverall: { $gte: filters.rating } }
                         : {})
                 }
             },
             { $sort: { avgOverall: -1 } },
-            { $limit: 10 }
+            { $limit: limitCount }
         ]).exec();
     }
 

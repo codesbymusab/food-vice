@@ -1,4 +1,4 @@
-const SignupUser = require("../../application/use-cases/user/signupUser")
+const SignupUser = require("../../application/use-cases/user/SignupUser")
 const LoginUser = require("../../application/use-cases/user/loginUser")
 const GoogleSignIn = require("../../application/use-cases/user/GoogleSignIn")
 const UserRepoImpl = require("../../infrastructure/database/mongodb/repositories/UserRepoImpl")

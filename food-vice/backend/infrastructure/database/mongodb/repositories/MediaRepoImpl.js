@@ -1,13 +1,16 @@
 const Media = require('../models/MediaModel')
-class MediaRepoImpl {
-    async getByOwnerId(ownerId, all=false) {
+const mongoose = require('mongoose')
 
-        if (all) {
-            return await Media.find({ ownerId: ownerId })
-        }
-        else {
-            return await Media.findOne({ ownerId: ownerId })
-        }
+class MediaRepoImpl {
+    async getByOwnerId({ownerId, limitCount=1}) {
+
+        if(limitCount===1)
+        return await Media.findOne({ ownerId: ownerId })
+        
+        return await Media.aggregate([
+            {"$match": { "ownerId": new mongoose.Types.ObjectId(ownerId) }},
+            { $limit: limitCount },
+        ]).exec()
     }
 
 }

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { AddReviewForm } from "./AddReviewForm";
-import { RatingSummaryCard, type Rating } from "./RatingSummaryCard";
-import { ReviewTile, type Review } from "./ReviewTile";
-import { Link, useNavigate, useParams } from "react-router";
+import { type Rating } from "./RatingSummaryCard";
+import {useNavigate, useParams } from "react-router";
 import GoogleMapReact from "google-map-react";
 import { useAuth } from "../../../context/AuthContext";
+import { Overview } from "./Overview";
+import { Reviews } from "./Reviews";
+import { Photos } from "./Photos";
+import { Reels } from "./Reels";
+import type { Review } from "./ReviewTile";
 
 export type SimilarRestaurant = {
 
@@ -25,7 +28,7 @@ export type SimilarRestaurant = {
     }[]
 }
 
-type Restaurant = {
+export type Restaurant = {
     restaurant: {
         _id: string,
         name: string,
@@ -77,12 +80,11 @@ type Restaurant = {
     }[],
     rating?: Rating,
     reviewCount?: number,
-    recentReviews:
-    Review[],
-    userReview: Review
+    isSaved: boolean
 
 }
 
+type SelectedTab= 'Overview' |'Reviews' | 'Photos' | 'Reels'
 
 export const Marker = ({ text }: { lat: number; lng: number; text: string }) => (
     <div className="w-20 relative">
@@ -99,20 +101,18 @@ const d = new Date()
 export function RestaurantDetailPage() {
     const params = useParams();
     const [location, setLocation] = useState<[number, number] | undefined>(undefined);
-    const [showReviewForm, setShowReviewForm] = useState(false);
     const [restaurantDetails, setRestaurantDetails] = useState<Restaurant | null>(null);
     const [similarRestaurants, setSimilarRestaurants] = useState<SimilarRestaurant | null>(null);
+    const [recentReviews, setRecentReviews] = useState<Review[] | null>(null)
+    const [userReview, setUserReview] = useState<Review[] | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
+    const [selectedTab,setSelectedTab]=useState<SelectedTab>('Overview')
+
     const { user } = useAuth()
 
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (!showReviewForm) {
-            window.scrollTo(0, 0);
-        }
-    }, [showReviewForm]);
-
+   
     function fetchLocation() {
         if (!navigator.geolocation) {
             console.error("Geolocation not supported");
@@ -141,6 +141,8 @@ export function RestaurantDetailPage() {
             if (res.ok) {
                 const { details } = await res.json();
                 setRestaurantDetails(details);
+                if (details.recentReviews) setRecentReviews(details.recentReviews)
+                if (details.userReview) setUserReview([details.userReview])
                 console.log(details)
             }
         } catch (error) {
@@ -165,6 +167,39 @@ export function RestaurantDetailPage() {
         }
     }
 
+    async function saveRestaurant(userId: string, restId: string) {
+
+        try {
+            const res = await fetch("http://localhost:3000/save/restaurant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: userId, restId: restId }),
+                credentials: "include"
+            });
+
+            if (res.ok) {
+
+                setRestaurantDetails({
+                    ...restaurantDetails!,
+                    isSaved: !restaurantDetails!.isSaved
+                })
+
+            }
+            else {
+                throw new Error('Failed to save restaurant')
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return false
+
+        }
+
+    }
+
+
+
+
     useEffect(() => {
         fetchLocation();
     }, []);
@@ -174,6 +209,7 @@ export function RestaurantDetailPage() {
         if (!loading) {
             fetchRestaurant(location);
             fetchSimilarRestaurants(location)
+
         }
 
     }, [loading]);
@@ -230,8 +266,8 @@ export function RestaurantDetailPage() {
                         </div>
                         <div className="flex flex-wrap gap-3">
                             <button
-                                className="flex items-center gap-2 rounded-lg bg-white/10 backdrop-blur-md px-4 py-2 text-sm font-bold text-white border border-white/20 hover:bg-white/20 transition-all">
-                                <span className="material-symbols-outlined text-lg">bookmark</span> Save
+                                className={`flex items-center gap-2 rounded-lg ${restaurantDetails.isSaved ? 'text-primary bg-primary/10 border-white/20 hover:bg-white/20' : 'bg-white/10 text-white border-primary/20 hover:bg-primary/20'} backdrop-blur-md px-4 py-2 text-sm font-bold border transition-all`} onClick={async () => await saveRestaurant(user!.userId, restaurantDetails.restaurant._id)}>
+                                <span className="material-symbols-outlined text-lg">bookmark</span> {restaurantDetails.isSaved ? 'Saved' : 'Save'}
                             </button>
                             <button
                                 className="flex items-center gap-2 rounded-lg bg-white/10 backdrop-blur-md px-4 py-2 text-sm font-bold text-white border border-white/20 hover:bg-white/20 transition-all">
@@ -245,116 +281,30 @@ export function RestaurantDetailPage() {
             <div
                 className="sticky top-[65px] z-40 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
                 <div className="mx-auto max-w-7xl px-4 md:px-10">
-                    <div className="flex gap-8 overflow-x-auto no-scrollbar py-4">
-                        <a className="tab-active text-sm font-bold whitespace-nowrap" href="#">Overview</a>
-                        <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
-                            href="#">Reviews</a>
-                        <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
-                            href="#">Photos</a>
-                        <a className="text-slate-500 hover:text-primary text-sm font-medium whitespace-nowrap"
-                            href="#">Reels</a>
+                    <div className="flex gap-4 overflow-x-auto no-scrollbar py-4">
+                        <button className={` rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Overview' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Overview')}>Overview</button>
+                        <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Reviews' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Reviews')}>Reviews</button>
+                        <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Photos' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Photos')}>Photos</button>
+                        <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Reels' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Reels')}>Reels</button>
                     </div>
                 </div>
             </div>
 
             <div className="mx-auto max-w-7xl px-4 md:px-10 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <div className="lg:col-span-2 space-y-10 p-8 rounded-xl">
-
-                        <section>
-                            <h3 className="text-xl font-bold mb-4">About the Restaurant</h3>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-                                {restaurantDetails?.restaurant.description}
-                            </p>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-
-                                {restaurantDetails.labels?.map((e) => {
-                                    return (
-                                        <div
-                                            className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10" key={e.label._id}>
-                                            <span className="material-symbols-outlined text-primary">{e.label.symbol}</span>
-                                            <span className="text-sm font-medium">{e.label.name}</span>
-                                        </div>
-                                    )
-                                })}
-
-
-                            </div>
-                        </section>
-                        {restaurantDetails.rating &&
-                            <section
-                                className="p-6 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-
-                                <RatingSummaryCard rating={restaurantDetails.rating} />
-                            </section>
-                        }
-
-                        <section>
-
-                            {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} />
-
-                                : (
-
-
-                                    <>
-
-                                        {restaurantDetails.userReview &&
-                                            (
-                                                <div className="mb-6">
-                                                    <h3 className="text-xl font-bold mb-6">Your Review</h3>
-
-                                                    <div className="space-y-8 bg-white rounded-3xl p-4">
-                                                        {
-                                                           
-                                                            <ReviewTile key={restaurantDetails.userReview._id} review={restaurantDetails.userReview} />
-                                                            
-                                                        }
-
-
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                        <div className="flex items-center justify-between mb-6 ">
-                                            <h3 className="text-xl font-bold">Recent Reviews</h3>
-
-                                            {!restaurantDetails.userReview && (<button className="flex items-center justify-center gap-2 text-primary font-bold text-sm hover:scale-110" onClick={() => { setShowReviewForm((prev) => !prev) }}>
-                                                <span className="material-symbols-outlined text-lg">edit</span> <span className="hover:underline underline-offset-4">Write a Review</span>
-                                            </button>)
-
-                                            }
-                                        </div>
-
-
-                                        {restaurantDetails.recentReviews.length > 0 ? <div className="space-y-8 bg-white rounded-3xl p-4">
-                                            {
-                                                restaurantDetails.recentReviews.map((review) => {
-                                                    return <ReviewTile key={review._id} review={review} />
-                                                })
-                                            }
-
-
-                                        </div>
-                                        :
-                                            !restaurantDetails.userReview && <div className="mt-24 flex text-xl justify-center items-center text-slate-600 font-bold">
-                                                Be the first to review this restaurant
-                                            </div>
-                                        }
-                                    </>
-
-                                )
-                            }
-                        </section>
-                    </div>
-
+                    
+                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}/>}
+                    {selectedTab==='Reviews' && <Reviews userReview={userReview} setUserReview={setUserReview}/>}
+                    {selectedTab==='Photos' && <Photos/>}
+                    {selectedTab==='Reels' && <Reels/>}
+                    
                     <aside className="space-y-8">
 
                         {restaurantDetails.location && (<div
                             className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
                             <div className="h-48 w-full bg-slate-200 relative">
                                 <GoogleMapReact
-                                    bootstrapURLKeys={{ key: "AIzaSyBfVwHE1g9wDMtM_1n8aus-TyX_Y5fnfwY" }}
+                                    bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY as string }}
 
                                     center={{ lat: restaurantDetails.location?.latitude, lng: restaurantDetails.location?.longitude }}
                                     defaultZoom={17}

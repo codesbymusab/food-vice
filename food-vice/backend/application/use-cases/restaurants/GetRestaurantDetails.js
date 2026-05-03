@@ -3,10 +3,11 @@ const { openingTime } = require("../../../shared/utils/openingTime");
 
 
 class GetRestaurantDetails {
-    constructor(restaurantRepo, mediaRepo, reviewRepo) {
+    constructor(restaurantRepo, mediaRepo, reviewRepo,saveRepo) {
         this.restaurantRepo = restaurantRepo;
         this.mediaRepo = mediaRepo
         this.reviewRepo = reviewRepo
+        this.saveRepo=saveRepo
     }
 
     async execute(data) {
@@ -44,17 +45,20 @@ class GetRestaurantDetails {
             labels,
             rating,
             recentReviews,
-            userReview
+            userReview,
+            saveStatus
 
         ] = await Promise.all([
             this.restaurantRepo.getCuisines(restaurant._id),
             this.restaurantRepo.getLocation(restaurant.locationId, currentLocation),
-            this.mediaRepo.getByOwnerId(restaurant._id),
+            this.mediaRepo.getByOwnerId({ownerId:restaurant._id,limitCount:1}),
             this.restaurantRepo.getOpeningHours(restaurant._id),
             this.restaurantRepo.getLabels(restaurant._id),
             this.reviewRepo.getRestaurantRating(restaurant._id),
             this.reviewRepo.getReviews({restId:restaurant._id,userId:userId}),
-            this.reviewRepo.getReviews({restId:restaurant._id,userId:userId,limitCount:1,currentUser:true})
+            this.reviewRepo.getReviews({restId:restaurant._id,userId:userId,limitCount:1,currentUser:true}),
+            this.saveRepo.getByRestId({restId:restaurant._id,userId:data.userId})
+        
         ]);
 
         
@@ -67,7 +71,8 @@ class GetRestaurantDetails {
             result.rating = rating[0];
             result.reviewCount = rating[0].totalReviews;
         }
-
+   
+        
         if (recentReviews) {
             
             const withCounts = await Promise.all(
@@ -91,6 +96,15 @@ class GetRestaurantDetails {
         result.isOpen = isRestaurantOpen(result.openingHours);
         const time = openingTime(result.openingHours);
         if (time) result.openingTime = time;
+
+        console.log(saveStatus)
+
+        if (saveStatus) {
+            result.isSaved=true
+        }
+        else{
+            result.isSaved=false
+        }
 
         return result;
     }

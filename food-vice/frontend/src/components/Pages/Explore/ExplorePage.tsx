@@ -1,7 +1,8 @@
-import { RestaurantCard, type TopRatedRestaurant } from './RestaurantCard';
+import { RestaurantCard, type RecommendedRestaurant, type TopRatedRestaurant } from './RestaurantCard';
 import { FiltersSidebar } from './FiltersSidebar';
 import { useEffect, useState } from 'react';
 import ExploreMapView from './ExploreMapView';
+import { useAuth } from '../../../context/AuthContext';
 
 export type Cuisine = {
   _id: string,
@@ -16,7 +17,9 @@ export type Filter = {
 }
 function ExplorePage() {
 
+  const { user } = useAuth()
   const [topRatedRestaurants, setTopRatedRestaurants] = useState<TopRatedRestaurant[] | null>(null);
+  const [recommendedRestaurants, setRecommendedRestaurants] = useState<RecommendedRestaurant[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true)
   const [location, setLocation] = useState<[number, number] | null>(null);
   const [mapView, setMapView] = useState<boolean>(false)
@@ -51,7 +54,7 @@ function ExplorePage() {
   async function fetchTopRatedRestaurants(location: [number, number] | null) {
     try {
       const res = await fetch(
-        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}`,
+        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}&userId=${user?.userId}`,
         { credentials: "include" }
       );
       if (res.ok) {
@@ -64,6 +67,22 @@ function ExplorePage() {
     }
   }
 
+  async function fetchRecommendedRestaurants(location: [number, number] | null) {
+    try {
+      const res = await fetch(
+        `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}&userId=${user?.userId}`,
+        { credentials: "include" }
+      );
+      if (res.ok) {
+        const { details } = await res.json();
+        console.log(details)
+        setRecommendedRestaurants(details);
+
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async function fetchCuisines() {
     try {
@@ -75,6 +94,9 @@ function ExplorePage() {
         const cus = await res.json();
         setCuisines(cus.result);
 
+      }
+      else {
+        throw new Error('Failed to get cuisines')
       }
     } catch (error) {
       console.error(error);
@@ -91,6 +113,7 @@ function ExplorePage() {
     if (!loading) {
 
       fetchTopRatedRestaurants(location)
+      fetchRecommendedRestaurants(location)
     }
 
   }, [loading]);
@@ -103,11 +126,11 @@ function ExplorePage() {
   }, []);
 
 
-  async function applyFilters(){
+  async function applyFilters() {
     await fetchTopRatedRestaurants(location)
   }
 
-  
+
 
   if (!topRatedRestaurants) {
     return (
@@ -158,8 +181,8 @@ function ExplorePage() {
                 </div>
                 <div className="overflow-x-auto grid-rows-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {
-                    topRatedRestaurants.map((restaurant) => {
-                      return <RestaurantCard key={restaurant._id} restaurant={restaurant} />
+                    recommendedRestaurants && recommendedRestaurants.map((restaurant) => {
+                      return <RestaurantCard key={restaurant._id} restaurant={restaurant} setTopRatedRestaurants={setRecommendedRestaurants} />
                     })
                   }
 
@@ -177,10 +200,30 @@ function ExplorePage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 overflow-x-auto">
-                  {
-                    topRatedRestaurants.map((restaurant) => {
-                      return <RestaurantCard key={restaurant._id} restaurant={restaurant} />
-                    })
+                  { 
+                    recommendedRestaurants ?
+                    topRatedRestaurants
+                      .filter(
+                        top =>
+                          !recommendedRestaurants.some(
+                            rec => rec._id.toString() === top._id.toString()
+                          )
+                      )
+                      .map(restaurant => (
+                        <RestaurantCard
+                          key={restaurant._id}
+                          restaurant={restaurant}
+                          setTopRatedRestaurants={setTopRatedRestaurants}
+                        />
+                      ))
+                      :
+                      topRatedRestaurants.map(restaurant => (
+                        <RestaurantCard
+                          key={restaurant._id}
+                          restaurant={restaurant}
+                          setTopRatedRestaurants={setTopRatedRestaurants}
+                        />
+                      ))
                   }
                 </div>
               </div>

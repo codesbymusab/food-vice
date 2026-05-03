@@ -16,8 +16,11 @@ class GetTopRatedyRestaurants {
             throw new Error('Location is required')
         }
 
+        if(!data.userId){
+            throw new  Error('UserId is required')
+        }
 
-        const result = await this.restaurantRepo.getTopRated(data.location,data.filters)
+        const result = await this.restaurantRepo.getTopRated(data.location,data.filters,data.userId)
 
         if (result) {
 
@@ -26,7 +29,7 @@ class GetTopRatedyRestaurants {
             for (let i = 0; i < result.length; i++) {
 
 
-                const media = await this.mediaRepo.getByOwnerId(result[i]._id)
+                const media = await this.mediaRepo.getByOwnerId({ownerId:result[i]._id})
                 console.log(media)
                 if (media) {
                     result[i]['media'] = media

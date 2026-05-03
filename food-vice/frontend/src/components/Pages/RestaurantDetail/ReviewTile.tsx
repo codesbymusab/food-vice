@@ -1,3 +1,6 @@
+import type { Dispatch, SetStateAction } from "react"
+import { useAuth } from "../../../context/AuthContext"
+
 
 export type Review = {
     _id: string,
@@ -8,16 +11,62 @@ export type Review = {
         name: string,
         profilePhoto?: string,
         level: number,
-        reviewCount:number
+        reviewCount: number
     }
     photos: {
         _id: string,
         url: string
     }[],
-    isLikedByUser:boolean 
+    isLikedByUser: boolean,
+    likeCount: number,
+    overallRating: number
 
 }
-export function ReviewTile({ review }: { review: Review }) {
+export function ReviewTile({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
+
+    const { user } = useAuth()
+
+    async function toggleLikeReview(
+        userId: string,
+        reviewId: string,
+        currentLiked: boolean
+
+    ) {
+
+        setReviews(prev =>
+            prev
+                ? prev.map(r =>
+                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked,likeCount: currentLiked ? r.likeCount-1 : r.likeCount+1 } : r
+                )
+                : prev
+        );
+
+        try {
+            const res = await fetch("http://localhost:3000/like/review", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: userId, reviewId: reviewId }),
+                credentials: "include",
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to update like");
+            }
+
+            console.log(await res.json());
+        } catch (err) {
+            console.error(err);
+
+            setReviews(prev =>
+                prev
+                    ? prev.map(r =>
+                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount+1 : r.likeCount-1 } : r
+                    )
+                    : prev
+            );
+        }
+    }
+
     return (
         <div className="border-b-2 border-slate-200 dark:border-slate-800 pb-2 bg-white">
             <div className="flex items-center gap-4 mb-4">
@@ -32,11 +81,16 @@ export function ReviewTile({ review }: { review: Review }) {
                     <p className="text-xs text-slate-500"><span className="text-primary font-semibold">Level {review.user.level} Foodie</span> • {review.user.reviewCount} reviews</p>
                 </div>
                 <div className="ml-auto flex text-primary text-sm">
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
+
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <span
+                            key={i}
+                            className={`material-symbols-outlined ${i < Math.floor(review.overallRating) ? "fill-1 text-primary" : "text-gray-300"
+                                }`}
+                        >
+                            star
+                        </span>
+                        ))}
                 </div>
             </div>
             <p className="text-slate-600 dark:text-slate-400 mb-4">
@@ -46,7 +100,7 @@ export function ReviewTile({ review }: { review: Review }) {
                 {
                     review.photos.map((photo) => {
                         return (
-                            <img key={photo._id} className="mb-3 size-24 rounded-lg object-cover flex-shrink-0" 
+                            <img key={photo._id} className="mb-3 size-24 rounded-lg object-cover flex-shrink-0"
 
                                 src={photo.url} />
 
@@ -56,9 +110,11 @@ export function ReviewTile({ review }: { review: Review }) {
                 }
             </div>
             <div className="flex items-center gap-4 text-slate-400">
-                    <button className={`flex items-center gap-1 text-xs ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary' }  transition-colors`}><span className="material-symbols-outlined text-lg">thumb_up</span> 18</button>
-                    <button className="flex items-center gap-1 text-xs hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">chat_bubble</span> 2</button>
-                </div>
+                <button className={`flex items-center gap-1 text-lg ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
+                    onClick={async () => await toggleLikeReview(user!.userId, review._id, review.isLikedByUser)}
+                ><span className="material-symbols-outlined text-xl">thumb_up</span> {review.likeCount}</button>
+                {/* {<button className="flex items-center gap-1 text-xs hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">chat_bubble</span> 2</button>} */}
+            </div>
         </div>
     )
 }

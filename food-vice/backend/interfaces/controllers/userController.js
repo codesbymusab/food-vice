@@ -9,7 +9,7 @@ exports.getUser=async (req,res)=>{
      
         const userRepo = new UserRepoImpl()
         const getUser=new GetUser(userRepo)
-        const user=await getUser.execute({userId:req.userId})
+        const user=await getUser.execute({userId:req.body.userId})
 
         if(user){
             res.status(200).json({user:user});

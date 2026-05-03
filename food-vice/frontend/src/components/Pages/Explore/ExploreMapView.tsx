@@ -63,7 +63,7 @@ function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants
 
     <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-3xl flex items-center justify-center">
       { location ? <GoogleMapReact
-        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY}}
+        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY as string}}
         defaultZoom={13}
         defaultCenter={{ lat: location[0], lng: location[1] }}>
         {

@@ -50,16 +50,18 @@ class ReviewRepoImpl {
         ).exec()
     }
 
-    async getReviews({ restId, userId, limitCount = 5,currentUser=false }) {
+    async getReviews({ restId, userId, limitCount = 5, currentUser = false }) {
         const matchStage = {};
         if (restId) matchStage.restaurantId = new mongoose.Types.ObjectId(restId);
         if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
-        if(userId && !currentUser) matchStage.uid = { $ne: new mongoose.Types.ObjectId(userId) };
+        if (userId && !currentUser) matchStage.uid = { $ne: new mongoose.Types.ObjectId(userId) };
 
         return await RestaurantReviews.aggregate([
             { $match: matchStage },
             { $sort: { createdAt: -1 } },
             { $limit: limitCount },
+
+            
             {
                 $lookup: {
                     from: "users",
@@ -69,6 +71,8 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
+
+           
             {
                 $lookup: {
                     from: "media",
@@ -77,6 +81,7 @@ class ReviewRepoImpl {
                     as: "photos",
                 },
             },
+
            
             {
                 $lookup: {
@@ -102,6 +107,37 @@ class ReviewRepoImpl {
                     isLikedByUser: { $gt: [{ $size: "$likeStatus" }, 0] },
                 },
             },
+
+            
+            {
+                $lookup: {
+                    from: "reviewlikes",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "allLikes",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$allLikes" },
+                },
+            },
+
+            
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "ratingDocs",
+                },
+            },
+            {
+                $addFields: {
+                    overallRating: { $avg: "$ratingDocs.overall" },
+                },
+            },
+
             {
                 $project: {
                     _id: 1,
@@ -116,13 +152,17 @@ class ReviewRepoImpl {
                     "user.profilePhoto": 1,
                     "user.level": 1,
                     isLikedByUser: 1,
+                    likeCount: 1,
+                    overallRating: 1,
                 },
             },
         ]).exec();
     }
 
 
+    async createReview({ userId, restaurantId, text }) {
 
+    }
 
 }
 
