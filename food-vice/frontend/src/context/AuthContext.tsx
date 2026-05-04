@@ -45,6 +45,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
+
+    setLoading(true)
+
     try {
       const res = await fetch("http://localhost:3000/user/me", {
         credentials: "include",
@@ -55,7 +58,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await res.json();
-      console.log(data) 
+
       if(data.user){
         
         setUser(data.user as User);

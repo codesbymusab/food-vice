@@ -1,4 +1,5 @@
 const SaveRestaurant = require('../models/Saves/SavedRestaurantModel.js')
+const SaveReel = require('../models/Saves/SavedReelModel.js')
 
 const mongoose = require('mongoose')
 
@@ -28,6 +29,32 @@ class SaveRepoImpl {
             uid: userId
         })
     }
+
+
+    async saveReel({ userId, reelId }) {
+        return await SaveReel.create({
+            uid: userId,
+            reelId: reelId
+        });
+    }
+
+
+
+
+    async unsaveReel(id) {
+
+
+        return await SaveReel.findByIdAndDelete({ _id: id })
+
+    }
+
+    async getByReelId({ reelId, userId }) {
+
+        return await SaveReel.findOne({
+            reelId: reelId,
+            uid: userId
+        })
+    } 
 
 }
 

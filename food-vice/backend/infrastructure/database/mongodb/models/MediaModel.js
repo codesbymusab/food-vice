@@ -11,7 +11,7 @@ const MediaSchema = new mongoose.Schema({
 
   ownerType: { 
     type: String, 
-    enum: ['review', 'reel', 'thread', 'restaurant'], 
+    enum: ['review','user','reel', 'thread', 'restaurant'], 
     required: true 
   },
 

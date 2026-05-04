@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export function ProtectedRoute(){
   const { user, loading } = useAuth();
   const location = useLocation();
+  
   if (loading) return <div>Loading...</div>;
    
   if (!user) {

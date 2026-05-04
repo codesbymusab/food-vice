@@ -6,7 +6,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { Overview } from "./Overview";
 import { Reviews } from "./Reviews";
 import { Photos } from "./Photos";
-import { Reels } from "./Reels";
+import { Reels } from "./RestaurantReels";
 import type { Review } from "./ReviewTile";
 
 export type SimilarRestaurant = {

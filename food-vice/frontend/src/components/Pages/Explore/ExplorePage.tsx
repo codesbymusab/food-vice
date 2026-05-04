@@ -128,6 +128,7 @@ function ExplorePage() {
 
   async function applyFilters() {
     await fetchTopRatedRestaurants(location)
+    await fetchRecommendedRestaurants(location)
   }
 
 

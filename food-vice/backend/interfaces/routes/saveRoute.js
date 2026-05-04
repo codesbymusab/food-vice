@@ -4,5 +4,5 @@ const { verifyAuth } = require('../middlewares/authMiddleware')
 const router=express.Router()
 
 router.post('/restaurant',saveCtrl.saveRestaurant)
-router.post('/reel',saveCtrl.saveRestaurant)
+router.post('/reel',saveCtrl.saveReel)
 module.exports=router
