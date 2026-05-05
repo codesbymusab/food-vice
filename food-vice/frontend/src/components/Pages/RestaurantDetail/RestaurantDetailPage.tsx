@@ -248,7 +248,7 @@ export function RestaurantDetailPage() {
                             <div className="mt-3 flex flex-wrap items-center gap-4 text-sm font-medium text-slate-200">
                                 {restaurantDetails.reviewCount && (<div className="flex items-center gap-1 text-primary">
                                     <span className="material-symbols-outlined fill-1">star</span>
-                                    <span className="text-lg font-bold">{(restaurantDetails.rating!.overallRating)}</span>
+                                    <span className="text-lg font-bold">{(restaurantDetails.rating!.overallRating.toFixed(1))}</span>
                                     <span className="text-slate-200 font-normal">{`(${restaurantDetails.reviewCount} reviews)`}</span>
                                 </div>)
                                 }
@@ -285,7 +285,7 @@ export function RestaurantDetailPage() {
                         <button className={` rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Overview' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Overview')}>Overview</button>
                         <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Reviews' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Reviews')}>Reviews</button>
                         <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Photos' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Photos')}>Photos</button>
-                        <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Reels' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Reels')}>Reels</button>
+                        {/* <button  className={`rounded-xl p-3 tab-active text-sm font-bold whitespace-nowrap ${selectedTab==='Reels' ? 'text-primary bg-primary/10':'hover:bg-primary/10 hover:text-primary'}`} onClick={()=>setSelectedTab('Reels')}>Reels</button> */}
                     </div>
                 </div>
             </div>
@@ -293,7 +293,7 @@ export function RestaurantDetailPage() {
             <div className="mx-auto max-w-7xl px-4 md:px-10 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
-                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}/>}
+                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}  fetchRestaurant={fetchRestaurant} location={location!}/>}
                     {selectedTab==='Reviews' && <Reviews userReview={userReview} setUserReview={setUserReview}/>}
                     {selectedTab==='Photos' && <Photos/>}
                     {selectedTab==='Reels' && <Reels/>}

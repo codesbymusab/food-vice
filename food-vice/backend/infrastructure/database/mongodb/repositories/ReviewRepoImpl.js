@@ -1,3 +1,4 @@
+const RatingModel = require('../models/Reviews/RatingModel')
 const RestaurantReviews = require('../models/Reviews/ReviewModel')
 const mongoose = require('mongoose')
 
@@ -61,7 +62,7 @@ class ReviewRepoImpl {
             { $sort: { createdAt: -1 } },
             { $limit: limitCount },
 
-            
+
             {
                 $lookup: {
                     from: "users",
@@ -71,8 +72,8 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
-            
-           
+
+
             {
                 $lookup: {
                     from: "media",
@@ -82,7 +83,7 @@ class ReviewRepoImpl {
                 },
             },
 
-           
+
             {
                 $lookup: {
                     from: "reviewlikes",
@@ -108,7 +109,7 @@ class ReviewRepoImpl {
                 },
             },
 
-            
+
             {
                 $lookup: {
                     from: "reviewlikes",
@@ -123,7 +124,7 @@ class ReviewRepoImpl {
                 },
             },
 
-            
+
             {
                 $lookup: {
                     from: "ratings",
@@ -143,8 +144,8 @@ class ReviewRepoImpl {
                     _id: 1,
                     text: 1,
                     createdAt: 1,
-                    restaurantId:1,
-                    
+                    restaurantId: 1,
+
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,
@@ -161,14 +162,21 @@ class ReviewRepoImpl {
         ]).exec();
     }
 
-     async getRecentReviews({ limitCount = 3 }) {
-        
-        return await RestaurantReviews.aggregate([
-           
+    async getRecentReviews({ limitCount = 3, userId = null }) {
+        const pipeline = [];
+
+
+        if (userId) {
+            pipeline.push({
+                $match: { uid: new mongoose.Types.ObjectId(userId) }
+            });
+        }
+
+    
+        pipeline.push(
             { $sort: { createdAt: -1 } },
             { $limit: limitCount },
 
-            
             {
                 $lookup: {
                     from: "users",
@@ -178,8 +186,7 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
-            
-           
+
             {
                 $lookup: {
                     from: "media",
@@ -189,9 +196,6 @@ class ReviewRepoImpl {
                 },
             },
 
-        
-
-            
             {
                 $lookup: {
                     from: "reviewlikes",
@@ -206,7 +210,6 @@ class ReviewRepoImpl {
                 },
             },
 
-            
             {
                 $lookup: {
                     from: "ratings",
@@ -226,8 +229,7 @@ class ReviewRepoImpl {
                     _id: 1,
                     text: 1,
                     createdAt: 1,
-                    restaurantId:1,
-                    
+                    restaurantId: 1,
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,
@@ -236,19 +238,37 @@ class ReviewRepoImpl {
                     "user.username": 1,
                     "user.profilePhoto": 1,
                     "user.level": 1,
-                   
                     likeCount: 1,
                     overallRating: 1,
                 },
-            },
-        ]).exec();
+            }
+        );
+
+        return await RestaurantReviews.aggregate(pipeline).exec();
     }
 
 
     async createReview({ userId, restaurantId, text }) {
+    return await RestaurantReviews.create({
+      uid: new mongoose.Types.ObjectId(userId),
+      restaurantId: new mongoose.Types.ObjectId(restaurantId),
+      text,
+    });
+  }
 
-    }
-
+  async createRating({ reviewId, food, service, ambience, price, overall }) {
+  
+    return await RatingModel.create({
+      reviewId: new mongoose.Types.ObjectId(reviewId),
+      food,
+      service,
+      ambience,
+      price,
+      overall,
+    });
+  }
 }
+
+
 
 module.exports = ReviewRepoImpl

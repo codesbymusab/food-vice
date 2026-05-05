@@ -83,7 +83,9 @@ export function RestaurantCard({ restaurant, setTopRatedRestaurants }: { restaur
                     </h3>
 
                 </div>
-                <p className="text-sm text-slate-500 mb-3">{restaurant.cuisines}</p>
+                <p className="text-sm text-slate-500 mb-3">{restaurant.cuisines.slice(0,3).map((cuisine)=>{
+                    return `• ${cuisine} `
+                })}</p>
                 <div className="mt-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <span className="flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-400">

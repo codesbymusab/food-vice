@@ -8,10 +8,11 @@ const RestaurantCuisineModel = require('../models/Restaurant/RestaurantCuisineMo
 const CusineModel = require('../models/Restaurant/CusineModel')
 const SavedRestaurant = require('../models/Saves/SavedRestaurantModel')
 
+
 class RestaurantRepoImpl {
 
     async getRecommended(location, filters, userId, limitCount = 5) {
-        
+
         const savedCuisineIds = await SavedRestaurant.aggregate([
             { $match: { uid: new mongoose.Types.ObjectId(userId) } },
             {
@@ -28,7 +29,7 @@ class RestaurantRepoImpl {
 
         const cuisineIds = savedCuisineIds[0]?.cuisineIds || [];
 
-        
+
         return await Location.aggregate([
             {
                 $geoNear: {
@@ -97,7 +98,7 @@ class RestaurantRepoImpl {
                     as: "oh"
                 }
             },
-             {
+            {
                 $lookup: {
                     from: "savedrestaurants",
                     let: { restId: "$restaurant._id" },
@@ -128,7 +129,7 @@ class RestaurantRepoImpl {
                     latitude: { $first: "$latitude" },
                     longitude: { $first: "$longitude" },
                     savedDocs: { $first: "$savedDocs" }
-                    
+
                 }
             },
             {
@@ -152,7 +153,7 @@ class RestaurantRepoImpl {
 
     async getTopRated(location, filters, userId, limitCount = 5) {
         console.log(filters)
-        
+
         return await Location.aggregate([
             {
                 $geoNear: {
@@ -438,6 +439,130 @@ class RestaurantRepoImpl {
 
         ]).exec()
     }
+
+    async getSavedRestaurants(userId, limit = 5) {
+    return await SavedRestaurant.aggregate([
+        {
+            $match: {
+                uid: new mongoose.Types.ObjectId(userId)
+            }
+        },
+
+       
+        {
+            $lookup: {
+                from: "restaurants",
+                localField: "restaurantId",
+                foreignField: "_id",
+                as: "restaurant"
+            }
+        },
+        { $unwind: "$restaurant" },
+
+       
+        {
+            $lookup: {
+                from: "restaurantcuisines",
+                localField: "restaurant._id",
+                foreignField: "restaurantId",
+                as: "rc"
+            }
+        },
+        {
+            $lookup: {
+                from: "cuisines",
+                localField: "rc.cuisineId",
+                foreignField: "_id",
+                as: "cuisines"
+            }
+        },
+
+      
+        {
+            $lookup: {
+                from: "reviews",
+                localField: "restaurant._id",
+                foreignField: "restaurantId",
+                as: "reviews"
+            }
+        },
+
+        {
+            $lookup: {
+                from: "ratings",
+                localField: "reviews._id",
+                foreignField: "reviewId",
+                as: "ratingDocs"
+            }
+        },
+
+    
+        {
+            $addFields: {
+                avgOverall: {
+                    $cond: [
+                        { $gt: [{ $size: "$ratingDocs" }, 0] },
+                        { $avg: "$ratingDocs.overall" },
+                        null
+                    ]
+                }
+            }
+        },
+
+       
+        {
+            $lookup: {
+                from: "media",
+                let: { restId: "$restaurant._id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$ownerId", "$$restId"] },
+                                    { $eq: ["$ownerType", "restaurant"] },
+                                    { $eq: ["$type", "image"] }
+                                ]
+                            }
+                        }
+                    },
+                    { $sort: { createdAt: 1 } },
+                    {$limit: 1} 
+                ],
+                as: "media"
+            }
+        },
+       
+        {
+            $unwind: "$media"
+        },
+        {
+            $project: {
+                _id: 0,
+                restaurant: {
+                    _id: "$restaurant._id",
+                    name: "$restaurant.name",
+                    description: "$restaurant.description",
+                    priceCategory: "$restaurant.priceCategory"
+                },
+                coverPhoto: 1,
+                cuisines: "$cuisines.name",
+                rating: { overallRating: { $round: ["$avgOverall", 1] } },
+                savedAt: "$createdAt",
+                media:1
+            }
+        },
+
+        { $sort: { savedAt: -1 } },
+        { $limit: limit }
+    ]).exec();
+}
+
+
+
+
+
+
 }
 
 module.exports = RestaurantRepoImpl

@@ -8,6 +8,7 @@ const GetRecommendedRestaurants = require('../../application/use-cases/restauran
 const GetCuisines = require('../../application/use-cases/restaurants/GetCuisines')
 const GetRestaurantPhotos = require('../../application/use-cases/restaurants/GetRestaurantPhotos')
 const SaveRepoImpl = require('../../infrastructure/database/mongodb/repositories/SaveRepoImpl')
+const GetSavedRestaurants = require('../../application/use-cases/saves/GetSavedRestaurants')
 
 exports.recommendedRest = async (req, res) => {
 
@@ -250,3 +251,20 @@ exports.restPhotos = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
+
+
+
+exports.savedRestaurants=async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const restRepo=new RestaurantRepoImpl()
+    const getSavedRestaurants = new GetSavedRestaurants(restRepo);
+
+    const result = await getSavedRestaurants.execute({ userId: userId });
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+}
+

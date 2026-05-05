@@ -51,12 +51,44 @@ class ReelRepoImpl {
           as: "savedRestaurantMatch"
         }
       });
+
+      if (source === "saved") {
+        pipeline.push({
+          $lookup: {
+            from: "savedreels",
+            let: { reelId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$reelId", "$$reelId"] },
+                      { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] }
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "savedMatch"
+          }
+        });
+        pipeline.push({
+          $match: { $expr: { $gt: [{ $size: "$savedMatch" }, 0] } }
+        });
+      }
+
+
+      if (source === "user") {
+        pipeline.push({
+          $match: { uid: new mongoose.Types.ObjectId(userId) }
+        });
+      }
       pipeline.push({
         $match: { $expr: { $gt: [{ $size: "$savedRestaurantMatch" }, 0] } }
       });
     }
 
-    // Common pipeline stages
+
     pipeline.push(
       { $sort: { createdAt: -1 } },
       { $limit: limit },

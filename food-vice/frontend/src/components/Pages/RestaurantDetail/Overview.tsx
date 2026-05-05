@@ -4,18 +4,22 @@ import { ReviewTile, type Review } from "./ReviewTile";
 import { AddReviewForm } from "./AddReviewForm";
 import { RatingSummaryCard } from "./RatingSummaryCard";
 
+
 type OverviewProps={
     restaurantDetails:Restaurant,
     userReview:Review[]|null,
     recentReviews:Review[]|null,
     setUserReview:Dispatch<React.SetStateAction<Review[] | null>>,
     setRecentReviews:Dispatch<React.SetStateAction<Review[] | null>>
+    fetchRestaurant:(location: [number, number] | undefined) => Promise<void>,
+    location:[number,number]
+
 }
 
-export function Overview({restaurantDetails,userReview,recentReviews,setUserReview,setRecentReviews}:OverviewProps){
+export function Overview({restaurantDetails,userReview,recentReviews,setUserReview,setRecentReviews,fetchRestaurant,location}:OverviewProps){
 
     const [showReviewForm, setShowReviewForm] = useState(false);
-
+    
      useEffect(() => {
         if (!showReviewForm) {
             window.scrollTo(0, 0);
@@ -56,7 +60,7 @@ export function Overview({restaurantDetails,userReview,recentReviews,setUserRevi
 
             <section>
 
-                {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} />
+                {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} fetchRestaurant={fetchRestaurant} location={location}  />
 
                     : (
 

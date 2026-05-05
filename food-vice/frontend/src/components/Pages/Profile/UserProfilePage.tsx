@@ -5,10 +5,17 @@ import { PostedReview } from "./PostedReview";
 import { SavedRestaurant } from "./SavedRestaurant";
 import { useParams } from "react-router";
 import { EditProfilePage } from "./EditProfilePage";
+import type { Restaurant } from "../RestaurantDetail/RestaurantDetailPage";
+import type { Reel } from "../Reels/ReelsPage";
+import type { Review } from "../RestaurantDetail/ReviewTile";
 
+type UserReels={
+    saved: Reel[],
+    user:Reel[]
+}
 export type UserProfile = {
     _id: string,
-    userId:string
+    userId: string
     name: string,
     username: string
     email: string,
@@ -21,54 +28,62 @@ export type UserProfile = {
     reviewsCount: number,
     address?: string,
     bio?: string,
-    provider:string
+    provider: string
 }
+
+type SelectedTab='restaurants'|'reviews'|'reels'
 export function UserProfilePage() {
 
-    
+
     const params = useParams()
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState<string>('restaurants')
-    const [showEditForm,setShowEditForm]=useState<boolean>(false)
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [reels, setReels] = useState<UserReels|null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [showEditForm, setShowEditForm] = useState<boolean>(false);
+    const [selectedTab,setSelectedTab]=useState<SelectedTab>('restaurants')
 
-    const fetchUserProfile = async () => {
-
-        setLoading(true)
-
+    async function fetchUserProfile() {
         try {
-            const res = await fetch(`http://localhost:3000/user/profile/${params.id}`, {
-                credentials: "include",
-            });
+            setLoading(true);
 
-            if (!res.ok) {
-                throw new Error("Not authenticated");
+            const [profileRes, restaurantsRes, reelsRes, reviewsRes] = await Promise.all([
+                fetch(`http://localhost:3000/user/profile/${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/restaurant/saved?userId=${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/reels/${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/reviews/user/${params.id}`, { credentials: "include" }),
+            ]);
+
+            if (!profileRes.ok || !restaurantsRes.ok || !reelsRes.ok || !reviewsRes.ok) {
+                throw new Error("Failed to load user data");
             }
 
-            const data = await res.json();
+           
+            const profileData = await profileRes.json();
+            const restaurantsData = await restaurantsRes.json();
+            const reelsData = await reelsRes.json();
+            const reviewsData = await reviewsRes.json();
 
-            if (data) {
-                console.log(data)
-                setUserProfile(data as UserProfile);
-                setLoading(false)
-            }
-            else {
-                setUserProfile(null)
-            }
+        
+            setUserProfile(profileData);
+            setRestaurants(restaurantsData);
+            setReels(reelsData);
+            setReviews(reviewsData);
+
         } catch (err) {
-            console.log(err)
-            setUserProfile(null);
-        } 
-    };
+            console.error("Error fetching user profile data:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         fetchUserProfile();
     }, []);
 
 
-
-
-    function changeTab(tab: string): void {
+    function changeTab(tab: SelectedTab): void {
         setSelectedTab(tab)
     }
     function editProfile() {
@@ -77,12 +92,14 @@ export function UserProfilePage() {
 
     if (loading) return <div>Loading...</div>
 
-    if(showEditForm){
-        return <EditProfilePage  profile={userProfile!} setShowEditForm={setShowEditForm} fetchProfile={fetchUserProfile}/>
+    if (showEditForm) {
+        return <EditProfilePage profile={userProfile!} setShowEditForm={setShowEditForm} fetchProfile={fetchUserProfile} />
     }
+
+    if(!userProfile) return <div>Fialed to load user</div>
     return (
 
-        
+
         <main className="max-w-4xl mx-auto px-4 py-10">
 
             <div className="bg-white dark:bg-slate-800/40 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden mb-8">
@@ -91,8 +108,8 @@ export function UserProfilePage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                         <div className="relative size-32 md:size-40 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
-                           {userProfile!.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto}/> : userProfile!.name?.charAt(0)}
-                            
+                            {userProfile!.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> : userProfile!.name?.charAt(0)}
+
                         </div>
                         <div className="absolute bottom-2 right-2 bg-accent text-white p-1.5 rounded-full border-4 border-white dark:border-slate-800 shadow-lg">
                             <span className="material-symbols-outlined text-sm block">verified</span>
@@ -102,11 +119,11 @@ export function UserProfilePage() {
                     <div className="flex-1 text-center md:text-left space-y-4">
                         <div>
                             <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.name}</h1>
-                            {userProfile?.bio && userProfile.bio!=='' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
+                            {userProfile?.bio && userProfile.bio !== '' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
                                 <span className="material-symbols-outlined text-xl">account_box</span> {userProfile.bio}
                             </p>
                             }
-                            {userProfile?.address && userProfile.address!=='' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
+                            {userProfile?.address && userProfile.address !== '' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
                                 <span className="material-symbols-outlined text-xl">location_on</span> {userProfile.address}
                             </p>
                             }
@@ -165,7 +182,7 @@ export function UserProfilePage() {
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Reviews</p>
                 </div>
                 <div className="bg-white dark:bg-slate-800/40 p-5 rounded-xl border border-slate-100 dark:border-slate-700 text-center hover:border-primary/30 transition-colors">
-                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.savedReelsCount+userProfile!.savedRestaurantsCount}</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.savedReelsCount + userProfile!.savedRestaurantsCount}</p>
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Saved</p>
                 </div>
             </div>
@@ -205,10 +222,12 @@ export function UserProfilePage() {
 
                 {selectedTab === 'restaurants' && (<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <SavedRestaurant />
-                    <SavedRestaurant />
-
-
+                    {
+                        restaurants && restaurants.slice(0,2).map((restaurant)=>{
+                            return <SavedRestaurant restaurant={restaurant} />
+                        })
+                    }
+                    
 
                 </div>
                 )
@@ -216,9 +235,12 @@ export function UserProfilePage() {
 
                 {selectedTab === 'reviews' && (<div className="space-y-8">
 
-                    <PostedReview />
-                    <PostedReview />
-                    <PostedReview />
+                    {
+                        reviews && reviews.map((review)=>{
+                            return <PostedReview review={review} setReviews={setReviews} />
+                        })
+                    }
+                    
 
 
                 </div>
@@ -232,11 +254,11 @@ export function UserProfilePage() {
                                 <h3 className="text-2xl font-bold">Yours</h3>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
+
+                                { reels && reels.user.map((reel)=>{
+                                    return <ReelCard reel={reel} />
+                                })
+                            }
                             </div>
                         </div>
 
@@ -246,11 +268,9 @@ export function UserProfilePage() {
                                 <h3 className="text-2xl font-bold">Favorites</h3>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 text-white">
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
+                                { reels && reels.saved.map((reel)=>{
+                                    return <ReelCard reel={reel} />
+                                })}
                             </div>
                         </div>
 

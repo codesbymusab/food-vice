@@ -12,7 +12,7 @@ export function Reels() {
         try {
 
             const res = await fetch(
-                `http://localhost:3000/reels/recent?userId=${user!.userId}`,
+                `http://localhost:3000/reels/recent/reels?userId=${user!.userId}`,
                 { credentials: "include" }
             );
             if (res.ok) {

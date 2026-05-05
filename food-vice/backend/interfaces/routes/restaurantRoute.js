@@ -9,4 +9,6 @@ router.get('/details/:id',restCntrl.restDetails)
 router.get('/similar/:id',restCntrl.similarRest)
 router.get('/cuisines',restCntrl.restCuisines)
 router.get('/photos/:id',restCntrl.restPhotos)
+router.get("/saved", restCntrl.savedRestaurants);
+
 module.exports=router

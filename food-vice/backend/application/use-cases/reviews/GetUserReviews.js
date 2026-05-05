@@ -1,15 +1,16 @@
 const {formatReviewDate}=require('../../../shared/utils/dateFormatter')
-class GetRecentReviews {
+
+class GetUserReviews {
     constructor(reviewRepo) {
         this.reviewRepo = reviewRepo
     }
 
-    async execute(data) {
+    async execute({userId}) {
 
-        
+        if(!userId) throw new Error("User id required")
         const result = {};
 
-        const reviews = await this.reviewRepo.getRecentReviews({})
+        const reviews = await this.reviewRepo.getRecentReviews({userId:userId})
        
         if (reviews) {
             
@@ -37,4 +38,4 @@ class GetRecentReviews {
 
 }
 
-module.exports = GetRecentReviews
+module.exports = GetUserReviews

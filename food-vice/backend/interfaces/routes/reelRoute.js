@@ -6,8 +6,9 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/upload", upload.single("file"), reelCntrl.upload)
-router.get("/recent", reelCntrl.getRecent);
-router.get("/followers", reelCntrl.getFollowers);
+router.get('/:userId', reelCntrl.getUserReels)
+router.get("/recent/reels", reelCntrl.getRecent);
+router.get("/followers/reels", reelCntrl.getFollowers);
 router.get('/tags/popular', reelCntrl.getPopularTags)
 router.post("/:reelId/view",reelCntrl.updateViews)
 

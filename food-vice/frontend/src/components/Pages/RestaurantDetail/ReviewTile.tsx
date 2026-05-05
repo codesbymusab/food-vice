@@ -6,6 +6,7 @@ export type Review = {
     _id: string,
     text: string,
     createdAt: string,
+    restaurantId: string,
     user: {
         username: string,
         name: string,
@@ -36,7 +37,7 @@ export function ReviewTile({ review, setReviews }: { review: Review, setReviews:
         setReviews(prev =>
             prev
                 ? prev.map(r =>
-                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked,likeCount: currentLiked ? r.likeCount-1 : r.likeCount+1 } : r
+                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked, likeCount: currentLiked ? r.likeCount - 1 : r.likeCount + 1 } : r
                 )
                 : prev
         );
@@ -60,7 +61,7 @@ export function ReviewTile({ review, setReviews }: { review: Review, setReviews:
             setReviews(prev =>
                 prev
                     ? prev.map(r =>
-                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount+1 : r.likeCount-1 } : r
+                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount + 1 : r.likeCount - 1 } : r
                     )
                     : prev
             );
@@ -90,7 +91,7 @@ export function ReviewTile({ review, setReviews }: { review: Review, setReviews:
                         >
                             star
                         </span>
-                        ))}
+                    ))}
                 </div>
             </div>
             <p className="text-slate-600 dark:text-slate-400 mb-4">
@@ -109,10 +110,12 @@ export function ReviewTile({ review, setReviews }: { review: Review, setReviews:
 
                 }
             </div>
-            <div className="flex items-center gap-4 text-slate-400">
+
+            <div className="pt-4 border-t border-slate-50 dark:border-slate-700 flex justify-between items-center">
                 <button className={`flex items-center gap-1 text-lg ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
                     onClick={async () => await toggleLikeReview(user!.userId, review._id, review.isLikedByUser)}
-                ><span className="material-symbols-outlined text-xl">thumb_up</span> {review.likeCount}</button>
+                ><span className="material-symbols-outlined text-xl">thumb_up</span> {`(${review.likeCount})`}</button><span className="text-sm font-medium text-slate-500">{review.createdAt}</span>
+
                 {/* {<button className="flex items-center gap-1 text-xs hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">chat_bubble</span> 2</button>} */}
             </div>
         </div>

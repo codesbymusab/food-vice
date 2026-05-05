@@ -1,28 +1,50 @@
-class ReviewRestaurant
-{
-    constructor(reviewRepo,mediaRepo) {
-        this.reviewRepo = reviewRepo;
-        this.mediaRepo=mediaRepo
+class ReviewRestaurant {
+  constructor(reviewRepo, mediaRepo,storageService) {
+    this.reviewRepo = reviewRepo;
+    this.mediaRepo = mediaRepo;
+    this.storageService=storageService
+  }
+
+  async execute({ userId, restaurantId, text, rating, files }) {
+    if (!userId || !restaurantId || !text || !rating) {
+      throw new Error("userId, restaurantId, text, and rating are required");
     }
 
-    async execute(data) {
+    const review = await this.reviewRepo.createReview({ userId, restaurantId, text });
+
+
+    const ratingDoc = await this.reviewRepo.createRating({
+      reviewId: review._id,
+      ...rating,
+    });
+
+
+    let mediaDocs = [];
+    if (files && files.length > 0) {
+      for (const file of files) {
         
-        if(!data.userId){
-            throw new Error('User id required')
-        }
+        const url = await this.storageService.uploadFile(file, "reviews");
 
-        if(!data.restId){
-            throw new Error('Restaurant id required')
-        }
+        
+        const mediaDoc = await this.mediaRepo.save({
+          url,
+          type: file.mimetype.startsWith("video") ? "video" : "image",
+          ownerType: "review",
+          ownerId: review._id,
+          uploadedBy: userId,
+        });
 
-        if(!data.rating){
-            throw new Error('Rating is requied')
-        }
-
-        return await this.reviewRepo.createReview({userId:data.userId,restaurantId:data.restId,text:data.text})
+        mediaDocs.push(mediaDoc);
+      }
     }
 
-
+   
+    return {
+      review,
+      rating: ratingDoc,
+      media: mediaDocs,
+    };
+  }
 }
 
-module.exports = ReviewRestaurant
+module.exports = ReviewRestaurant;

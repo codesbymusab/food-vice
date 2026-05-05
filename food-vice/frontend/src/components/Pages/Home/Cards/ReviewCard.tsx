@@ -4,11 +4,11 @@ import type { Dispatch, SetStateAction } from "react"
 import { useAuth } from "../../../../context/AuthContext"
 
 export function ReviewCard({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
-    
+
     const navigate = useNavigate()
-    const {user} =useAuth()
-    
-        async function toggleLikeReview(
+    const { user } = useAuth()
+
+    async function toggleLikeReview(
         userId: string,
         reviewId: string,
         currentLiked: boolean
@@ -18,7 +18,7 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
         setReviews(prev =>
             prev
                 ? prev.map(r =>
-                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked,likeCount: currentLiked ? r.likeCount-1 : r.likeCount+1 } : r
+                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked, likeCount: currentLiked ? r.likeCount - 1 : r.likeCount + 1 } : r
                 )
                 : prev
         );
@@ -42,13 +42,13 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
             setReviews(prev =>
                 prev
                     ? prev.map(r =>
-                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount+1 : r.likeCount-1 } : r
+                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount + 1 : r.likeCount - 1 } : r
                     )
                     : prev
             );
         }
     }
-    
+
     return (
         <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow"  >
             <div className="flex items-center justify-between mb-4">
@@ -57,36 +57,37 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                         <img className="w-full h-full object-cover" src={review.user.profilePhoto} />
                     </div>
                     <div >
-                        <h6 className="font-bold text-sm hover:text-accent-cyan cursor-pointer" onClick={()=>navigate(`/profile/1`)}>{review.user.name}</h6>
-                        <p className="text-xs text-slate-500" onClick={()=>navigate('/restaurant/1')}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">The Burger House</span></p>
+                        <h6 className="font-bold text-sm hover:text-accent-cyan cursor-pointer" onClick={() => navigate(`/profile/1`)}>{review.user.name}</h6>
+                        <p className="text-xs text-slate-500" onClick={() => navigate('/restaurant/1')}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">The Burger House</span></p>
                     </div>
                 </div>
                 <div className="flex gap-0.5">
-                    <span className="material-symbols-outlined text-sm text-primary fill-current">star</span>
-                    <span className="material-symbols-outlined text-sm text-primary fill-current">star</span>
-                    <span className="material-symbols-outlined text-sm text-primary fill-current">star</span>
-                    <span className="material-symbols-outlined text-sm text-primary fill-current">star</span>
-                    <span className="material-symbols-outlined text-sm text-slate-300">star</span>
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <span
+                            key={i}
+                            className={`material-symbols-outlined ${i < Math.floor(review.overallRating) ? "fill-1 text-primary" : "text-gray-300"
+                                }`}
+                        >
+                            star
+                        </span>
+                    ))}
                 </div>
             </div>
-            <div className="cursor-pointer" onClick={()=>navigate('/restaurant/1')}>
+            <div className="cursor-pointer" onClick={() => navigate('/restaurant/1')}>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4 ">
                     {review.text}
                 </p>
                 <div className="rounded-2xl overflow-hidden" data-alt="Close up photo of a gourmet burger">
-                    {review.photos.map((photo) => {return <img key={photo._id} className="w-full h-64 object-cover" src={photo.url}/>})}
+                    {review.photos.map((photo) => { return <img key={photo._id} className="w-full h-64 object-cover" src={photo.url} /> })}
                 </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-                <div className="flex items-center gap-4 text-slate-400">
-                    <button className={`flex items-center gap-1 text-lg ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
+            <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-700 flex justify-between items-center">
+                <button className={`flex items-center gap-1 text-lg ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
                     onClick={async () => await toggleLikeReview(user!.userId, review._id, review.isLikedByUser)}
-                ><span className="material-symbols-outlined text-xl">thumb_up</span> {review.likeCount}</button>
-                <button className="flex items-center gap-1 text-xs hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">chat_bubble</span> 2</button>
-                </div>
-                <span className="text-xs text-slate-400">1 hour ago</span>
+                ><span className="material-symbols-outlined text-xl">thumb_up</span> {`(${review.likeCount})`}</button><span className="text-sm font-medium text-slate-500">{review.createdAt}</span>
             </div>
+
         </div>
     )
 }

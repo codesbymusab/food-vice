@@ -3,33 +3,10 @@ const MediaRepoImpl = require("../../infrastructure/database/mongodb/repositorie
 const ReviewRepoImpl = require("../../infrastructure/database/mongodb/repositories/ReviewRepoImpl")
 const GetRestaurantReviews = require('../../application/use-cases/restaurants/GetRestaurantReviews')
 const GetRecentReviews = require("../../application/use-cases/reviews/GetRecentReviews")
-
-exports.create = async (req, res) => {
-
-    try {
+const GetUserReviews = require("../../application/use-cases/reviews/GetUserReviews")
+const StorageServiceImpl = require("../../infrastructure/services/FirebaseStorage/StorageServiceImp")
 
 
-        const reviewRepo = new ReviewRepoImpl()
-        const mediaRepo = new MediaRepoImpl()
-        const createReview = new ReviewRestaurant(reviewRepo, mediaRepo)
-        const restReviews = await createReview.execute(req.body)
-
-
-        if (restReviews) {
-            res.status(200).json(restReviews);
-        }
-
-        res.status(400).json({ message: 'Restaurant not found' });
-
-
-    }
-    catch (error) {
-        console.log(error)
-        res.status(400).json({ message: error.message })
-    }
-
-
-}
 
 exports.restReviews = async (req, res) => {
     try {
@@ -54,7 +31,7 @@ exports.restReviews = async (req, res) => {
 
 exports.recentReviews = async (req, res) => {
     try {
-        console.log("recent reviews")
+        
         const reviewRepo = new ReviewRepoImpl()
         const getrecentReviews = new GetRecentReviews(reviewRepo)
         const result = await getrecentReviews.execute()
@@ -70,3 +47,50 @@ exports.recentReviews = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
+
+
+exports.userReviews = async (req, res) => {
+    try {
+        
+        const userId=req.params.userId
+        const reviewRepo = new ReviewRepoImpl()
+        const getuserReviews = new GetUserReviews(reviewRepo)
+        const result = await getuserReviews.execute({userId})
+
+        if (result) {
+            res.status(200).json(result.reviews);
+        }
+
+        res.status(400).json({ message: 'Failed to load user reviews' });
+    }
+    catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
+}
+
+exports.createReview= async (req, res) =>  {
+  try {
+    const { userId, restaurantId, text, rating } = req.body;
+    const formattedRating = typeof req.body.rating === "string" ? JSON.parse(req.body.rating) : req.body.rating;
+
+    const files = req.files;
+    const reviewRepo = new ReviewRepoImpl();
+    const mediaRepo=new MediaRepoImpl()
+    const storageService=new StorageServiceImpl()
+    const reviewRestaurant = new ReviewRestaurant(reviewRepo,mediaRepo,storageService);
+    const result = await reviewRestaurant.execute({
+      userId,
+      restaurantId,
+      text,
+      rating:formattedRating,
+      files
+    });
+
+    res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+}
+

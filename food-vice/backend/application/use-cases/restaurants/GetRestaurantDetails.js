@@ -1,5 +1,6 @@
 const { isRestaurantOpen } = require("../../../shared/utils/isRestaurantOpen");
 const { openingTime } = require("../../../shared/utils/openingTime");
+const {formatReviewDate}=require('../../../shared/utils/dateFormatter')
 
 
 class GetRestaurantDetails {
@@ -80,6 +81,7 @@ class GetRestaurantDetails {
                     const userReviewCount = await this.reviewRepo.getCountByUserId(review.user._id);
                     return {
                         ...review,
+                        createdAt: formatReviewDate(review.createdAt),
                         user: {
                             ...review.user,
                             reviewCount: userReviewCount[0]?.reviewCount || 0
@@ -91,6 +93,7 @@ class GetRestaurantDetails {
         }
 
        if(userReview[0]){
+            userReview[0].createdAt=formatReviewDate(userReview[0].createdAt),
             result.userReview=userReview[0]
        }
         result.isOpen = isRestaurantOpen(result.openingHours);

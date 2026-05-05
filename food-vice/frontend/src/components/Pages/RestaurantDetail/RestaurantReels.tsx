@@ -44,7 +44,7 @@ export function Reels() {
             </div>
 
 
-            {reels && reels.length > 0 ? <>
+            {/* {reels && reels.length > 0 ? <>
                 
                 <ReelCard />
                 <ReelCard />
@@ -56,7 +56,7 @@ export function Reels() {
                     No Reels Uploaded
                 </div>
             
-            }   
+            }    */}
         </section>
     )
 }

@@ -3,6 +3,7 @@ const GetFollowerReels = require("../../application/use-cases/reels/GetFollowerR
 const GetPopularTags = require("../../application/use-cases/reels/GetPopularTags");
 const GetRecentReels = require("../../application/use-cases/reels/GetRecentReels");
 const GetReelComments = require("../../application/use-cases/reels/GetReelComments");
+const GetUserReels = require("../../application/use-cases/reels/GetUserReels");
 const PostReelComment = require("../../application/use-cases/reels/PostReelComment");
 const UploadReel = require("../../application/use-cases/reels/UploadReel");
 const ReelModel = require("../../infrastructure/database/mongodb/models/Reels/ReelModel");
@@ -87,6 +88,21 @@ exports.updateViews=async (req, res) => {
         );
         res.json({ success: true });
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
+exports.getUserReels = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const userId = req.params.userId
+        const reelRepo = new ReelRepoImpl()
+        const getReels = new GetUserReels(reelRepo)
+        const reels = await getReels.execute({ limit, userId });
+        res.json(reels);
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 }
