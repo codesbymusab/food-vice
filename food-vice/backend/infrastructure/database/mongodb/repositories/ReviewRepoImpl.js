@@ -71,7 +71,7 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
-
+            
            
             {
                 $lookup: {
@@ -143,6 +143,8 @@ class ReviewRepoImpl {
                     _id: 1,
                     text: 1,
                     createdAt: 1,
+                    restaurantId:1,
+                    
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,
@@ -152,6 +154,89 @@ class ReviewRepoImpl {
                     "user.profilePhoto": 1,
                     "user.level": 1,
                     isLikedByUser: 1,
+                    likeCount: 1,
+                    overallRating: 1,
+                },
+            },
+        ]).exec();
+    }
+
+     async getRecentReviews({ limitCount = 3 }) {
+        
+        return await RestaurantReviews.aggregate([
+           
+            { $sort: { createdAt: -1 } },
+            { $limit: limitCount },
+
+            
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uid",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$user" },
+            
+           
+            {
+                $lookup: {
+                    from: "media",
+                    localField: "_id",
+                    foreignField: "ownerId",
+                    as: "photos",
+                },
+            },
+
+        
+
+            
+            {
+                $lookup: {
+                    from: "reviewlikes",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "allLikes",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$allLikes" },
+                },
+            },
+
+            
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "ratingDocs",
+                },
+            },
+            {
+                $addFields: {
+                    overallRating: { $avg: "$ratingDocs.overall" },
+                },
+            },
+
+            {
+                $project: {
+                    _id: 1,
+                    text: 1,
+                    createdAt: 1,
+                    restaurantId:1,
+                    
+                    "photos._id": 1,
+                    "photos.url": 1,
+                    "photos.caption": 1,
+                    "user._id": 1,
+                    "user.name": 1,
+                    "user.username": 1,
+                    "user.profilePhoto": 1,
+                    "user.level": 1,
+                   
                     likeCount: 1,
                     overallRating: 1,
                 },

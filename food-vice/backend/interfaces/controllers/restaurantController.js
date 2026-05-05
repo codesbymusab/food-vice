@@ -64,13 +64,14 @@ exports.topRatedRest = async (req, res) => {
 
         let location = undefined
 
-        const { lat, lon, cuisine, price, rating, dist, userId } = req.query;
+        const { lat, lon, cuisine, price, rating, dist, userId, limitCount } = req.query;
 
         const filters = {
             cuisine: cuisine || "All",
             price: price || "",
             rating: rating ? Number(rating) : 0,
             distance: dist ? Number(dist) : 50,
+            limitCount: limitCount ? Number(limitCount) : 5
         };
 
 

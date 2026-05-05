@@ -14,7 +14,7 @@ exports.signupUser = async (req, res) => {
         const user = await signupUser.execute(req.body)
 
         if (user) {
-            console.log(user)
+           
             res.status(201).json({ message: 'User created Successfully', user: user })
         }
     }

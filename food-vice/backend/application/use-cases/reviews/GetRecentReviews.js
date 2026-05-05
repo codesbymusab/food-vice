@@ -1,18 +1,14 @@
-class GetRestaurantReviews {
+class GetRecentReviews {
     constructor(reviewRepo) {
         this.reviewRepo = reviewRepo
     }
 
     async execute(data) {
 
-          
-        if (!data.restId) {
-            throw new Error("Restaurant id required");
-        }
-
+        
         const result = {};
 
-        const reviews = await this.reviewRepo.getReviews({restId:data.restId})
+        const reviews = await this.reviewRepo.getRecentReviews({})
        
         if (reviews) {
             
@@ -39,4 +35,4 @@ class GetRestaurantReviews {
 
 }
 
-module.exports = GetRestaurantReviews
+module.exports = GetRecentReviews

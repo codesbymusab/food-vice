@@ -128,7 +128,7 @@ class ReelRepoImpl {
         }
       },
       {
-        $addFields: {
+        $addFields: !userId ? 0 : {
           videoUrl: { $arrayElemAt: ["$media.url", 0] },
           likeCount: { $size: "$likes" },
           commentCount: { $size: "$comments" },

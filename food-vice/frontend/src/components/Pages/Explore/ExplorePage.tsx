@@ -13,7 +13,7 @@ export type Filter = {
   cuisine?: string,
   price?: string,
   rating?: number,
-  distance?: number
+  dist?: number
 }
 function ExplorePage() {
 
@@ -28,7 +28,7 @@ function ExplorePage() {
     cuisine: 'All',
     price: "",
     rating: 0,
-    distance: 50,
+    dist: 50,
 
   })
 
@@ -54,7 +54,7 @@ function ExplorePage() {
   async function fetchTopRatedRestaurants(location: [number, number] | null) {
     try {
       const res = await fetch(
-        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}&userId=${user?.userId}`,
+        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${user?.userId}`,
         { credentials: "include" }
       );
       if (res.ok) {
@@ -70,7 +70,7 @@ function ExplorePage() {
   async function fetchRecommendedRestaurants(location: [number, number] | null) {
     try {
       const res = await fetch(
-        `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.distance}&userId=${user?.userId}`,
+        `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${user?.userId}`,
         { credentials: "include" }
       );
       if (res.ok) {

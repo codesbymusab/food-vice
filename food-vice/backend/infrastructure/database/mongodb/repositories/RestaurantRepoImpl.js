@@ -151,6 +151,8 @@ class RestaurantRepoImpl {
 
 
     async getTopRated(location, filters, userId, limitCount = 5) {
+        console.log(filters)
+        
         return await Location.aggregate([
             {
                 $geoNear: {
@@ -266,7 +268,7 @@ class RestaurantRepoImpl {
                 }
             },
             { $sort: { avgOverall: -1 } },
-            { $limit: limitCount }
+            { $limit: filters.limitCount ? filters.limitCount : limitCount }
         ]).exec();
     }
 

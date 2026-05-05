@@ -2,6 +2,7 @@ const ReviewRestaurant = require("../../application/use-cases/reviews/ReviewRest
 const MediaRepoImpl = require("../../infrastructure/database/mongodb/repositories/MediaRepoImpl")
 const ReviewRepoImpl = require("../../infrastructure/database/mongodb/repositories/ReviewRepoImpl")
 const GetRestaurantReviews = require('../../application/use-cases/restaurants/GetRestaurantReviews')
+const GetRecentReviews = require("../../application/use-cases/reviews/GetRecentReviews")
 
 exports.create = async (req, res) => {
 
@@ -36,13 +37,33 @@ exports.restReviews = async (req, res) => {
         console.log(restId)
         const reviewRepo = new ReviewRepoImpl()
         const getReviews = new GetRestaurantReviews(reviewRepo)
-        const reviews = await getReviews.execute({ restId: restId })
+        const result = await getReviews.execute({ restId: restId })
 
-        if (reviews) {
-            res.status(200).json(reviews);
+        if (result.reviews) {
+            res.status(200).json(result.reviews);
         }
 
         res.status(400).json({ message: 'Failed to load reviews' });
+    }
+    catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
+}
+
+
+exports.recentReviews = async (req, res) => {
+    try {
+        console.log("recent reviews")
+        const reviewRepo = new ReviewRepoImpl()
+        const getrecentReviews = new GetRecentReviews(reviewRepo)
+        const result = await getrecentReviews.execute()
+
+        if (result) {
+            res.status(200).json(result.reviews);
+        }
+
+        res.status(400).json({ message: 'Failed to load recent reviews' });
     }
     catch (error) {
         console.log(error)

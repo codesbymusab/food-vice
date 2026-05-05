@@ -21,7 +21,7 @@ export function FiltersSidebar({ cuisines, filters, setFilters, applyFilters}: F
                                 cuisine: 'All',
                                 price: "",
                                 rating: 0,
-                                distance: 50,
+                                dist: 50,
                             })
 
                             applyFilters()
@@ -97,8 +97,8 @@ export function FiltersSidebar({ cuisines, filters, setFilters, applyFilters}: F
                     <p className="text-xs font-bold text-slate-500 uppercase">Distance (km)</p>
                     <select
                         className="w-full rounded-lg border-primary/10 bg-primary/5 text-sm py-2 px-3 focus:ring-primary/20 focus:border-primary"
-                        value={filters.distance}
-                        onChange={(e) => setFilters({ ...filters, distance: Number(e.target.value) })}
+                        value={filters.dist}
+                        onChange={(e) => setFilters({ ...filters, dist: Number(e.target.value) })}
                     >
                         <option value={2}>Under 2 km</option>
                         <option value={5}>Under 5 km</option>

@@ -30,7 +30,7 @@ class GetRecommendedRestaurants {
 
 
                 const media = await this.mediaRepo.getByOwnerId({ownerId:result[i]._id})
-                console.log(media)
+               
                 if (media) {
                     result[i]['media'] = media
                 }

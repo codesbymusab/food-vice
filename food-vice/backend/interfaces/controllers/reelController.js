@@ -38,7 +38,7 @@ exports.getRecent = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         const userId = req.query.userId
-        console.log(userId)
+       
         const reelRepo = new ReelRepoImpl()
         const getRecentReels = new GetRecentReels(reelRepo)
         const reels = await getRecentReels.execute({ limit, userId });
@@ -53,7 +53,7 @@ exports.getFollowers = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         const userId = req.query.userId
-        console.log(userId)
+        
         const reelRepo = new ReelRepoImpl()
         const getRecentReels = new GetFollowerReels(reelRepo)
         const reels = await getRecentReels.execute({ limit, userId });

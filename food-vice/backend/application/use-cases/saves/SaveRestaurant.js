@@ -18,7 +18,7 @@ class SaveRestaurant
 
         
         if(save){
-            console.log(save)
+         
             await this.saveRepo.unsaveRestaurant(save._id)
             return 'Restaurant unsaved'
         }
