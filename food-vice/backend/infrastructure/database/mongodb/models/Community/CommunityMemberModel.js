@@ -6,4 +6,4 @@ const CommunityMemberSchema = new mongoose.Schema({
   role: { type: String, default: 'member' }
 });
 
-module.exports = mongoose.model('CommunityMember', CommunityMemberSchema);
+module.exports = mongoose.model('CommunityMember', CommunityMemberSchema);

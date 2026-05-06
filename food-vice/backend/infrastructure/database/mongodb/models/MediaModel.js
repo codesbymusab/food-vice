@@ -11,17 +11,17 @@ const MediaSchema = new mongoose.Schema({
 
   ownerType: { 
     type: String, 
-    enum: ['review', 'reel', 'thread', 'restaurant'], 
+    enum: ['review','user','reel', 'thread', 'restaurant'], 
     required: true 
   },
 
   ownerId: { 
-    type: Schema.Types.ObjectId, 
+    type:mongoose.Schema.Types.ObjectId, 
     required: true 
   },
 
   uploadedBy: { 
-    type: Schema.Types.ObjectId, 
+    type:mongoose.Schema.Types.ObjectId, 
     ref: 'User' 
   }
 

@@ -1,4 +1,4 @@
-const SignupUser = require("../../application/use-cases/user/signupUser")
+const SignupUser = require("../../application/use-cases/user/SignupUser")
 const LoginUser = require("../../application/use-cases/user/loginUser")
 const GoogleSignIn = require("../../application/use-cases/user/GoogleSignIn")
 const UserRepoImpl = require("../../infrastructure/database/mongodb/repositories/UserRepoImpl")
@@ -14,7 +14,7 @@ exports.signupUser = async (req, res) => {
         const user = await signupUser.execute(req.body)
 
         if (user) {
-            console.log(user)
+           
             res.status(201).json({ message: 'User created Successfully', user: user })
         }
     }
@@ -39,6 +39,7 @@ exports.loginUser = async (req, res) => {
         const loginUser = new LoginUser(userRepo, authRepo)
         const {user,token} = await loginUser.execute(req.body)
 
+        
 
         if (token) {
             

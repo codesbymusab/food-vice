@@ -12,10 +12,15 @@ import type {
 } from "react"
 
 interface User {
-  UserId: string;
+  userId: string;
   email: string;
   name?: string;
   username:string;
+  profilePhoto?: string;
+  address?: string,
+  bio?: string,
+  level: number,
+  dateJoined: Date
 
 }
 
@@ -40,6 +45,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
+
+    setLoading(true)
+
     try {
       const res = await fetch("http://localhost:3000/user/me", {
         credentials: "include",
@@ -50,9 +58,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await res.json();
-      
-      setUser(data.user as User);
 
+      if(data.user){
+        console.log(data.user)
+        setUser(data.user as User);
+      
+      }
+      else{
+        setUser(null)
+
+      }
     } catch (err) {
       console.log(err)
       setUser(null);

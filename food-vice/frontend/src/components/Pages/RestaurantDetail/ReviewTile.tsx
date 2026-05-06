@@ -1,41 +1,122 @@
-export function ReviewTile() {
+import type { Dispatch, SetStateAction } from "react"
+import { useAuth } from "../../../context/AuthContext"
+
+
+export type Review = {
+    _id: string,
+    text: string,
+    createdAt: string,
+    restaurantId: string,
+    user: {
+        username: string,
+        name: string,
+        profilePhoto?: string,
+        level: number,
+        reviewCount: number
+    }
+    photos: {
+        _id: string,
+        url: string
+    }[],
+    isLikedByUser: boolean,
+    likeCount: number,
+    overallRating: number
+
+}
+export function ReviewTile({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
+
+    const { user } = useAuth()
+
+    async function toggleLikeReview(
+        userId: string,
+        reviewId: string,
+        currentLiked: boolean
+
+    ) {
+
+        setReviews(prev =>
+            prev
+                ? prev.map(r =>
+                    r._id === reviewId ? { ...r, isLikedByUser: !currentLiked, likeCount: currentLiked ? r.likeCount - 1 : r.likeCount + 1 } : r
+                )
+                : prev
+        );
+
+        try {
+            const res = await fetch("http://localhost:3000/like/review", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: userId, reviewId: reviewId }),
+                credentials: "include",
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to update like");
+            }
+
+            console.log(await res.json());
+        } catch (err) {
+            console.error(err);
+
+            setReviews(prev =>
+                prev
+                    ? prev.map(r =>
+                        r._id === reviewId ? { ...r, isLikedByUser: currentLiked, likeCount: currentLiked ? r.likeCount + 1 : r.likeCount - 1 } : r
+                    )
+                    : prev
+            );
+        }
+    }
+
     return (
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-8">
+        <div className="border-b-2 border-slate-200 dark:border-slate-800 pb-2 bg-white">
             <div className="flex items-center gap-4 mb-4">
-                <div className="size-12 rounded-full overflow-hidden bg-slate-200">
-                    <img alt="Sarah J." data-alt="Portrait of a woman with dark hair"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHQGPxq5HmwHSxVLfrfGJjixXnuMGLKTleY67SIcdYPmfFCZGSW9utEop3r1Ic7FDmhrCRC_U0S_vqD-vr2k5HgelEpRt4CXgDx69wRchoY2blgb5P6aXmAZVXiGVscTvh7gwKnge1dIkHl8S_7vw7xZ33mvjNsr34sEdtg3vSKTb07NRtibmLrPLeO23P7eSzYjlUuHo1W2Z5Km4MrXcO5MijdXr4Mc1JLPI1jcL-oYI_pziMDZ8PtpDtK6yqiVtOEHZJRNfeYIM" />
+                {review.user.profilePhoto && (<div className="size-12 rounded-full overflow-hidden bg-slate-200">
+                    <img alt={review.user.username}
+                        src={review.user.profilePhoto} />
                 </div>
+                )
+                }
                 <div>
-                    <h4 className="font-bold">Sarah Jenkins</h4>
-                    <p className="text-xs text-slate-500">Level 4 Foodie • 42 reviews</p>
+                    <h4 className="font-bold">{review.user.name}</h4>
+                    <p className="text-xs text-slate-500"><span className="text-primary font-semibold">Level {review.user.level} Foodie</span> • {review.user.reviewCount} reviews</p>
                 </div>
                 <div className="ml-auto flex text-primary text-sm">
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
-                    <span className="material-symbols-outlined fill-1">star</span>
+
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <span
+                            key={i}
+                            className={`material-symbols-outlined ${i < Math.floor(review.overallRating) ? "fill-1 text-primary" : "text-gray-300"
+                                }`}
+                        >
+                            star
+                        </span>
+                    ))}
                 </div>
             </div>
             <p className="text-slate-600 dark:text-slate-400 mb-4">
-                The Truffle Tagliatelle was life-changing. Service was impeccable—they noticed
-                it was our anniversary and surprised us with a complimentary dessert.
+                {review.text}
             </p>
             <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                <img alt="Pasta dish" className="size-24 rounded-lg object-cover flex-shrink-0"
-                    data-alt="Creamy pasta with herbs and mushrooms"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXj4UpgT_JmJi3xHnSu3e7GIKUWNwN7i5B5LHUYGAHEUhO2Q1SyjCotKW1i3uy7ovEtUG7D37QF_B2R9ktzYSntgUHwkbu4f6SplKGNZlEgvFyf-zkwv9PvFsP6wKhFJ7cv-OwPoKww9IcP2bpBr9b3yYqjWSYCzew1oNsr1p6UAVl03uu6DyLz8uIlc4aNbwZ2Fo4ATZAEUVoOs_K-f9rH_znpjMAxy3Ahvz7v_fwO_eNfbjljGRfuIAWjSiHfJhj7W9y0n2O2Tk" />
-                <img alt="Cocktail" className="size-24 rounded-lg object-cover flex-shrink-0"
-                    data-alt="Refreshing citrus cocktail on a marble table"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2Bi_MxHb73_pbyb1Se8MkK9A61a3y6tYIuFgqQcM1IF4ARiEQbWJX2j5LwFrww0RGi29YR9F7uR4yAAReBb3_6YN6BUULOBQ6c5ZD2L92qEaNvLOrbIhPPkjW-RTbqrfOjpQFDHP-QTAT47bbWonmDPNjUVe3wlgyVYDVPlC9_Alne9b1V4WyWQjNYGMZV1uAMf6_aRVYnxxtrzMiY7LE7r0oftNexh83tpY2K2kdN-aA6hLlabm5nsyOG1wRZVde3BBeB0SqQnA" />
+                {
+                    review.photos.map((photo) => {
+                        return (
+                            <img key={photo._id} className="mb-3 size-24 rounded-lg object-cover flex-shrink-0"
+
+                                src={photo.url} />
+
+                        )
+                    })
+
+                }
             </div>
-            <div className="mt-4 flex gap-4 text-xs font-bold text-slate-500">
-                <button className="flex items-center gap-1 hover:text-primary"><span
-                    className="material-symbols-outlined text-sm">thumb_up</span> Helpful
-                    (12)</button>
-                <button className="flex items-center gap-1 hover:text-primary"><span
-                    className="material-symbols-outlined text-sm">comment</span> Reply</button>
+
+            <div className="pt-4 border-t border-slate-50 dark:border-slate-700 flex justify-between items-center">
+                <button className={`flex items-center gap-1 text-lg ${review.isLikedByUser ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
+                    onClick={async () => await toggleLikeReview(user!.userId, review._id, review.isLikedByUser)}
+                ><span className="material-symbols-outlined text-xl">thumb_up</span> {`(${review.likeCount})`}</button><span className="text-sm font-medium text-slate-500">{review.createdAt}</span>
+
+                {/* {<button className="flex items-center gap-1 text-xs hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">chat_bubble</span> 2</button>} */}
             </div>
         </div>
     )

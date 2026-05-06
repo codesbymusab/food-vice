@@ -1,37 +1,58 @@
-export function FiltersSidebar() {
+import type { Cuisine, Filter } from "./ExplorePage";
+
+type FiltersSidebarProps = { cuisines: Cuisine[] | null, filters: Filter, setFilters: React.Dispatch<React.SetStateAction<Filter>>, applyFilters: () => Promise<void> }
+
+
+export function FiltersSidebar({ cuisines, filters, setFilters, applyFilters}: FiltersSidebarProps) {
     return (
-        <aside className="hidden lg:flex w-72 flex-col border-r border-primary/10 bg-background-light dark:bg-background-dark p-6 gap-8 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
+        <aside className="hidden lg:flex w-72 flex-col border-r border-primary/10 bg-white dark:bg-background-dark p-6 gap-8 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-bold text-lg">Filters</h3>
-                    <button className="text-xs font-semibold text-accent uppercase tracking-wider hover:underline">
-                        Clear All
-                    </button>
+                    <div >
+                        <button className="mr-1 text-xs font-semibold bg-primary text-white rounded-md py-1 px-2 text-accent uppercase tracking-wider hover:underline" onClick={() => {
+
+                            applyFilters()
+                        }}>
+                            Apply
+                        </button>
+                        <button className="text-xs font-semibold text-accent uppercase tracking-wider hover:underline" onClick={() => {
+                            setFilters({
+                                cuisine: 'All',
+                                price: "",
+                                rating: 0,
+                                dist: 50,
+                            })
+
+                            applyFilters()
+                        }}>
+                            Clear All
+                        </button>
+                    </div>
+
                 </div>
 
                 <div className="space-y-3">
                     <p className="text-xs font-bold text-slate-500 uppercase">Cuisine Type</p>
                     <div className="space-y-1">
-                        <label className="flex items-center gap-3 p-2 rounded-lg bg-primary/10 text-primary cursor-pointer">
-                            <span className="material-symbols-outlined text-xl">restaurant</span>
-                            <span className="text-sm font-semibold">All Cuisines</span>
-                            <input checked className="hidden" name="cuisine" type="radio" />
+                        <label className={`flex items-center gap-3 p-2 rounded-lg ${filters.cuisine === 'All' ? 'bg-primary/10 text-primary font-semibold' : 'font-medium'} cursor-pointer`} onClick={() => setFilters({ ...filters, cuisine: 'All' })}>
+
+
+                            <span className="text-sm">All Cuisines</span>
+
                         </label>
-                        <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 cursor-pointer">
-                            <span className="material-symbols-outlined text-xl text-slate-400">lunch_dining</span>
-                            <span className="text-sm font-medium">Fast Food</span>
-                            <input className="hidden" name="cuisine" type="radio" />
-                        </label>
-                        <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 cursor-pointer">
-                            <span className="material-symbols-outlined text-xl text-slate-400">local_pizza</span>
-                            <span className="text-sm font-medium">Italian</span>
-                            <input className="hidden" name="cuisine" type="radio" />
-                        </label>
-                        <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 cursor-pointer">
-                            <span className="material-symbols-outlined text-xl text-slate-400">eco</span>
-                            <span className="text-sm font-medium">Healthy / Vegan</span>
-                            <input className="hidden" name="cuisine" type="radio" />
-                        </label>
+                        {
+                            cuisines && cuisines.slice(0, 5).map((cuisine) => {
+                                return (
+                                    <label key={cuisine._id} className={`flex items-center gap-3 p-2 rounded-lg ${filters.cuisine === cuisine.name && 'bg-primary/10 text-primary font-semibold'} cursor-pointer`} onClick={() => setFilters({ ...filters, cuisine: cuisine.name })}>
+
+                                        <span className="text-sm">{cuisine.name}</span>
+
+                                    </label>
+                                )
+                            })
+                        }
+
                     </div>
                 </div>
                 <hr className="border-primary/5" />
@@ -39,18 +60,19 @@ export function FiltersSidebar() {
                 <div className="space-y-3">
                     <p className="text-xs font-bold text-slate-500 uppercase">Price Range</p>
                     <div className="flex gap-2">
-                        <button className="flex-1 py-1.5 rounded border border-primary/20 text-sm font-medium hover:bg-primary hover:text-white transition-colors">
+                        <button className={`flex-1 py-1.5 rounded border border-primary/20 ${filters.price == '' && 'bg-primary text-white'}  text-sm font-medium"`} onClick={() => setFilters({ ...filters, price: '' })}>
+                            All
+                        </button>
+                        <button className={`flex-1 py-1.5 rounded border border-primary/20 ${filters.price == '$' && 'bg-primary text-white'}  text-sm font-medium"`} onClick={() => setFilters({ ...filters, price: '$' })}>
                             $
                         </button>
-                        <button className="flex-1 py-1.5 rounded border border-primary/20 bg-primary text-white text-sm font-medium">
+                        <button className={`flex-1 py-1.5 rounded border border-primary/20 ${filters.price == '$$' && 'bg-primary text-white'}  text-sm font-medium"`} onClick={() => setFilters({ ...filters, price: '$$' })}>
                             $$
                         </button>
-                        <button className="flex-1 py-1.5 rounded border border-primary/20 text-sm font-medium hover:bg-primary hover:text-white transition-colors">
+                        <button className={`flex-1 py-1.5 rounded border border-primary/20 ${filters.price == '$$$' && 'bg-primary text-white'}  text-sm font-medium"`} onClick={() => setFilters({ ...filters, price: '$$$' })}>
                             $$$
                         </button>
-                        <button className="flex-1 py-1.5 rounded border border-primary/20 text-sm font-medium hover:bg-primary hover:text-white transition-colors">
-                            $$$$
-                        </button>
+
                     </div>
                 </div>
 
@@ -63,7 +85,9 @@ export function FiltersSidebar() {
                             min="1"
                             step="0.5"
                             type="range"
-                            defaultValue="4"
+
+                            value={filters.rating}
+                            onChange={(e) => setFilters({ ...filters, rating: Number.parseFloat(e.target.value) })}
                         />
                         <span className="text-sm font-bold text-primary">4.0+</span>
                     </div>
@@ -71,12 +95,17 @@ export function FiltersSidebar() {
 
                 <div className="space-y-3">
                     <p className="text-xs font-bold text-slate-500 uppercase">Distance (km)</p>
-                    <select className="w-full rounded-lg border-primary/10 bg-primary/5 text-sm py-2 px-3 focus:ring-primary/20 focus:border-primary">
-                        <option>Under 2 km</option>
-                        <option selected>Under 5 km</option>
-                        <option>Under 10 km</option>
-                        <option>City Wide</option>
+                    <select
+                        className="w-full rounded-lg border-primary/10 bg-primary/5 text-sm py-2 px-3 focus:ring-primary/20 focus:border-primary"
+                        value={filters.dist}
+                        onChange={(e) => setFilters({ ...filters, dist: Number(e.target.value) })}
+                    >
+                        <option value={2}>Under 2 km</option>
+                        <option value={5}>Under 5 km</option>
+                        <option value={10}>Under 10 km</option>
+                        <option value={50}>City Wide</option>
                     </select>
+
                 </div>
             </div>
         </aside>

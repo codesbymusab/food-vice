@@ -13,17 +13,9 @@ class GetUser {
 
 
         const user = await this.userRepo.getById(data.userId);
-     
-        if (user) {
-            return {
-                user: {
-                    userId: user._id,
-                    name: user.name,
-                    username: user.username,
-                    email: user.email
-                }
-
-            }
+        
+        if (user[0]) {
+            return user[0]
         }
 
         throw new Error('User not found')

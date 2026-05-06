@@ -1,42 +1,113 @@
 import { useNavigate } from "react-router"
+import { useAuth } from "../../../context/AuthContext"
+import type { Dispatch, SetStateAction } from "react"
 
-export function RestaurantCard() {
-    const navigate= useNavigate()
+export type TopRatedRestaurant =
+    {
+        _id: string,
+        name: string,
+        distKm: number,
+        avgOverall: number,
+        cuisines: string[],
+        priceCategory: string,
+        isOpen?: boolean,
+        openingTime?: string
+        media?: {
+            _id: string,
+            url: string,
+        },
+        latitude: number,
+        longitude: number,
+        isSaved: boolean
+
+    }
+export type RecommendedRestaurant = TopRatedRestaurant
+    
+
+export function RestaurantCard({ restaurant, setTopRatedRestaurants }: { restaurant: TopRatedRestaurant, setTopRatedRestaurants: Dispatch<SetStateAction<TopRatedRestaurant[] | null>> }) {
+    const navigate = useNavigate()
+    const { user } = useAuth()
+
+    async function saveRestaurant(userId: string, restId: string) {
+
+        try {
+            const res = await fetch("http://localhost:3000/save/restaurant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: userId, restId: restId }),
+                credentials: "include"
+            });
+
+            if (res.ok) {
+                console.log(await res.json())
+                setTopRatedRestaurants(prev =>
+                    prev
+                        ? prev.map(r =>
+                            r._id === restId ? { ...r, isSaved: !r.isSaved } : r
+                        )
+                        : prev
+                );
+
+            }
+            else {
+                throw new Error('Failed to save restaurant')
+            }
+        }
+
+        catch (error) {
+            console.log(error)
+            return false
+
+        }
+
+    }
+
+
     return (
-        <div className="group relative flex flex-col rounded-xl border border-primary/5 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden hover:shadow-xl transition-all" onClick={()=>navigate('/restaurant/1')}>
+        <div className="group relative flex flex-col rounded-xl border border-primary/5 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden hover:shadow-xl transition-all" >
             <div
-                className="h-48 w-full bg-cover bg-center overflow-hidden"
-                data-alt="Close up of a gourmet juicy beef burger"
+                className="h-48 bg-cover scale-105 hover:scale-110"
+
                 style={{
-                    backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuBj1Kvc8EVJLk3cDxJ9Cr-xXMpOPZ04--Xnb7GxMmPgic0foRpbVtAtOyxA3j-V2qx23Si87VxTs3fqTQEFqkSdSvTiQOSWXyhRGGhi-E5G6cxsFKaABpmSVL-OZ9HBk96LOsDDjYRF_UyQfufbQXIA1oLT5bGUz6kq1vytOCDMXxEUmd5_LeovTdF3YMKEc1RJxG2bWowLbpQ0N95gLvNL9CUSagFtJrTZcVPmgu_q1AS49fiBsyRUbPG6sITdvI8Rxkxy1emzZVI")`,
+                    backgroundImage: `url(${restaurant.media?.url})`
                 }}
+                onClick={() => navigate(`/restaurant/${restaurant._id}`)}
             >
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur dark:bg-slate-900/90 rounded-full px-2 py-1 flex items-center gap-1 text-xs font-bold text-primary">
-                    <span className="material-symbols-outlined text-sm fill-1">star</span> 4.8
-                </div>
+
+
             </div>
-            <div className="p-4 flex flex-col flex-1">
-                <div className="flex items-start justify-between mb-1">
+            <div className="p-4 flex flex-col flex-1" onClick={() => navigate(`/restaurant/${restaurant._id}`)}>
+                <div className="flex items-center justify-between mb-1">
                     <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                        The Burger Lab
+                        {restaurant.name}
                     </h3>
-                    <span className="text-xs font-bold text-slate-400">$$</span>
+
                 </div>
-                <p className="text-sm text-slate-500 mb-3">Gourmet Burgers • American • 1.2 km</p>
+                <p className="text-sm text-slate-500 mb-3">{restaurant.cuisines.slice(0,3).map((cuisine)=>{
+                    return `• ${cuisine} `
+                })}</p>
                 <div className="mt-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <span className="flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-400">
-                            <span className="material-symbols-outlined text-sm text-accent">schedule</span> 15-25 min
+                            <span className="material-symbols-outlined text-sm text-accent">location_pin</span> {restaurant.distKm.toFixed(1)} Km away
                         </span>
                         <span className="flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-400 border-l border-slate-300 dark:border-slate-700 pl-2">
-                            <span className="material-symbols-outlined text-sm text-accent">delivery_dining</span> Free
+                            <span className="material-symbols-outlined text-sm text-accent">schedule</span> {restaurant.isOpen && restaurant.isOpen ? 'Open Now' : `Opens ${restaurant.openingTime}`}
                         </span>
+                        <span className="text-sm text-slate-600">{restaurant.priceCategory}</span>
+
                     </div>
-                    <button className="text-primary">
-                        <span className="material-symbols-outlined">favorite</span>
-                    </button>
+                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-lg flex items-center gap-1 shadow-sm">
+                        <span className="material-symbols-outlined text-sm text-primary fill-current">star</span>
+                        <span className="text-sm font-bold">{restaurant.avgOverall.toFixed(1)}</span>
+                    </div>
                 </div>
             </div>
+            <button className={`absolute top-2 right-2 material-symbols-outlined text-3xl ${restaurant.isSaved ? 'text-primary bg-primary/30 hover:text-white' : 'text-white hover:text-primary'} rounded-lg  backdrop-blur-sm transition-all`} onClick={async () => await saveRestaurant(user!.userId, restaurant._id)}>
+                bookmark
+            </button>
         </div>
     )
 }
+
+

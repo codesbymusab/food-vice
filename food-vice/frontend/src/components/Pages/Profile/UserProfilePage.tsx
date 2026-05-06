@@ -1,22 +1,105 @@
-import { useState} from "react";
+import { useEffect, useState } from "react";
 import { ReelCard } from "../Home/Cards/ReelCard";
 import { AchievementBadge, AchievementBadgeAlt } from "./AchievementBadge";
 import { PostedReview } from "./PostedReview";
 import { SavedRestaurant } from "./SavedRestaurant";
-import { useNavigate } from "react-router";
+import { useParams } from "react-router";
+import { EditProfilePage } from "./EditProfilePage";
+import type { Restaurant } from "../RestaurantDetail/RestaurantDetailPage";
+import type { Reel } from "../Reels/ReelsPage";
+import type { Review } from "../RestaurantDetail/ReviewTile";
 
+type UserReels={
+    saved: Reel[],
+    user:Reel[]
+}
+export type UserProfile = {
+    _id: string,
+    userId: string
+    name: string,
+    username: string
+    email: string,
+    profilePhoto?: string,
+    level: number,
+    followersCount: number,
+    followingCount: number,
+    savedRestaurantsCount: number,
+    savedReelsCount: number,
+    reviewsCount: number,
+    address?: string,
+    bio?: string,
+    provider: string
+}
+
+type SelectedTab='restaurants'|'reviews'|'reels'
 export function UserProfilePage() {
 
-    const navigate=useNavigate()
-    const [selectedTab, setSelectedTab] = useState<string>('restaurants')
 
-    function changeTab(tab: string): void {
+    const params = useParams()
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [reels, setReels] = useState<UserReels|null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [showEditForm, setShowEditForm] = useState<boolean>(false);
+    const [selectedTab,setSelectedTab]=useState<SelectedTab>('restaurants')
+
+    async function fetchUserProfile() {
+        try {
+            setLoading(true);
+
+            const [profileRes, restaurantsRes, reelsRes, reviewsRes] = await Promise.all([
+                fetch(`http://localhost:3000/user/profile/${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/restaurant/saved?userId=${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/reels/${params.id}`, { credentials: "include" }),
+                fetch(`http://localhost:3000/reviews/user/${params.id}`, { credentials: "include" }),
+            ]);
+
+            if (!profileRes.ok || !restaurantsRes.ok || !reelsRes.ok || !reviewsRes.ok) {
+                throw new Error("Failed to load user data");
+            }
+
+           
+            const profileData = await profileRes.json();
+            const restaurantsData = await restaurantsRes.json();
+            const reelsData = await reelsRes.json();
+            const reviewsData = await reviewsRes.json();
+
+        
+            setUserProfile(profileData);
+            setRestaurants(restaurantsData);
+            setReels(reelsData);
+            setReviews(reviewsData);
+
+        } catch (err) {
+            console.error("Error fetching user profile data:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
+
+
+    function changeTab(tab: SelectedTab): void {
         setSelectedTab(tab)
     }
-    function editProfile(){
-        navigate('edit')
+    function editProfile() {
+        setShowEditForm(true)
     }
+
+    if (loading) return <div>Loading...</div>
+
+    if (showEditForm) {
+        return <EditProfilePage profile={userProfile!} setShowEditForm={setShowEditForm} fetchProfile={fetchUserProfile} />
+    }
+
+    if(!userProfile) return <div>Fialed to load user</div>
     return (
+
+
         <main className="max-w-4xl mx-auto px-4 py-10">
 
             <div className="bg-white dark:bg-slate-800/40 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden mb-8">
@@ -25,7 +108,8 @@ export function UserProfilePage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                         <div className="relative size-32 md:size-40 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
-                            <img className="w-full h-full object-cover" data-alt="High resolution portrait of Alex Rivera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4cl4m11HMIS8aHWn5BWCaIftOiUW2UbJQM_cMqdtb02Oh4G9hk-uyIziNUlBS92JInrrBd7ydsxcrgI-RvGIZh6f4bsK85wPi07-2yMqf7KbkiPqhzsMDPoptYYZUfhHZAy7H6dm9psx9mw9UNLIzhKTdCp0eTqKF9xTUowbwVpGC4bbs83owtnlhoWC6fj_YCDyCLe7BkK9ZGIqh2WSJ0PB_GLj-7B6JUMM0g7s0lAiliOtD4869BhJoSlNPNGkH54XC_eib6xk" />
+                            {userProfile!.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> : userProfile!.name?.charAt(0)}
+
                         </div>
                         <div className="absolute bottom-2 right-2 bg-accent text-white p-1.5 rounded-full border-4 border-white dark:border-slate-800 shadow-lg">
                             <span className="material-symbols-outlined text-sm block">verified</span>
@@ -34,28 +118,38 @@ export function UserProfilePage() {
 
                     <div className="flex-1 text-center md:text-left space-y-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Alex Rivera</h1>
-                            <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
-                                <span className="material-symbols-outlined text-sm">location_on</span> San Francisco, CA • Food Enthusiast since 2021
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.name}</h1>
+                            {userProfile?.bio && userProfile.bio !== '' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
+                                <span className="material-symbols-outlined text-xl">account_box</span> {userProfile.bio}
                             </p>
+                            }
+                            {userProfile?.address && userProfile.address !== '' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
+                                <span className="material-symbols-outlined text-xl">location_on</span> {userProfile.address}
+                            </p>
+                            }
                         </div>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-4"><button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
-                            <span className="material-symbols-outlined text-sm">person_add</span> Follow
-                        </button>
-                            <button className="shadow-xl shadow-orange-500/5 inline-flex items-center gap-2 px-5 py-2 border border-slate-300 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" onClick={()=>editProfile()}>
-                                <span className="material-symbols-outlined text-sm">edit</span> Edit Profile
+                        <div className="flex flex-wrap justify-center md:justify-start gap-4">
+
+                            {params.id !== userProfile!.userId ? (<button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
+                                <span className="material-symbols-outlined text-sm">person_add</span> Follow
+
                             </button>
-                            
+                            )
+                                :
+                                (<button className="shadow-xl shadow-orange-500/5 inline-flex items-center gap-2 px-5 py-2 border border-slate-300 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" onClick={() => editProfile()}>
+                                    <span className="material-symbols-outlined text-sm">edit</span> Edit Profile
+                                </button>
+                                )}
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-3 min-w-[120px]">
                         <div className="bg-primary text-white px-4 py-2 rounded-xl text-center shadow-sm">
-                            <p className="text-xl font-bold">840</p>
+                            <p className="text-xl font-bold">{userProfile?.followersCount}</p>
                             <p className="text-[10px] font-bold uppercase tracking-widest opacity-90">Followers</p>
                         </div>
                         <div className="bg-slate-100 dark:bg-slate-700/50 px-4 py-2 rounded-xl text-center border border-slate-200 dark:border-slate-600">
-                            <p className="text-xl font-bold text-slate-900 dark:text-slate-100">452</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-slate-100">{userProfile?.followingCount}</p>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Following</p>
                         </div>
                     </div>
@@ -71,7 +165,7 @@ export function UserProfilePage() {
                         </div>
                         <div className="text-right">
                             <span className="inline-flex items-center gap-1 bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold">
-                                <span className="material-symbols-outlined text-xs">auto_awesome</span> EXPERT LEVEL
+                                <span className="material-symbols-outlined text-xs">auto_awesome</span> LEVEL {userProfile!.level}
                             </span>
                         </div>
                     </div>
@@ -84,11 +178,11 @@ export function UserProfilePage() {
 
             <div className="grid grid-cols-2 gap-4 mb-12">
                 <div className="bg-white dark:bg-slate-800/40 p-5 rounded-xl border border-slate-100 dark:border-slate-700 text-center hover:border-primary/30 transition-colors">
-                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">128</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{userProfile?.reviewsCount}</p>
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Reviews</p>
                 </div>
                 <div className="bg-white dark:bg-slate-800/40 p-5 rounded-xl border border-slate-100 dark:border-slate-700 text-center hover:border-primary/30 transition-colors">
-                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">84</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.savedReelsCount + userProfile!.savedRestaurantsCount}</p>
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Saved</p>
                 </div>
             </div>
@@ -113,25 +207,27 @@ export function UserProfilePage() {
             <div className="mt-12">
                 <div className="flex border-b border-slate-200 dark:border-slate-700 mb-8">
 
-                    <button className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab==='restaurants' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`} 
+                    <button className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab === 'restaurants' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`}
                         onClick={() => changeTab('restaurants')}>
-                            Saved Restaurants
+                        Saved Restaurants
                     </button>
-                    <button  className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab==='reviews' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`} 
+                    <button className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab === 'reviews' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`}
                         onClick={() => changeTab('reviews')}>
-                            My Reviews
+                        My Reviews
                     </button>
-                    <button className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab==='reels' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`} 
+                    <button className={`px-6 md:px-8 py-4 text-sm font-medium ${selectedTab === 'reels' ? 'border-b-2 border-primary text-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-all`}
                         onClick={() => changeTab('reels')}>
-                            Reels
+                        Reels
                     </button></div>
 
                 {selectedTab === 'restaurants' && (<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <SavedRestaurant />
-                    <SavedRestaurant />
-
-
+                    {
+                        restaurants && restaurants.slice(0,2).map((restaurant)=>{
+                            return <SavedRestaurant restaurant={restaurant} />
+                        })
+                    }
+                    
 
                 </div>
                 )
@@ -139,9 +235,12 @@ export function UserProfilePage() {
 
                 {selectedTab === 'reviews' && (<div className="space-y-8">
 
-                    <PostedReview />
-                    <PostedReview />
-                    <PostedReview />
+                    {
+                        reviews && reviews.map((review)=>{
+                            return <PostedReview review={review} setReviews={setReviews} />
+                        })
+                    }
+                    
 
 
                 </div>
@@ -155,11 +254,11 @@ export function UserProfilePage() {
                                 <h3 className="text-2xl font-bold">Yours</h3>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
+
+                                { reels && reels.user.map((reel)=>{
+                                    return <ReelCard reel={reel} />
+                                })
+                            }
                             </div>
                         </div>
 
@@ -169,11 +268,9 @@ export function UserProfilePage() {
                                 <h3 className="text-2xl font-bold">Favorites</h3>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 text-white">
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
-                                <ReelCard />
+                                { reels && reels.saved.map((reel)=>{
+                                    return <ReelCard reel={reel} />
+                                })}
                             </div>
                         </div>
 

@@ -1,6 +1,40 @@
+import { useEffect, useState } from "react";
+import type { Reel } from "../../Reels/ReelsPage";
 import { ReelCard } from "../Cards/ReelCard";
+import { useAuth } from "../../../../context/AuthContext";
 
 export function Reels() {
+
+
+    const [reels, setReels] = useState<Reel[] | null>(null)
+    const {user}=useAuth()
+    async function fetchRecentReels() {
+        try {
+
+            const res = await fetch(
+                `http://localhost:3000/reels/recent/reels?userId=${user!.userId}`,
+                { credentials: "include" }
+            );
+            if (res.ok) {
+                const reels = await res.json();
+                console.log(reels)
+                setReels(reels)
+            }
+            else {
+                throw new Error('Failed to load recent reels')
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+
+    useEffect(() => {
+        fetchRecentReels()
+    }, [])
+
+
+
     return (
         <section className="px-4 mb-16 bg-slate-900 -mx-4 py-12 lg:rounded-3xl lg:mx-4 text-white">
             <div className="max-w-7xl mx-auto">
@@ -10,11 +44,12 @@ export function Reels() {
                     <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Trending</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
+
+                    {
+                        reels && reels.length>0 && reels.map((reel) => {
+                            return <ReelCard reel={reel} />
+                        })
+                    }
                 </div>
             </div>
         </section>
