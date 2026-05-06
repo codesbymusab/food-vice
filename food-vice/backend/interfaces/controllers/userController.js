@@ -12,14 +12,16 @@ exports.getUser=async (req,res)=>{
         const user=await getUser.execute({userId:req.userId})
 
         if(user){
-            res.status(200).json(user);
+            return res.status(200).json(user);
         }
 
-        res.status(400).json({ message: 'User not logged in' });
+        return res.status(400).json({ message: 'User not logged in' });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        if (!res.headersSent) {
+            return res.status(400).json({message:error.message})
+        }
     }
     
 
@@ -34,18 +36,18 @@ exports.editUser = async (req, res) => {
         const user = await editUser.execute(req.body)
        
         if (user) {
-
-            res.status(200).json({ message: 'User updated Successfully'})
+            return res.status(200).json({ message: 'User updated Successfully'})
         }
+        return res.status(400).json({ message: 'User update failed' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        if (!res.headersSent) {
+            return res.status(400).json({ message: error.message })
+        }
 
     }
 
 
 
 }
-
-

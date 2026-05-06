@@ -4,6 +4,8 @@ const cors = require('cors')
 const mongodbConfig = require('./infrastructure/database/mongodb/config/db')
 const authRoute = require('./interfaces/routes/authRoute')
 const userRoute = require('./interfaces/routes/userRoute')
+const communityRoute = require('./interfaces/routes/communityRoute')
+const threadRoute = require('./interfaces/routes/threadRoute')
 const { verifyAuth } = require('./interfaces/middlewares/authMiddleware')
 const cookieParser = require('cookie-parser');
 
@@ -25,3 +27,5 @@ mongodbConfig.connectDB()
 
 app.use('/auth', authRoute)
 app.use('/user', userRoute)
+app.use('/community', communityRoute)
+app.use('/thread', threadRoute)

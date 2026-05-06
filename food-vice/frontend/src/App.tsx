@@ -64,12 +64,12 @@ function MainLayout() {
         <Route path="/profile/:id" element={<UserProfilePage />} />
         <Route path="/reels" element={<ReelsPage />} />
         <Route path="/community" element={<CommunitiesPage />} />
-        <Route path="/community/:name" element={<CommunityDetailPage />} />
-        <Route path="/community/:name/:id" element={<ThreadDetailPage />} />
+        <Route path="/community/:id" element={<CommunityDetailPage />} />
+        <Route path="/community/:id/:threadId" element={<ThreadDetailPage />} />
         <Route path="/restaurant/:id" element={<RestaurantDeatilPage />} />
         <Route path="/profile/:id/edit" element={<EditProfilePage />} />
         <Route path="/community/create" element={<CreateCommunityPage />} />
-        <Route path="/community/:name/create" element={<CreateThreadPage />} />
+        <Route path="/community/:id/create-thread" element={<CreateThreadPage />} />
 
       </Routes>
       <Footer />
