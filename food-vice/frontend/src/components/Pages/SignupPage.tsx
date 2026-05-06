@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { signUpUser } from "../../apis/user";
 
 export function SignupPage() {
 
@@ -38,29 +39,22 @@ export function SignupPage() {
     }
 
     async function onSignUpClick() {
-
         try {
-            const res = await fetch("http://localhost:3000/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    name:nameInput,
-                    username:usernameInput, 
-                    email: emailInput,
-                    password: passwordInput,
-                    confirmPassword:confPasswordInput
-                }),
-                credentials: "include"
-
+            const user = await signUpUser({
+                name: nameInput,
+                username: usernameInput,
+                email: emailInput,
+                password: passwordInput,
+                confirmPassword: confPasswordInput,
             });
-           if(res.ok){
-                navigate('/home')
+
+            if (user) {
+                navigate('/home');
             }
         }
         catch (error) {
-            console.log(error)
+            console.log(error);
         }
-       
     }
 
 

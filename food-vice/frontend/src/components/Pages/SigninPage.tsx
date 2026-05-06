@@ -4,6 +4,7 @@ import google from '../../assets/google.svg'
 import '../../index.css'
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../context/AuthContext";
+import { loginUser, loginWithGoogle } from "../../apis/user";
 
 
 export function SigninPage() {
@@ -26,47 +27,30 @@ export function SigninPage() {
 
     }
     async function onSignInClick() {
-  
         try {
-            const res = await fetch("http://localhost:3000/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: emailInput, password: passwordInput }),
-                credentials: "include"
-            });
-
-            if (res.ok) {
-                const { user } = await res.json()
-                setUser(user)
-                navigate('/home')
+            const user = await loginUser({ email: emailInput, password: passwordInput });
+            if (user) {
+                setUser(user);
+                navigate('/home');
             }
         }
         catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
     }
 
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-
             try {
-                const res = await fetch("http://localhost:3000/auth/google", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ access_token: tokenResponse.access_token }),
-                    credentials: "include"
-                });
-
-                if (res.ok) {
-                    const { user } = await res.json()
-                    setUser(user)
-                    navigate('/home')
+                const user = await loginWithGoogle(tokenResponse.access_token);
+                if (user) {
+                    setUser(user);
+                    navigate('/home');
                 }
             }
             catch (error) {
-                console.log(error)
+                console.log(error);
             }
         }
     });

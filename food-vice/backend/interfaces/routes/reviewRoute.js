@@ -5,8 +5,8 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+router.get('/recent',reviewCntrl.recentReviews)
 router.get('/:restaurantId',reviewCntrl.restReviews)
 router.get('/user/:userId/',reviewCntrl.userReviews)
-router.get('/recent/reviews',reviewCntrl.recentReviews)
 router.post("/create", upload.array("files"), reviewCntrl.createReview);
 module.exports=router

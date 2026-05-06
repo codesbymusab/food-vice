@@ -4,6 +4,8 @@ import { SearchBar } from "../../SearchBar";
 import { UploadReelForm } from "./UploadForm";
 import { useAuth } from "../../../context/AuthContext";
 import { UploadProgressDialog } from "./ProgressDialouge";
+import { ErrorScreen, SkeletonList } from "../../Shared/Feedback";
+import { fetchRecentReels, fetchFollowersReels, fetchPopularTags, uploadReel as uploadReelApi, saveReel as saveReelApi, toggleLikeReel as toggleLikeReelApi } from "../../../apis/reels";
 
 type ReelsMode = 'for-you' | 'following' | 'discover'
 export type ReelTag = {
@@ -45,6 +47,8 @@ export function ReelsPage() {
     const [loading, setLoading] = useState<boolean>(false)
     const [reels, setReels] = useState<Reel[] | null>(null)
     const [popularTags, setPopularTags] = useState<ReelTag[] | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [tagError, setTagError] = useState<string | null>(null)
 
     const { user } = useAuth()
 
@@ -64,96 +68,54 @@ export function ReelsPage() {
             }, 1000)
             formData.append("userId", user!.userId)
 
-            const response = await fetch("http://localhost:3000/reels/upload", {
-                method: "POST",
-                body: formData,
-                credentials: "include"
-            });
-
-            if (!response.ok) {
-                throw new Error("Upload failed");
-            }
-
-            const data = await response.json();
-            console.log("Reel uploaded:", data);
+            await uploadReelApi({ formData, userId: user!.userId });
             setShowUploadForm(false)
-
-            // setReels([...reels, data]);
         } catch (err) {
             console.error("Error uploading reel:", err);
             alert("Failed to upload reel");
         } finally {
             setUploading(false)
-
         }
     }
 
-    async function fetchPopularTags() {
+    async function loadPopularTags() {
         try {
-
-            const res = await fetch(
-                `http://localhost:3000/reels/tags/popular`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const tags = await res.json();
-                console.log(tags)
-                setPopularTags(tags)
-            }
-            else {
-                throw new Error('Failed to load tags')
-            }
+            const tags = await fetchPopularTags();
+            setPopularTags(tags ?? null);
         } catch (error) {
             console.error(error);
+            setTagError("Unable to load popular tags right now.");
         }
-
     }
 
-    async function fetchRecentReels() {
+    async function loadRecentReels() {
+        setError(null)
         try {
             setLoading(true)
-            const res = await fetch(
-                `http://localhost:3000/reels/recent/reels?userId=${user?.userId}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const reels = await res.json();
-                console.log(reels)
-                setReels(reels)
-            }
-            else {
-                throw new Error('Failed to load recent reels')
-            }
+            const reels = await fetchRecentReels({ userId: user?.userId ?? '' });
+            setReels(reels ?? null)
         } catch (error) {
             console.error(error);
+            setError("Unable to load reels. Please try again.");
         }
         finally {
             setLoading(false)
         }
     }
 
-    async function fetchFollowersReels() {
+    async function loadFollowersReels() {
+        setError(null)
         try {
             setLoading(true)
-            const res = await fetch(
-                `http://localhost:3000/reels/followers/reels?userId=${user?.userId}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const reels = await res.json();
-
-                if(reels.length>0){
-                    setReels(reels)
-                }
-                else{
-                    await fetchRecentReels()
-                }
-            }
-            else {
-                throw new Error('Failed to load followers reels')
+            const reels = await fetchFollowersReels({ userId: user?.userId ?? '' });
+            if (reels && reels.length > 0) {
+                setReels(reels);
+            } else {
+                await loadRecentReels();
             }
         } catch (error) {
             console.error(error);
+            setError("Unable to load following reels. Please try again.");
         }
         finally {
             setLoading(false)
@@ -161,44 +123,27 @@ export function ReelsPage() {
     }
 
     async function saveReel(userId: string, reelId: string) {
-
         try {
-            const res = await fetch("http://localhost:3000/save/reel", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, reelId: reelId }),
-                credentials: "include"
-            });
-
-            if (res.ok) {
-                console.log(await res.json())
-                setReels(prev =>
-                    prev
-                        ? prev.map(r =>
-                            r._id === reelId ? { ...r, isSavedByUser: !r.isSavedByUser, saveCount: r.isSavedByUser ? r.saveCount - 1 : r.saveCount + 1 } : r
-                        )
-                        : prev
-                );
-            }
-            else {
-                throw new Error('Failed to save reel')
-            }
+            await saveReelApi(userId, reelId);
+            setReels(prev =>
+                prev
+                    ? prev.map(r =>
+                        r._id === reelId ? { ...r, isSavedByUser: !r.isSavedByUser, saveCount: r.isSavedByUser ? r.saveCount - 1 : r.saveCount + 1 } : r
+                    )
+                    : prev
+            );
         }
         catch (error) {
-            console.log(error)
-            return false
-
+            console.log(error);
+            return false;
         }
-
     }
 
     async function toggleLikeReel(
         userId: string,
         reelId: string,
         currentLiked: boolean
-
     ) {
-
         setReels(prev =>
             prev
                 ? prev.map(r =>
@@ -208,21 +153,9 @@ export function ReelsPage() {
         );
 
         try {
-            const res = await fetch("http://localhost:3000/like/reel", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, reelId: reelId }),
-                credentials: "include",
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to update like");
-            }
-
-            console.log(await res.json());
+            await toggleLikeReelApi({ userId, reelId });
         } catch (err) {
             console.error(err);
-
             setReels(prev =>
                 prev
                     ? prev.map(r =>
@@ -234,8 +167,8 @@ export function ReelsPage() {
     }
 
     useEffect(() => {
-        fetchRecentReels()
-        fetchPopularTags()
+        loadRecentReels()
+        loadPopularTags()
     }, [])
 
     
@@ -246,13 +179,41 @@ export function ReelsPage() {
 
     function fetchReels() {
 
-        if (reelsMode === "following") fetchFollowersReels()
-        if (reelsMode === "for-you") fetchRecentReels()
-        if (reelsMode === "discover") fetchRecentReels()
+        if (reelsMode === "following") loadFollowersReels()
+        if (reelsMode === "for-you") loadRecentReels()
+        if (reelsMode === "discover") loadRecentReels()
 
     }
 
-    if (loading) return <div>Loading...</div>
+    if (loading && !reels) {
+        return (
+            <main className="flex flex-1 max-w-[1440px] mx-auto w-full">
+                <aside className="bg-white hidden lg:flex w-64 flex-col border-slate-200 dark:border-slate-800 p-4 sticky top-[65px] h-[calc(100vh-65px)]">
+                    <div className="mb-6 h-48 rounded-3xl bg-slate-100 animate-pulse dark:bg-slate-800"></div>
+                    <div className="space-y-3">
+                        {Array.from({ length: 4 }).map((_, index) => (
+                            <div key={index} className="h-12 rounded-2xl bg-slate-100 animate-pulse dark:bg-slate-800" />
+                        ))}
+                    </div>
+                </aside>
+
+                <section className="flex-1 p-4">
+                    <div className="mb-6 h-12 w-56 rounded-full bg-slate-100 animate-pulse dark:bg-slate-800"></div>
+                    <SkeletonList count={6} />
+                </section>
+            </main>
+        )
+    }
+
+    if (error && !reels) {
+        return (
+            <main className="flex flex-1 max-w-[1440px] mx-auto w-full">
+                <div className="flex-1 p-4">
+                    <ErrorScreen title="Could not load reels" message={error} onRetry={fetchReels} />
+                </div>
+            </main>
+        )
+    }
 
     return (
         <main className="flex flex-1 max-w-[1440px] mx-auto w-full">

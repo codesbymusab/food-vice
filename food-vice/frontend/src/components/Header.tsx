@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { NotificationsDropDown } from "./NotificationsDropdown";
 import { useAuth } from "../context/AuthContext";
+import { signOutUser } from "../apis/user";
 
 export function Header() {
 
@@ -10,21 +11,14 @@ export function Header() {
     const {user,setUser}=useAuth()
 
     async function onSignOutClick() {
-        
         try {
-            const res = await fetch("http://localhost:3000/auth/signout", {
-                credentials: "include"
-            });
-
-            if (res.ok) {
-                setUser(null)
-                navigate('/login')
-            }
+            await signOutUser();
+            setUser(null);
+            navigate('/login');
         }
         catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
     }
 
     return (

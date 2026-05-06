@@ -5,6 +5,7 @@ import { PostedReview } from "./PostedReview";
 import { SavedRestaurant } from "./SavedRestaurant";
 import { useParams } from "react-router";
 import { EditProfilePage } from "./EditProfilePage";
+import { fetchUserProfile as loadUserProfileData, fetchSavedRestaurants, fetchUserReels, fetchUserReviews } from "../../../apis/profile";
 import type { Restaurant } from "../RestaurantDetail/RestaurantDetailPage";
 import type { Reel } from "../Reels/ReelsPage";
 import type { Review } from "../RestaurantDetail/ReviewTile";
@@ -48,29 +49,17 @@ export function UserProfilePage() {
         try {
             setLoading(true);
 
-            const [profileRes, restaurantsRes, reelsRes, reviewsRes] = await Promise.all([
-                fetch(`http://localhost:3000/user/profile/${params.id}`, { credentials: "include" }),
-                fetch(`http://localhost:3000/restaurant/saved?userId=${params.id}`, { credentials: "include" }),
-                fetch(`http://localhost:3000/reels/${params.id}`, { credentials: "include" }),
-                fetch(`http://localhost:3000/reviews/user/${params.id}`, { credentials: "include" }),
+            const [profileData, restaurantsData, reelsData, reviewsData] = await Promise.all([
+                loadUserProfileData(params.id!),
+                fetchSavedRestaurants(params.id!),
+                fetchUserReels(params.id!),
+                fetchUserReviews(params.id!),
             ]);
 
-            if (!profileRes.ok || !restaurantsRes.ok || !reelsRes.ok || !reviewsRes.ok) {
-                throw new Error("Failed to load user data");
-            }
-
-           
-            const profileData = await profileRes.json();
-            const restaurantsData = await restaurantsRes.json();
-            const reelsData = await reelsRes.json();
-            const reviewsData = await reviewsRes.json();
-
-        
             setUserProfile(profileData);
             setRestaurants(restaurantsData);
             setReels(reelsData);
             setReviews(reviewsData);
-
         } catch (err) {
             console.error("Error fetching user profile data:", err);
         } finally {

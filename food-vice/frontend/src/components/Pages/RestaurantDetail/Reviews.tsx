@@ -1,6 +1,7 @@
 import { useEffect, useState, type Dispatch } from "react"
 import { type Review, ReviewTile } from "./ReviewTile"
 import { useParams } from "react-router"
+import { fetchReviews } from "../../../apis/reviews"
 
 type ReviewProps = {
     
@@ -12,28 +13,17 @@ export function Reviews({ userReview, setUserReview }:ReviewProps) {
     
     const [reviews, setReviews] = useState<Review[] | null>(null)
 
-    async function fetchReviews() {
+    async function loadReviews() {
         try {
-            const res = await fetch(
-                `http://localhost:3000/reviews/${params.id}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const {reviews} = await res.json();
-                console.log(reviews)
-                setReviews(reviews)
-                
-            }
-            else{
-                throw new Error('Failed to load reviews')
-            }
+            const reviewsData = await fetchReviews({restId:params.id!});
+            setReviews(reviewsData ?? null);
         } catch (error) {
             console.error(error);
         }
     }
 
     useEffect(() => {
-        fetchReviews()
+        loadReviews()
     }, [])
 
     return (

@@ -2,36 +2,39 @@ import { useEffect, useState } from "react";
 import type { TopRatedRestaurant } from "../../Explore/RestaurantCard";
 import { TopRatedCard } from "../Cards/TopRatedCard";
 import { useAuth } from "../../../../context/AuthContext";
+import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { fetchTopRatedRestaurants } from "../../../../apis/restaurants";
 
-export function TopRated({location}:{location:[number,number]}) {
+export function TopRated({location}:{location:[number,number] | null}) {
 
     const [topRatedRestaurants, setTopRatedRestaurants] = useState<TopRatedRestaurant[] | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     const {user} = useAuth()
     
     
   
 
-  async function fetchTopRatedRestaurants(location: [number, number] | null) {
+  async function loadTopRatedRestaurants(location: [number, number] | null) {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(
-        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&userId=${user!.userId}`,
-        { credentials: "include" }
-      );
-      if (res.ok) {
-        const { details } = await res.json();
-        setTopRatedRestaurants(details);
-
-      }
-      else{
-        throw new Error('Failed to load top rated restaurants')
-      }
+      const details = await fetchTopRatedRestaurants({
+        userId: user!.userId,
+        filters: { cuisine: 'All', price: '', rating: 0, dist: 50 },
+        location,
+      });
+      setTopRatedRestaurants(details);
     } catch (error) {
       console.error(error);
+      setError("Unable to load top rated restaurants. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-      fetchTopRatedRestaurants(location)
+      loadTopRatedRestaurants(location)
     }, []);
   
 
@@ -49,9 +52,21 @@ export function TopRated({location}:{location:[number,number]}) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             {
-                topRatedRestaurants && topRatedRestaurants.map((restaurant)=>{
-                    return <TopRatedCard key={restaurant._id} restaurant={restaurant}/>
-                })
+                loading ? (
+                    <SkeletonList count={3} />
+                ) : error ? (
+                    <div className="col-span-full">
+                        <ErrorScreen title="Unable to load top rated restaurants" message={error} onRetry={() => loadTopRatedRestaurants(location)} />
+                    </div>
+                ) : topRatedRestaurants && topRatedRestaurants.length > 0 ? (
+                    topRatedRestaurants.map((restaurant)=>{
+                        return <TopRatedCard key={restaurant._id} restaurant={restaurant}/>
+                    })
+                ) : (
+                    <div className="col-span-full rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                        No top rated restaurants are available yet.
+                    </div>
+                )
             }
            
                 

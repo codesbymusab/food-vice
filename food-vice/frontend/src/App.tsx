@@ -11,13 +11,13 @@ import { ReelsPage } from "./components/Pages/Reels/ReelsPage";
 import { CommunitiesPage } from "./components/Pages/Community/CommunitiesPage";
 import { ThreadDetailPage } from "./components/Pages/Community/Threads/ThreadDetailPage";
 import { RestaurantDetailPage } from "./components/Pages/RestaurantDetail/RestaurantDetailPage";
-import { EditProfilePage } from "./components/Pages/Profile/EditProfilePage";
 import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunityPage";
 import ExplorePage from "./components/Pages/Explore/ExplorePage";
 import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
 import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
 import { PublicRoute } from "./components/PublicRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { OfflineScreen } from "./components/Shared/Feedback";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -62,11 +62,14 @@ function MainLayout() {
         <Route path="/profile/:id" element={<UserProfilePage />} />
         <Route path="/reels" element={<ReelsPage />} />
         <Route path="/community" element={<CommunitiesPage />} />
-        <Route path="/community/:name" element={<CommunityDetailPage />} />
-        <Route path="/community/:name/:id" element={<ThreadDetailPage />} />
+        <Route path="/community/:id" element={<CommunityDetailPage />} />
+        <Route path="/community/:id/:threadId" element={<ThreadDetailPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDeatilPage />} />
+      
+        
         <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} />
         <Route path="/community/create" element={<CreateCommunityPage />} />
-        <Route path="/community/:name/create" element={<CreateThreadPage />} />
+        <Route path="/community/:id/create-thread" element={<CreateThreadPage />} />
 
       </Routes>
       <Footer />
@@ -76,6 +79,24 @@ function MainLayout() {
 }
 
 function App() {
+  const [isOnline, setIsOnline] = useState(() => typeof navigator !== "undefined" ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  if (!isOnline) {
+    return <OfflineScreen />;
+  }
 
   return (
 

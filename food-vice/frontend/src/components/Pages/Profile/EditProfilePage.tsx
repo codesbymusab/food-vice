@@ -1,5 +1,6 @@
 import { useState } from "react"
 import type { UserProfile } from "./UserProfilePage"
+import { editUserProfile } from "../../../apis/profile"
 
 export function EditProfilePage({ profile, setShowEditForm, fetchProfile }: { profile: UserProfile, setShowEditForm: React.Dispatch<React.SetStateAction<boolean>>, fetchProfile: () => Promise<void> }) {
 
@@ -76,16 +77,9 @@ export function EditProfilePage({ profile, setShowEditForm, fetchProfile }: { pr
 
             console.log([...data.entries()])
 
-            const res = await fetch(`http://localhost:3000/user/edit`, {
-                method: "PUT",
-                body: data,
-                credentials: "include"
-            })
-
-            if (res.ok) {
-                setShowEditForm(false)
-                await fetchProfile()
-            }
+            await editUserProfile(data)
+            setShowEditForm(false)
+            await fetchProfile()
 
 
 

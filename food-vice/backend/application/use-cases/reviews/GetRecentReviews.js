@@ -4,12 +4,12 @@ class GetRecentReviews {
         this.reviewRepo = reviewRepo
     }
 
-    async execute(data) {
+    async execute({userId}) {
 
         
         const result = {};
 
-        const reviews = await this.reviewRepo.getRecentReviews({})
+        const reviews = await this.reviewRepo.getRecentReviews({userId})
        
         if (reviews) {
             

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router"
 import { useAuth } from "../../../context/AuthContext"
+import { saveRestaurant as saveRestaurantApi } from "../../../apis/restaurants"
 import type { Dispatch, SetStateAction } from "react"
 
 export type TopRatedRestaurant =
@@ -29,37 +30,19 @@ export function RestaurantCard({ restaurant, setTopRatedRestaurants }: { restaur
     const { user } = useAuth()
 
     async function saveRestaurant(userId: string, restId: string) {
-
         try {
-            const res = await fetch("http://localhost:3000/save/restaurant", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, restId: restId }),
-                credentials: "include"
-            });
-
-            if (res.ok) {
-                console.log(await res.json())
-                setTopRatedRestaurants(prev =>
-                    prev
-                        ? prev.map(r =>
-                            r._id === restId ? { ...r, isSaved: !r.isSaved } : r
-                        )
-                        : prev
-                );
-
-            }
-            else {
-                throw new Error('Failed to save restaurant')
-            }
+            await saveRestaurantApi({ userId, restId });
+            setTopRatedRestaurants(prev =>
+                prev
+                    ? prev.map(r =>
+                        r._id === restId ? { ...r, isSaved: !r.isSaved } : r
+                    )
+                    : prev
+            );
+        } catch (error) {
+            console.log(error);
+            return false;
         }
-
-        catch (error) {
-            console.log(error)
-            return false
-
-        }
-
     }
 
 

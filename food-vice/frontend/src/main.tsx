@@ -6,6 +6,7 @@ import App from './App.tsx'
 import ScrollToTop from './components/ScrollToTop.tsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './context/AuthContext.tsx'
+import { LocationProvider } from './context/LocationContext.tsx'
 
 
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
 
         <ScrollToTop />
         <AuthProvider>
-          <App />
+          <LocationProvider>
+            <App />
+          </LocationProvider>
         </AuthProvider>
 
       </BrowserRouter>

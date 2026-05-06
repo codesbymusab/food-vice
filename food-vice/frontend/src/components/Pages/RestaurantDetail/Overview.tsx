@@ -11,8 +11,8 @@ type OverviewProps={
     recentReviews:Review[]|null,
     setUserReview:Dispatch<React.SetStateAction<Review[] | null>>,
     setRecentReviews:Dispatch<React.SetStateAction<Review[] | null>>
-    fetchRestaurant:(location: [number, number] | undefined) => Promise<void>,
-    location:[number,number]
+    fetchRestaurant:(location: [number, number] | null) => Promise<void>,
+    location:[number,number] | null
 
 }
 

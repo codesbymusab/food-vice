@@ -4,6 +4,8 @@ const cors = require('cors')
 const mongodbConfig = require('./infrastructure/database/mongodb/config/db')
 const authRoute = require('./interfaces/routes/authRoute')
 const userRoute = require('./interfaces/routes/userRoute')
+const communityRoute = require('./interfaces/routes/communityRoute')
+const threadRoute = require('./interfaces/routes/threadRoute')
 const restRoute = require('./interfaces/routes/restaurantRoute')
 const saveRoute = require('./interfaces/routes/saveRoute')
 const likeRoute = require('./interfaces/routes/likeRoute')
@@ -12,7 +14,8 @@ const reelRoute= require('./interfaces/routes/reelRoute')
 const commentRoute= require('./interfaces/routes/commentRoute')
 const { verifyAuth } = require('./interfaces/middlewares/authMiddleware')
 const cookieParser = require('cookie-parser');
-const { testUploadReel } = require('./app')
+
+
 
 
 dotenv.config()
@@ -33,9 +36,12 @@ mongodbConfig.connectDB()
 
 app.use('/auth', authRoute)
 app.use('/user', userRoute)
+app.use('/community', communityRoute)
+app.use('/thread', threadRoute)
 app.use('/restaurant', restRoute)
 app.use('/save', saveRoute)
 app.use('/like', likeRoute)
 app.use('/reviews',reviewRoute)
 app.use('/reels',reelRoute)
 app.use('/comments',commentRoute)
+

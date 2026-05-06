@@ -370,9 +370,8 @@ class ReelRepoImpl {
   async createReel({ title, description, tags, userId }) {
 
     const tagDocs = await Promise.all(
-      JSON.parse(tags).map(async tagName => {
+      tags.map(async tagName => {
         let tag = await ReelTagModel.findOne({ name: tagName });
-        if (!tag) tag = await ReelTagModel.create({ name: tagName });
         return tag._id;
       })
     );

@@ -3,6 +3,10 @@ import { FiltersSidebar } from './FiltersSidebar';
 import { useEffect, useState } from 'react';
 import ExploreMapView from './ExploreMapView';
 import { useAuth } from '../../../context/AuthContext';
+import { useAppLocation } from '../../../context/LocationContext';
+import { ErrorScreen, SkeletonList } from '../../Shared/Feedback';
+import { fetchTopRatedRestaurants as loadTopRatedRestaurantsAPI, fetchRecommendedRestaurants as loadRecommendedRestaurantsAPI } from '../../../apis/restaurants';
+import { fetchCuisines } from '../../../apis/cuisines';
 
 export type Cuisine = {
   _id: string,
@@ -18,10 +22,11 @@ export type Filter = {
 function ExplorePage() {
 
   const { user } = useAuth()
+  const { location, loading: locationLoading, error: locationError, fetchLocation } = useAppLocation();
   const [topRatedRestaurants, setTopRatedRestaurants] = useState<TopRatedRestaurant[] | null>(null);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState<RecommendedRestaurant[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true)
-  const [location, setLocation] = useState<[number, number] | null>(null);
+  const [error, setError] = useState<string | null>(null)
   const [mapView, setMapView] = useState<boolean>(false)
   const [cuisines, setCuisines] = useState<Cuisine[] | null>(null)
   const [filters, setFilters] = useState<Filter>({
@@ -32,72 +37,34 @@ function ExplorePage() {
 
   })
 
-  function fetchLocation() {
-    if (!navigator.geolocation) {
-      console.error("Geolocation not supported");
-      setLoading(false)
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setLocation([latitude, longitude]);
-        setLoading(false)
-      },
-      (error) => {
-        console.error("Error getting user location:", error);
-        setLoading(false)
-      }
-    );
-  }
-
-  async function fetchTopRatedRestaurants(location: [number, number] | null) {
+  async function loadTopRatedRestaurants(location: [number, number] | null) {
     try {
-      const res = await fetch(
-        `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${user?.userId}`,
-        { credentials: "include" }
-      );
-      if (res.ok) {
-        const { details } = await res.json();
-        setTopRatedRestaurants(details);
-
-      }
+      const details = await loadTopRatedRestaurantsAPI({ userId: user?.userId ?? '', filters, location });
+      setTopRatedRestaurants(details ?? null);
     } catch (error) {
       console.error(error);
+      setError("Unable to load top rated restaurants. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function fetchRecommendedRestaurants(location: [number, number] | null) {
+  async function loadRecommendedRestaurants(location: [number, number] | null) {
     try {
-      const res = await fetch(
-        `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${user?.userId}`,
-        { credentials: "include" }
-      );
-      if (res.ok) {
-        const { details } = await res.json();
-        console.log(details)
-        setRecommendedRestaurants(details);
-
-      }
+      const details = await loadRecommendedRestaurantsAPI({ userId: user?.userId ?? '', filters, location });
+      setRecommendedRestaurants(details ?? null);
     } catch (error) {
       console.error(error);
+      setError("Unable to load recommended restaurants. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function fetchCuisines() {
+  async function loadCuisines() {
     try {
-      const res = await fetch(
-        'http://localhost:3000/restaurant/cuisines',
-        { credentials: "include" }
-      );
-      if (res.ok) {
-        const cus = await res.json();
-        setCuisines(cus.result);
-
-      }
-      else {
-        throw new Error('Failed to get cuisines')
-      }
+      const result = await fetchCuisines();
+      setCuisines(result ?? null);
     } catch (error) {
       console.error(error);
     }
@@ -105,40 +72,47 @@ function ExplorePage() {
 
 
   useEffect(() => {
-    fetchLocation();
+    loadCuisines();
   }, []);
 
-
   useEffect(() => {
-    if (!loading) {
-
-      fetchTopRatedRestaurants(location)
-      fetchRecommendedRestaurants(location)
+    if (!locationLoading) {
+      setLoading(true);
+      setError(null);
+      void Promise.all([loadTopRatedRestaurants(location), loadRecommendedRestaurants(location)]);
     }
-
-  }, [loading]);
-
-  useEffect(() => {
-
-    fetchCuisines()
-
-
-  }, []);
+  }, [locationLoading, location]);
 
 
   async function applyFilters() {
-    await fetchTopRatedRestaurants(location)
-    await fetchRecommendedRestaurants(location)
+    setLoading(true);
+    setError(null);
+    await Promise.all([loadTopRatedRestaurants(location), loadRecommendedRestaurants(location)]);
   }
 
 
 
-  if (!topRatedRestaurants) {
+  const displayError = error ?? locationError;
+
+  if (locationLoading && !topRatedRestaurants && !recommendedRestaurants) {
     return (
-      <div>Loading....</div>
+      <main className="flex flex-1 min-h-[calc(100vh-80px)] p-4">
+        <div className="mx-auto w-full max-w-6xl space-y-6">
+          <div className="h-12 w-3/4 rounded-full bg-slate-200 animate-pulse dark:bg-slate-800"></div>
+          <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+            <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-100 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+              <div className="h-10 w-1/2 rounded-full bg-slate-200 animate-pulse dark:bg-slate-700"></div>
+              <div className="h-4 rounded-full bg-slate-200 animate-pulse dark:bg-slate-700"></div>
+              <div className="h-4 rounded-full bg-slate-200 animate-pulse dark:bg-slate-700"></div>
+            </div>
+            <div className="space-y-4">
+              <SkeletonList count={3} />
+            </div>
+          </div>
+        </div>
+      </main>
     )
   }
-
 
   return (
     <>
@@ -149,6 +123,11 @@ function ExplorePage() {
 
 
         <section className="flex-1 flex flex-col p-4 gap-8 overflow-y-auto max-w-[1200px] mx-auto w-full">
+          {displayError ? (
+            <div className="mb-6">
+              <ErrorScreen title="Unable to load explore content" message={displayError} onRetry={() => void fetchLocation()} />
+            </div>
+          ) : null}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Discover Delicious</h1>
@@ -203,7 +182,7 @@ function ExplorePage() {
                 <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 overflow-x-auto">
                   { 
                     recommendedRestaurants ?
-                    topRatedRestaurants
+                    topRatedRestaurants && topRatedRestaurants
                       .filter(
                         top =>
                           !recommendedRestaurants.some(
@@ -218,7 +197,7 @@ function ExplorePage() {
                         />
                       ))
                       :
-                      topRatedRestaurants.map(restaurant => (
+                      topRatedRestaurants && topRatedRestaurants.map(restaurant => (
                         <RestaurantCard
                           key={restaurant._id}
                           restaurant={restaurant}
@@ -231,7 +210,7 @@ function ExplorePage() {
             </>
             :
 
-            <ExploreMapView topRatedRestaurants={topRatedRestaurants} location={location} />
+            <ExploreMapView topRatedRestaurants={topRatedRestaurants!} location={location} />
           }
         </section>
 

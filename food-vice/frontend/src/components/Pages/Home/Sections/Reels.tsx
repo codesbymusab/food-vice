@@ -2,35 +2,32 @@ import { useEffect, useState } from "react";
 import type { Reel } from "../../Reels/ReelsPage";
 import { ReelCard } from "../Cards/ReelCard";
 import { useAuth } from "../../../../context/AuthContext";
+import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { fetchRecentReels } from "../../../../apis/reels";
 
 export function Reels() {
 
 
     const [reels, setReels] = useState<Reel[] | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string | null>(null)
     const {user}=useAuth()
-    async function fetchRecentReels() {
+    async function loadRecentReels() {
+        setLoading(true)
+        setError(null)
         try {
-
-            const res = await fetch(
-                `http://localhost:3000/reels/recent/reels?userId=${user!.userId}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const reels = await res.json();
-                console.log(reels)
-                setReels(reels)
-            }
-            else {
-                throw new Error('Failed to load recent reels')
-            }
+            const reelsData = await fetchRecentReels({ userId: user!.userId });
+            setReels(reelsData ?? null);
         } catch (error) {
             console.error(error);
+            setError("Unable to load reels. Please try again.");
+        } finally {
+            setLoading(false)
         }
-
     }
 
     useEffect(() => {
-        fetchRecentReels()
+        loadRecentReels()
     }, [])
 
 
@@ -44,12 +41,21 @@ export function Reels() {
                     <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Trending</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-
-                    {
-                        reels && reels.length>0 && reels.map((reel) => {
-                            return <ReelCard reel={reel} />
+                    {loading ? (
+                        <SkeletonList count={5} />
+                    ) : error ? (
+                        <div className="col-span-full">
+                            <ErrorScreen title="Could not load reels" message={error} onRetry={loadRecentReels} />
+                        </div>
+                    ) : reels && reels.length > 0 ? (
+                        reels.map((reel) => {
+                            return <ReelCard key={reel._id} reel={reel} />
                         })
-                    }
+                    ) : (
+                        <div className="col-span-full rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                            No reels are available yet.
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

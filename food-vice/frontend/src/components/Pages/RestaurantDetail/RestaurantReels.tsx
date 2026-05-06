@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 import { ReelCard } from "../Reels/ReelCard"
+import { fetchReels } from "../../../apis/reels"
 
 type Photo = {
     _id: string,
@@ -11,27 +12,17 @@ export function Reels() {
 
     const [reels, setReels] = useState<Photo[] | null>(null)
 
-    async function fetchReels() {
+    async function loadReels() {
         try {
-            const res = await fetch(
-                `http://localhost:3000/restaurant/reels/${params.id}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const { reels } = await res.json();
-                console.log(reels)
-                setReels(reels)
-            }
-            else {
-                throw new Error('Failed to load Reels')
-            }
+            const reels = await fetchReels({ reelId: params.id! });
+            setReels(reels ?? null);
         } catch (error) {
             console.error(error);
         }
     }
 
     useEffect(() => {
-        fetchReels()
+        loadReels()
     }, [])
 
     return (

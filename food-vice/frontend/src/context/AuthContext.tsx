@@ -11,6 +11,8 @@ import type {
   SetStateAction,
 } from "react"
 
+import { fetchUser as fetchUserApi } from "../apis/user";
+
 interface User {
   userId: string;
   email: string;
@@ -45,31 +47,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
+    setLoading(true);
 
-    setLoading(true)
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await fetch("http://localhost:3000/user/me", {
-        credentials: "include",
-      });
-
-      if (!res.ok){
-        throw new Error("Not authenticated");
-      }
-
-      const data = await res.json();
-
-      if(data.user){
-        console.log(data.user)
-        setUser(data.user as User);
-      
-      }
-      else{
-        setUser(null)
-
-      }
+      const userData = await fetchUserApi();
+      setUser(userData);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setUser(null);
     } finally {
       setLoading(false);

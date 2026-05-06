@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import type { Reel } from "./ReelsPage";
 import { useAuth } from "../../../context/AuthContext";
 import { ReelCommentsSheet } from "./ReelCommentsSheet";
+import { updateViews } from "../../../apis/reels";
 
 type ReelProps = {
     reel: Reel,
@@ -25,7 +26,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
         if (!video) return;
 
         const updateProgress = () => {
-            const percent = (video.currentTime / video.duration) * 100;
+            const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
             setProgress(percent || 0);
         };
 
@@ -46,17 +47,17 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
       
         if (video.paused) {
             video.play();
-            updateViews()
+            video.muted=false
+            updateView()
         } else {
             video.pause();
+            video.muted=true
         }
     };
 
-    async function updateViews() {
+    async function updateView() {
         try {
-            await fetch(`http://localhost:3000/reels/${reel._id}/view`, {
-                method: "POST"
-            });
+            await updateViews({ reelId: reel._id });
         } catch (error) {
             console.error("Error tracking view:", error);
         }
@@ -67,7 +68,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
         >
 
-            <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl">
+            <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl" onClick={togglePlay} >
 
 
 
@@ -79,7 +80,8 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                     autoPlay={false}
                     loop
                     muted
-
+                    preload="auto"
+                    
                 />
 
 
@@ -98,7 +100,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
 
                 <button
-                    onClick={togglePlay}
+                    onClick={(e)=>{e.stopPropagation(); togglePlay()}}
                     className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-16 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center transition-transform ${isPlaying && !showButton ? "opacity-0 hover:opacity-100" : "opacity-100"
                         }`}
                 >
@@ -111,14 +113,14 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                 <div className="absolute right-4 bottom-24 flex flex-col gap-6 text-white">
 
                     <div className="flex flex-col items-center gap-1">
-                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isLikedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async () => await toggleReelLike(user!.userId, reel._id, reel.isLikedByUser)}>
+                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isLikedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) =>{e.stopPropagation(); await toggleReelLike(user!.userId, reel._id, reel.isLikedByUser)}}>
                             <span className="material-symbols-outlined text-2xl">favorite</span>
                         </button>
                         <span className="text-xs font-bold">{reel.likeCount}</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1">
-                        <button className="size-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-accent-cyan transition-colors" onClick={() => setShowComments(prev => !prev)}>
+                        <button className="size-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-accent-cyan transition-colors" onClick={(e) => {e.stopPropagation(); setShowComments(prev => !prev)}}>
                             <span className="material-symbols-outlined text-2xl">chat</span>
                         </button>
                         <span className="text-xs font-bold">{commentCount}</span>
@@ -132,7 +134,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                     </div>
 
                     <div className="flex flex-col items-center gap-1">
-                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isSavedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async () => await saveReel(user!.userId, reel._id)}>
+                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isSavedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) => {e.stopPropagation(); await saveReel(user!.userId, reel._id)}}>
                             <span className="material-symbols-outlined text-2xl">bookmark</span>
                         </button>
                         <span className="text-xs font-bold">{reel.saveCount}</span>

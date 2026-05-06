@@ -2,6 +2,7 @@ import { useNavigate } from "react-router"
 import type { Review } from "../../RestaurantDetail/ReviewTile"
 import type { Dispatch, SetStateAction } from "react"
 import { useAuth } from "../../../../context/AuthContext"
+import { toggleLikeReview as toggleLikeReviewApi } from "../../../../apis/reviews"
 
 export function ReviewCard({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
 
@@ -24,18 +25,7 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
         );
 
         try {
-            const res = await fetch("http://localhost:3000/like/review", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, reviewId: reviewId }),
-                credentials: "include",
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to update like");
-            }
-
-            console.log(await res.json());
+            await toggleLikeReviewApi({ userId, reviewId });
         } catch (err) {
             console.error(err);
 
@@ -77,9 +67,9 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4 ">
                     {review.text}
                 </p>
-                <div className="rounded-2xl overflow-hidden" data-alt="Close up photo of a gourmet burger">
+                { review.photos.length> 0 && <div className="rounded-2xl overflow-hidden" data-alt="Close up photo of a gourmet burger">
                     {review.photos.map((photo) => { return <img key={photo._id} className="w-full h-64 object-cover" src={photo.url} /> })}
-                </div>
+                </div>}
             </div>
 
             <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-700 flex justify-between items-center">

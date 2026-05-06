@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { useParams } from "react-router";
+import { createReview } from "../../../apis/reviews";
 
-export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: { setShowReviewForm: React.Dispatch<React.SetStateAction<boolean>>,fetchRestaurant:(location: [number, number] | undefined) => Promise<void>,location:[number,number] }) {
+export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: { setShowReviewForm: React.Dispatch<React.SetStateAction<boolean>>,fetchRestaurant:(location: [number, number] | null) => Promise<void>,location:[number,number] | null }) {
   const [food, setFood] = useState(0);
   const [service, setService] = useState(0);
   const [ambience, setAmbience] = useState(0);
@@ -25,14 +26,8 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
 
       files.forEach(file => formData.append("files", file));
 
-      const res = await fetch("http://localhost:3000/reviews/create", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to submit review");
-
-      await fetchRestaurant(location)
+      await createReview(formData);
+      await fetchRestaurant(location);
 
       setShowReviewForm(false);
     } catch (err) {

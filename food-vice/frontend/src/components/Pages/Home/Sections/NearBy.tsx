@@ -4,8 +4,9 @@ import type { TopRatedRestaurant } from "../../Explore/RestaurantCard";
 import { NearByCard } from "../Cards/NearByCard";
 import { Marker } from "../../Explore/ExploreMapView";
 import GoogleMapReact from "google-map-react";
+import { fetchTopRatedRestaurants } from "../../../../apis/restaurants";
 
-export function Nearby({ location }: { location: [number, number] }) {
+export function Nearby({ location }: { location: [number, number] | null }) {
 
     const [nearbyRestaurants, setNearbyRestaurants] = useState<TopRatedRestaurant[] | null>(null);
     const { user } = useAuth()
@@ -13,27 +14,21 @@ export function Nearby({ location }: { location: [number, number] }) {
 
 
 
-    async function fetchTopRatedRestaurants(location: [number, number] | null) {
+    async function loadNearbyRestaurants(location: [number, number] | null) {
         try {
-            const res = await fetch(
-                `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&userId=${user!.userId}&dist=3&limitCount=3`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const { details } = await res.json();
-                setNearbyRestaurants(details);
-
-            }
-            else {
-                throw new Error('Failed to load top rated restaurants')
-            }
+            const details = await fetchTopRatedRestaurants({
+                userId: user!.userId,
+                filters: { cuisine: 'All', price: '', rating: 0, dist: 3 },
+                location,
+            });
+            setNearbyRestaurants(details);
         } catch (error) {
             console.error(error);
         }
     }
 
     useEffect(() => {
-        fetchTopRatedRestaurants(location)
+        loadNearbyRestaurants(location)
     }, []);
 
 

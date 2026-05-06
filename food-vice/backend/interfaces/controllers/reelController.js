@@ -52,7 +52,7 @@ exports.getRecent = async (req, res) => {
 
 exports.getFollowers = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 5;
         const userId = req.query.userId
         
         const reelRepo = new ReelRepoImpl()
@@ -67,7 +67,7 @@ exports.getFollowers = async (req, res) => {
 
 exports.getPopularTags = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 5;
         const reelRepo = new ReelRepoImpl()
         const getPopularTagsUseCase = new GetPopularTags(reelRepo);
         const tags = await getPopularTagsUseCase.execute({ limit });
@@ -95,7 +95,7 @@ exports.updateViews=async (req, res) => {
 
 exports.getUserReels = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 5;
         const userId = req.params.userId
         const reelRepo = new ReelRepoImpl()
         const getReels = new GetUserReels(reelRepo)

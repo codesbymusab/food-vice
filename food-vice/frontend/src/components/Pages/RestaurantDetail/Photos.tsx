@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
+import { fetchPhotos } from "../../../apis/restaurants"
 
 type Photo = {
     _id: string,
@@ -10,27 +11,17 @@ export function Photos() {
 
     const [photos, setPhotos] = useState<Photo[] | null>(null)
 
-    async function fetchPhotos() {
+    async function loadPhotos() {
         try {
-            const res = await fetch(
-                `http://localhost:3000/restaurant/photos/${params.id}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const { photos } = await res.json();
-                console.log(photos)
-                setPhotos(photos)
-            }
-            else {
-                throw new Error('Failed to load photos')
-            }
+            const photos = await fetchPhotos({ restId: params.id! });
+            setPhotos(photos ?? null);
         } catch (error) {
             console.error(error);
         }
     }
 
     useEffect(() => {
-        fetchPhotos()
+        loadPhotos()
     }, [])
 
     return (

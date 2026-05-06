@@ -1,4 +1,5 @@
 import { useAuth } from "../../../context/AuthContext";
+import { toggleLikeReview as toggleLikeReviewApi } from "../../../apis/reviews";
 import type { Review } from "../RestaurantDetail/ReviewTile";
 
 export function PostedReview({ review,setReviews }: { review: Review , setReviews: React.Dispatch<React.SetStateAction<Review[]>>}) {
@@ -21,21 +22,9 @@ export function PostedReview({ review,setReviews }: { review: Review , setReview
         );
 
         try {
-            const res = await fetch("http://localhost:3000/like/review", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, reviewId: reviewId }),
-                credentials: "include",
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to update like");
-            }
-
-            console.log(await res.json());
+            await toggleLikeReviewApi({ userId, reviewId });
         } catch (err) {
             console.error(err);
-
             setReviews(prev =>
                 prev
                     ? prev.map(r =>

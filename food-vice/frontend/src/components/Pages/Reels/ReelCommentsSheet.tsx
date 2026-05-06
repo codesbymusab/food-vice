@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { fetchComments, postComment, toggleCommentLike } from "../../../apis/reels";
 
 type ReelComment = {
   _id: string;
@@ -27,56 +28,38 @@ export function ReelCommentsSheet({
   const [comments, setComments] = useState<ReelComment[]>([]);
   const { user } = useAuth();
 
-  async function fetchComments() {
+  async function loadComments() {
     try {
-      const res = await fetch(
-        `http://localhost:3000/comments/${reelId}?userId=${user!.userId}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setComments(data);
-      } else {
-        throw new Error("Failed to load comments");
-      }
+      const data = await fetchComments({ userId: user!.userId, reelId });
+      setComments(data ?? []);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   }
 
-  async function postComment() {
+  async function postCommentHandler() {
     if (!newComment.trim()) return;
     try {
-      const res = await fetch(`http://localhost:3000/comments/${reelId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user!.userId, text: newComment }),
-      });
-      if (!res.ok) throw new Error("Failed to post comment");
+      await postComment({ reelId, userId: user!.userId, newComment });
       setNewComment("");
-      fetchComments();
-      setCommentCount(prev=>prev+1)
-      
+      await loadComments();
+      setCommentCount(prev => prev + 1);
     } catch (error) {
       console.error("Error posting comment:", error);
     }
   }
 
-  async function toggleCommentLike(commentId: string) {
+  async function toggleCommentLikeHandler(commentId: string) {
     try {
-      const res = await fetch(`http://localhost:3000/like/reel/comment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commentId, userId: user!.userId }),
-      });
-      if (!res.ok) throw new Error("Failed to toggle comment like");
-      fetchComments();
+      await toggleCommentLike({ commentId, userId: user!.userId });
+      await loadComments();
     } catch (error) {
       console.error("Error toggling comment like:", error);
     }
   }
 
   useEffect(() => {
-    fetchComments();
+    loadComments();
   }, []);
 
   return (
@@ -111,7 +94,7 @@ export function ReelCommentsSheet({
                         ? "bg-primary/20 text-primary"
                         : "bg-black/10 text-slate-600"
                     }`}
-                    onClick={() => toggleCommentLike(c._id)}
+                    onClick={() => toggleCommentLikeHandler(c._id)}
                   >
                     <span className="material-symbols-outlined text-lg">thumb_up</span>
                   </button>
@@ -137,7 +120,7 @@ export function ReelCommentsSheet({
             className="flex-1 border border-outline rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <button
-            onClick={postComment}
+            onClick={postCommentHandler}
             className="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary/80 transition-colors"
           >
             Post

@@ -11,7 +11,7 @@ const StorageServiceImpl = require("../../infrastructure/services/FirebaseStorag
 exports.restReviews = async (req, res) => {
     try {
         const restId = req.params.restaurantId
-        console.log(restId)
+      
         const reviewRepo = new ReviewRepoImpl()
         const getReviews = new GetRestaurantReviews(reviewRepo)
         const result = await getReviews.execute({ restId: restId })
@@ -34,7 +34,9 @@ exports.recentReviews = async (req, res) => {
         
         const reviewRepo = new ReviewRepoImpl()
         const getrecentReviews = new GetRecentReviews(reviewRepo)
-        const result = await getrecentReviews.execute()
+        const userId=req.query.userId
+        console.log(userId)
+        const result = await getrecentReviews.execute({userId:userId})
 
         if (result) {
             res.status(200).json(result.reviews);

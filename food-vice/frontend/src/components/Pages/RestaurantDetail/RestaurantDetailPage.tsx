@@ -3,10 +3,12 @@ import { type Rating } from "./RatingSummaryCard";
 import {useNavigate, useParams } from "react-router";
 import GoogleMapReact from "google-map-react";
 import { useAuth } from "../../../context/AuthContext";
+import { useAppLocation } from "../../../context/LocationContext";
 import { Overview } from "./Overview";
 import { Reviews } from "./Reviews";
 import { Photos } from "./Photos";
 import { Reels } from "./RestaurantReels";
+import { fetchRestaurantDetails, fetchSimilarRestaurants, saveRestaurant as saveRestaurantApi } from "../../../apis/restaurants";
 import type { Review } from "./ReviewTile";
 
 export type SimilarRestaurant = {
@@ -100,7 +102,7 @@ const d = new Date()
 
 export function RestaurantDetailPage() {
     const params = useParams();
-    const [location, setLocation] = useState<[number, number] | undefined>(undefined);
+    const { location, loading: locationLoading } = useAppLocation();
     const [restaurantDetails, setRestaurantDetails] = useState<Restaurant | null>(null);
     const [similarRestaurants, setSimilarRestaurants] = useState<SimilarRestaurant | null>(null);
     const [recentReviews, setRecentReviews] = useState<Review[] | null>(null)
@@ -112,107 +114,52 @@ export function RestaurantDetailPage() {
 
     const navigate = useNavigate()
 
-   
-    function fetchLocation() {
-        if (!navigator.geolocation) {
-            console.error("Geolocation not supported");
-            setLoading(false)
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                setLocation([latitude, longitude]);
-                setLoading(false)
-            },
-            (error) => {
-                console.error("Error getting user location:", error);
-                setLoading(false)
-            }
-        );
-    }
-
-    async function fetchRestaurant(location: [number, number] | undefined) {
+    async function loadRestaurant(location: [number, number] | null) {
         try {
-            const res = await fetch(
-                `http://localhost:3000/restaurant/details/${params.id}?lat=${location?.[0]}&lon=${location?.[1]}&userId=${user?.userId}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const { details } = await res.json();
-                setRestaurantDetails(details);
-                if (details.recentReviews) setRecentReviews(details.recentReviews)
-                if (details.userReview) setUserReview([details.userReview])
-                console.log(details)
-            }
+            const details = await fetchRestaurantDetails({ restaurantId: params.id!, location, userId: user?.userId });
+            setRestaurantDetails(details);
+            if (details?.recentReviews) setRecentReviews(details.recentReviews)
+            if (details?.userReview) setUserReview([details.userReview])
+            console.log(details)
         } catch (error) {
             console.error(error);
         }
     }
 
 
-    async function fetchSimilarRestaurants(location: [number, number] | undefined) {
+    async function loadSimilarRestaurants(location: [number, number] | null) {
         try {
-            const res = await fetch(
-                `http://localhost:3000/restaurant/similar/${params.id}?lat=${location?.[0]}&lon=${location?.[1]}`,
-                { credentials: "include" }
-            );
-            if (res.ok) {
-                const { details } = await res.json();
-                setSimilarRestaurants(details)
-                console.log(details)
-            }
+            const details = await fetchSimilarRestaurants({ restaurantId: params.id!, location });
+            setSimilarRestaurants(details)
+            console.log(details)
         } catch (error) {
             console.error(error);
         }
     }
 
     async function saveRestaurant(userId: string, restId: string) {
-
         try {
-            const res = await fetch("http://localhost:3000/save/restaurant", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId, restId: restId }),
-                credentials: "include"
-            });
-
-            if (res.ok) {
-
-                setRestaurantDetails({
-                    ...restaurantDetails!,
-                    isSaved: !restaurantDetails!.isSaved
-                })
-
-            }
-            else {
-                throw new Error('Failed to save restaurant')
-            }
+            await saveRestaurantApi({ userId, restId });
+            setRestaurantDetails({
+                ...restaurantDetails!,
+                isSaved: !restaurantDetails!.isSaved
+            })
         }
         catch (error) {
             console.log(error)
             return false
-
         }
-
     }
 
 
 
 
     useEffect(() => {
-        fetchLocation();
-    }, []);
-
-
-    useEffect(() => {
-        if (!loading) {
-            fetchRestaurant(location);
-            fetchSimilarRestaurants(location)
-
+        if (!locationLoading) {
+            loadRestaurant(location);
+            loadSimilarRestaurants(location)
         }
-
-    }, [loading]);
+    }, [locationLoading, location]);
 
 
     if (!restaurantDetails) {
@@ -293,7 +240,7 @@ export function RestaurantDetailPage() {
             <div className="mx-auto max-w-7xl px-4 md:px-10 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
-                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}  fetchRestaurant={fetchRestaurant} location={location!}/>}
+                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}  fetchRestaurant={loadRestaurant} location={location}/>}
                     {selectedTab==='Reviews' && <Reviews userReview={userReview} setUserReview={setUserReview}/>}
                     {selectedTab==='Photos' && <Photos/>}
                     {selectedTab==='Reels' && <Reels/>}
