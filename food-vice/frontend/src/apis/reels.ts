@@ -30,11 +30,11 @@ export type Reel = {
 
 }
 
-export async function fetchRecentReels({ userId }: { userId: string }) {
+export async function fetchRecentReels({ userId,tag }: { userId: string,tag:string|null }) {
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/recent/reels?userId=${userId}`,
+            `http://localhost:3000/reels/recent/reels?userId=${userId}&tag=${tag ?? 'All'}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -155,11 +155,11 @@ export async function fetchPopularTags() {
 }
 
 
-export async function fetchFollowersReels({ userId }: { userId: string }) {
+export async function fetchFollowersReels({ userId,tag }: { userId: string,tag:string|null }) {
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/followers/reels?userId=${userId}`,
+            `http://localhost:3000/reels/followers/reels?userId=${userId}&tag=${tag ?? 'All'}`,
             { credentials: "include" }
         );
         if (res.ok) {

@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import type { Review } from "../../RestaurantDetail/ReviewTile";
 import { ReviewCard } from "../Cards/ReviewCard";
 import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
-import { fetchRecentReviews } from "../../../../apis/reviews";
+import { fetchRecentReviews, type Review } from "../../../../apis/reviews";
 import { useAuth } from "../../../../context/AuthContext";
 
 export function Reviews() {

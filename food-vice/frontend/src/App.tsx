@@ -64,7 +64,7 @@ function MainLayout() {
         <Route path="/community" element={<CommunitiesPage />} />
         <Route path="/community/:id" element={<CommunityDetailPage />} />
         <Route path="/community/:id/:threadId" element={<ThreadDetailPage />} />
-        <Route path="/restaurant/:id" element={<RestaurantDeatilPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       
         
         <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} />

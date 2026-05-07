@@ -3,13 +3,15 @@ export type Review = {
     text: string,
     createdAt: string,
     restaurantId: string,
+    name:string,
     user: {
         username: string,
         name: string,
         profilePhoto?: string,
         level: number,
         reviewCount: number
-    }
+    },
+    restaurant?: {name: string},
     photos: {
         _id: string,
         url: string
@@ -80,6 +82,7 @@ export async function fetchRecentReviews({userId}:{userId:string}) {
         );
         if (res.ok) {
             const reviews = await res.json();
+            console.log(reviews)
             return reviews
 
         }

@@ -9,6 +9,10 @@ const GetCuisines = require('../../application/use-cases/restaurants/GetCuisines
 const GetRestaurantPhotos = require('../../application/use-cases/restaurants/GetRestaurantPhotos')
 const SaveRepoImpl = require('../../infrastructure/database/mongodb/repositories/SaveRepoImpl')
 const GetSavedRestaurants = require('../../application/use-cases/saves/GetSavedRestaurants')
+const GetNearbyyRestaurants = require('../../application/use-cases/restaurants/GetNearbyRest')
+const RestaurantViewModel = require('../../infrastructure/database/mongodb/models/Restaurant/RestaurantViewModel')
+const GetTrendingRestaurants = require('../../application/use-cases/restaurants/GetTrendingRestaurants')
+const mongoose=require('mongoose')
 
 exports.recommendedRest = async (req, res) => {
 
@@ -111,6 +115,52 @@ exports.topRatedRest = async (req, res) => {
 
 
 exports.nearbyRest = async (req, res) => {
+
+    try {
+
+        let location = undefined
+
+        const { lat, lon, cuisine, price, rating, dist, userId, limitCount } = req.query;
+
+        const filters = {
+            cuisine: cuisine || "All",
+            price: price || "",
+            rating: rating ? Number(rating) : 0,
+            distance: dist ? Number(dist) : 50,
+            limitCount: limitCount ? Number(limitCount) : 5
+        };
+
+
+        if (lat && lon && lat !== 'undefined' && lon !== 'undefined') {
+            const latNum = parseFloat(lat);
+            const lonNum = parseFloat(lon);
+
+            if (Number.isNaN(latNum) || Number.isNaN(lonNum)) {
+                location = undefined
+            }
+            else {
+                location = [lonNum, latNum]
+            }
+        }
+
+        const restRepo = new RestaurantRepoImpl()
+        const mediaRepo = new MediaRepoImpl()
+
+        const getNearRest = new GetNearbyyRestaurants(restRepo, mediaRepo)
+        const result = await getNearRest.execute({ location: location, filters: filters, userId: userId })
+
+        if (result) {
+            res.status(200).json({ details: result });
+        }
+
+        res.status(400).json({ message: 'Failed to load Restaurants' });
+
+
+    }
+    catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
 
 }
 
@@ -268,3 +318,53 @@ exports.savedRestaurants=async (req, res) => {
   }
 }
 
+
+
+exports.trendingRestaurants  = async (req, res) => {
+  try {
+    const { lat, lon, maxDistance, limit } = req.query;
+    let location = null;
+    if (lat && lon) {
+      const latNum = parseFloat(lat);
+      const lonNum = parseFloat(lon);
+      if (!Number.isNaN(latNum) && !Number.isNaN(lonNum)) location = [lonNum, latNum];
+    }
+    const restRepo=new RestaurantRepoImpl()
+    const mediaRepo=new MediaRepoImpl()
+    const getTrending=new GetTrendingRestaurants(restRepo,mediaRepo)
+    const data = await getTrending.execute({
+      userId: req.query.userId || null,
+      limit: limit ? Number(limit) : 5,
+      location,
+      maxDistance: maxDistance ? Number(maxDistance) : 50
+    });
+
+    return res.status(200).json({ details: data });
+  } catch (err) {
+    console.error("trending error:", err);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.postView = async (req, res) => {
+  try {
+    const restaurantId = req.params.id;
+    const { userId, meta } = req.body;
+
+    if (!restaurantId) return res.status(400).json({ message: "restaurant id required" });
+    if (!userId) return res.status(400).json({ message: "userId required" });
+
+    const view = new RestaurantViewModel({
+      restaurantId: new mongoose.Types.ObjectId(restaurantId),
+      uid: new mongoose.Types.ObjectId(userId),
+      meta: meta || {}
+    });
+
+    await view.save();
+    return res.status(201).json({ message: "view recorded" });
+  } catch (err) {
+    console.error("postView error:", err);
+    return res.status(500).json({ message: err.message });
+  }
+};

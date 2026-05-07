@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../../context/AuthContext";
 import type { TopRatedRestaurant } from "../../Explore/RestaurantCard";
 import { NearByCard } from "../Cards/NearByCard";
-import { Marker } from "../../Explore/ExploreMapView";
+import { Marker, UserMarker } from "../../Explore/ExploreMapView";
 import GoogleMapReact from "google-map-react";
-import { fetchTopRatedRestaurants } from "../../../../apis/restaurants";
+import { fetchNearbyRestaurants } from "../../../../apis/restaurants";
+import { useAppLocation } from "../../../../context/LocationContext";
 
-export function Nearby({ location }: { location: [number, number] | null }) {
-
+export function Nearby() {
+    const {location}=useAppLocation()
     const [nearbyRestaurants, setNearbyRestaurants] = useState<TopRatedRestaurant[] | null>(null);
     const { user } = useAuth()
 
@@ -16,7 +17,7 @@ export function Nearby({ location }: { location: [number, number] | null }) {
 
     async function loadNearbyRestaurants(location: [number, number] | null) {
         try {
-            const details = await fetchTopRatedRestaurants({
+            const details = await fetchNearbyRestaurants({
                 userId: user!.userId,
                 filters: { cuisine: 'All', price: '', rating: 0, dist: 3 },
                 location,
@@ -29,7 +30,7 @@ export function Nearby({ location }: { location: [number, number] | null }) {
 
     useEffect(() => {
         loadNearbyRestaurants(location)
-    }, []);
+    }, [location]);
 
 
 
@@ -48,20 +49,30 @@ export function Nearby({ location }: { location: [number, number] | null }) {
                 </div>
                 <div className="flex-[1.5] rounded-3xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl relative min-h-[300px]">
                     { nearbyRestaurants && location ? <GoogleMapReact
-                            bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY as string}}
-                            defaultZoom={13}
-                            defaultCenter={{ lat: location[0], lng: location[1] }}>
-                            {
-                              nearbyRestaurants.map((restaurant) => {
+                        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY }}
+                        defaultZoom={14}
+                        defaultCenter={{ lat: nearbyRestaurants[0].latitude, lng: nearbyRestaurants[1].longitude }}
+                        yesIWantToUseGoogleMapApiInternals
+                        onGoogleApiLoaded={({ map, maps }) => {
+                            map.setOptions({
+                                zoomControl: true,
+                                fullscreenControl: false, // optional
+                                streetViewControl: false, // optional
+                            });
+                        }}
+                    >   
+                        <UserMarker lat={location[0]} lng={location[1]}/>
+                        {
+                            nearbyRestaurants && nearbyRestaurants.map((restaurant) => {
                                 return <Marker key={restaurant._id} lat={restaurant.latitude} lng={restaurant.longitude} restaurant={restaurant} />
-                              })
-                            }
-                    
-                          </GoogleMapReact>
-                          :
-                          <h3 className="text-3xl font-bold">Location not Supported</h3>}
+                            })
+                        }
+
+                    </GoogleMapReact>
+                        :
+                        <h3 className="text-xl font-bold flex items-center justify-center">Location not Supported</h3>}
                 </div>
             </div>
-        </section>
+        </section >
     )
 }

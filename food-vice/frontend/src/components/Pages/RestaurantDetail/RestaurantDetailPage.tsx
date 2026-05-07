@@ -8,8 +8,9 @@ import { Overview } from "./Overview";
 import { Reviews } from "./Reviews";
 import { Photos } from "./Photos";
 import { Reels } from "./RestaurantReels";
-import { fetchRestaurantDetails, fetchSimilarRestaurants, saveRestaurant as saveRestaurantApi } from "../../../apis/restaurants";
-import type { Review } from "./ReviewTile";
+import { fetchRestaurantDetails, fetchSimilarRestaurants, saveRestaurant as saveRestaurantApi, updateViews } from "../../../apis/restaurants";
+import type { Review } from "../../../apis/reviews";
+
 
 export type SimilarRestaurant = {
 
@@ -151,12 +152,20 @@ export function RestaurantDetailPage() {
         }
     }
 
+     async function updateView() {
+            try {
+                await updateViews({ restId: params.id!, userId:user!.userId });
+            } catch (error) {
+                console.error("Error tracking view:", error);
+            }
+        }
 
 
 
     useEffect(() => {
         if (!locationLoading) {
             loadRestaurant(location);
+             updateView()
             loadSimilarRestaurants(location)
         }
     }, [locationLoading, location]);

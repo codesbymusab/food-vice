@@ -16,7 +16,7 @@ export function Reels() {
         setLoading(true)
         setError(null)
         try {
-            const reelsData = await fetchRecentReels({ userId: user!.userId });
+            const reelsData = await fetchRecentReels({ userId: user!.userId,tag: 'All' });
             setReels(reelsData ?? null);
         } catch (error) {
             console.error(error);

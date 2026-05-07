@@ -51,7 +51,7 @@ function ExplorePage() {
 
   async function loadRecommendedRestaurants(location: [number, number] | null) {
     try {
-      const details = await loadRecommendedRestaurantsAPI({ userId: user?.userId ?? '', filters, location });
+      const details = await loadRecommendedRestaurantsAPI({ userId: user?.userId ?? '',location,filters:null });
       setRecommendedRestaurants(details ?? null);
     } catch (error) {
       console.error(error);

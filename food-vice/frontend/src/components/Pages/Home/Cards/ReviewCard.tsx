@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router"
-import type { Review } from "../../RestaurantDetail/ReviewTile"
+
 import type { Dispatch, SetStateAction } from "react"
 import { useAuth } from "../../../../context/AuthContext"
-import { toggleLikeReview as toggleLikeReviewApi } from "../../../../apis/reviews"
+import { toggleLikeReview as toggleLikeReviewApi, type Review } from "../../../../apis/reviews"
 
 export function ReviewCard({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
 
@@ -47,8 +47,8 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                         <img className="w-full h-full object-cover" src={review.user.profilePhoto} />
                     </div>
                     <div >
-                        <h6 className="font-bold text-sm hover:text-accent-cyan cursor-pointer" onClick={() => navigate(`/profile/1`)}>{review.user.name}</h6>
-                        <p className="text-xs text-slate-500" onClick={() => navigate('/restaurant/1')}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">The Burger House</span></p>
+                        <h6 className="font-bold text-sm hover:text-accent-cyan cursor-pointer" onClick={() => navigate(`/profile/${user?.userId}`)}>{review.user.name}</h6>
+                        <p className="text-xs text-slate-500" onClick={() => navigate(`/restaurant/${review.restaurantId}`)}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">{review.restaurant && review.restaurant.name}</span></p>
                     </div>
                 </div>
                 <div className="flex gap-0.5">
@@ -63,7 +63,7 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                     ))}
                 </div>
             </div>
-            <div className="cursor-pointer" onClick={() => navigate('/restaurant/1')}>
+            <div className="cursor-pointer" onClick={() => navigate(`/restaurant/${review.restaurantId}`)}>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4 ">
                     {review.text}
                 </p>

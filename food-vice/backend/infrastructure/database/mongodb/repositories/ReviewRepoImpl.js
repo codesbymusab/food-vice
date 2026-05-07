@@ -73,6 +73,113 @@ class ReviewRepoImpl {
             },
             { $unwind: "$user" },
 
+            {
+                $lookup: {
+                    from: "media",
+                    localField: "_id",
+                    foreignField: "ownerId",
+                    as: "photos",
+                },
+            },
+
+
+            {
+                $lookup: {
+                    from: "reviewlikes",
+                    let: { reviewId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$reviewId", "$$reviewId"] },
+                                        { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                    as: "likeStatus",
+                },
+            },
+            {
+                $addFields: {
+                    isLikedByUser: { $gt: [{ $size: "$likeStatus" }, 0] },
+                },
+            },
+
+
+            {
+                $lookup: {
+                    from: "reviewlikes",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "allLikes",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$allLikes" },
+                },
+            },
+
+
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "reviewId",
+                    as: "ratingDocs",
+                },
+            },
+            {
+                $addFields: {
+                    overallRating: { $avg: "$ratingDocs.overall" },
+                },
+            },
+
+            {
+                $project: {
+                    _id: 1,
+                    text: 1,
+                    createdAt: 1,
+                    restaurantId: 1,
+                    "photos._id": 1,
+                    "photos.url": 1,
+                    "photos.caption": 1,
+                    "user._id": 1,
+                    "user.name": 1,
+                    "user.username": 1,
+                    "user.profilePhoto": 1,
+                    "user.level": 1,
+                    isLikedByUser: 1,
+                    likeCount: 1,
+                    overallRating: 1,
+                },
+            },
+        ]).exec();
+    }
+
+    async getRecentReviews({ limitCount = 3, userId, currentUser = false }) {
+        console.log('reviews')
+        console.log(userId)
+        const matchStage={}
+
+            if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
+            
+         return await RestaurantReviews.aggregate([
+            { $match: matchStage },
+           
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uid",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$user" },
 
             {
                 $lookup: {
@@ -145,7 +252,6 @@ class ReviewRepoImpl {
                     text: 1,
                     createdAt: 1,
                     restaurantId: 1,
-
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,
@@ -158,115 +264,34 @@ class ReviewRepoImpl {
                     likeCount: 1,
                     overallRating: 1,
                 },
+                
             },
-        ]).exec();
-    }
-
-    async getRecentReviews({ limitCount = 3, userId = null }) {
-        const pipeline = [];
-
-
-        if (userId) {
-            pipeline.push({
-                $match: { uid: new mongoose.Types.ObjectId(userId) }
-            });
-        }
-
-    
-        pipeline.push(
-            { $sort: { createdAt: -1 } },
+             { $sort: { createdAt: -1 } },
             { $limit: limitCount },
 
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "uid",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            { $unwind: "$user" },
-
-            {
-                $lookup: {
-                    from: "media",
-                    localField: "_id",
-                    foreignField: "ownerId",
-                    as: "photos",
-                },
-            },
-
-            {
-                $lookup: {
-                    from: "reviewlikes",
-                    localField: "_id",
-                    foreignField: "reviewId",
-                    as: "allLikes",
-                },
-            },
-            {
-                $addFields: {
-                    likeCount: { $size: "$allLikes" },
-                },
-            },
-
-            {
-                $lookup: {
-                    from: "ratings",
-                    localField: "_id",
-                    foreignField: "reviewId",
-                    as: "ratingDocs",
-                },
-            },
-            {
-                $addFields: {
-                    overallRating: { $avg: "$ratingDocs.overall" },
-                },
-            },
-
-            {
-                $project: {
-                    _id: 1,
-                    text: 1,
-                    createdAt: 1,
-                    restaurantId: 1,
-                    "photos._id": 1,
-                    "photos.url": 1,
-                    "photos.caption": 1,
-                    "user._id": 1,
-                    "user.name": 1,
-                    "user.username": 1,
-                    "user.profilePhoto": 1,
-                    "user.level": 1,
-                    likeCount: 1,
-                    overallRating: 1,
-                },
-            }
-        );
-
-        return await RestaurantReviews.aggregate(pipeline).exec();
+        ]).exec();
     }
 
 
     async createReview({ userId, restaurantId, text }) {
-    return await RestaurantReviews.create({
-      uid: new mongoose.Types.ObjectId(userId),
-      restaurantId: new mongoose.Types.ObjectId(restaurantId),
-      text,
-    });
-  }
+        return await RestaurantReviews.create({
+            uid: new mongoose.Types.ObjectId(userId),
+            restaurantId: new mongoose.Types.ObjectId(restaurantId),
+            text,
+        });
+    }
 
-  async createRating({ reviewId, food, service, ambience, price, overall }) {
-  
-    return await RatingModel.create({
-      reviewId: new mongoose.Types.ObjectId(reviewId),
-      food,
-      service,
-      ambience,
-      price,
-      overall,
-    });
-  }
+    async createRating({ reviewId, food, service, ambience, price, overall }) {
+
+        return await RatingModel.create({
+            reviewId: new mongoose.Types.ObjectId(reviewId),
+            food,
+            service,
+            ambience,
+            price,
+            overall,
+        });
+    }
 }
 
 

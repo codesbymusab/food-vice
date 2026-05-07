@@ -1,29 +1,8 @@
 import type { Dispatch, SetStateAction } from "react"
 import { useAuth } from "../../../context/AuthContext"
-import { toggleLikeReview as toggleLikeReviewApi } from "../../../apis/reviews"
+import { toggleLikeReview as toggleLikeReviewApi, type Review } from "../../../apis/reviews"
 
 
-export type Review = {
-    _id: string,
-    text: string,
-    createdAt: string,
-    restaurantId: string,
-    user: {
-        username: string,
-        name: string,
-        profilePhoto?: string,
-        level: number,
-        reviewCount: number
-    }
-    photos: {
-        _id: string,
-        url: string
-    }[],
-    isLikedByUser: boolean,
-    likeCount: number,
-    overallRating: number
-
-}
 export function ReviewTile({ review, setReviews }: { review: Review, setReviews: Dispatch<SetStateAction<Review[] | null>> }) {
 
     const { user } = useAuth()

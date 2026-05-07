@@ -10,29 +10,44 @@ import { TopRated } from './Sections/TopRated'
 import { Trending } from './Sections/Trending'
 import { HomeSkelton } from '../Skeltons/HomeSkelton'
 import { useAppLocation } from '../../../context/LocationContext'
+import { fetchCuisines } from '../../../apis/cuisines'
+import { type Cuisine, type Filter } from '../Explore/ExplorePage'
 
 export function HomePage() {
-    
+
     const { location, loading: locationLoading } = useAppLocation();
     const [dataLoading, setDataLoading] = useState(false);
+    const [cuisines, setCuisines] = useState<Cuisine[] | null>(null)
+    const [filters, setFilters] = useState<Filter|null>({
+        cuisine: 'All',
+        price: "",
+        rating: 0,
+        dist: 50,
+
+    })
     const prevLocationRef = useRef<[number, number] | null>(null);
 
-    useEffect(() => {
-        if (prevLocationRef.current && location && 
-            (prevLocationRef.current[0] !== location[0] || prevLocationRef.current[1] !== location[1])) {
-            setDataLoading(true);
-            // Reset after a short delay to show loading state
-            const timer = setTimeout(() => setDataLoading(false), 1000);
-            return () => clearTimeout(timer);
-        }
-        prevLocationRef.current = location;
-    }, [location]);
 
-  if(locationLoading || dataLoading){
-    return (
-      <HomeSkelton />
-    )
-  }
+    async function loadCuisines() {
+        
+        try {
+            const result = await fetchCuisines();
+            setCuisines(result);
+        } catch (error) {
+            console.error(error);
+
+        }
+    }
+
+   
+
+    useEffect(() => { loadCuisines() }, [])
+
+    if (locationLoading) {
+        return (
+            <HomeSkelton />
+        )
+    }
     return (
         <main className="max-w-7xl mx-auto pb-20 pt-8">
 
@@ -42,9 +57,9 @@ export function HomePage() {
 
             <Reels />
 
-            <TopRated location={location} />
+            <TopRated filters={filters} setFilters={setFilters} cuisines={cuisines} />
 
-            <Nearby location={location}/>
+            <Nearby />
 
             <section className="px-4 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <LatestDiscussion />
@@ -52,7 +67,7 @@ export function HomePage() {
             </section>
 
             <Reviews />
-            
+
         </main>
     )
 }

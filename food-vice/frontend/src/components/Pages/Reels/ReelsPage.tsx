@@ -49,6 +49,7 @@ export function ReelsPage() {
     const [popularTags, setPopularTags] = useState<ReelTag[] | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [tagError, setTagError] = useState<string | null>(null)
+    const [tag,setSelectedTag]=useState<string>('All')
 
     const { user } = useAuth()
 
@@ -72,7 +73,7 @@ export function ReelsPage() {
             setShowUploadForm(false)
         } catch (err) {
             console.error("Error uploading reel:", err);
-            alert("Failed to upload reel");
+            setError("Failed to upload reel");
         } finally {
             setUploading(false)
         }
@@ -92,7 +93,7 @@ export function ReelsPage() {
         setError(null)
         try {
             setLoading(true)
-            const reels = await fetchRecentReels({ userId: user?.userId ?? '' });
+            const reels = await fetchRecentReels({ userId: user?.userId ?? '', tag: tag});
             setReels(reels ?? null)
         } catch (error) {
             console.error(error);
@@ -107,7 +108,7 @@ export function ReelsPage() {
         setError(null)
         try {
             setLoading(true)
-            const reels = await fetchFollowersReels({ userId: user?.userId ?? '' });
+            const reels = await fetchFollowersReels({ userId: user?.userId ?? '',tag:tag });
             if (reels && reels.length > 0) {
                 setReels(reels);
             } else {
@@ -166,10 +167,14 @@ export function ReelsPage() {
         }
     }
 
-    useEffect(() => {
+     useEffect(() => {
         loadRecentReels()
         loadPopularTags()
     }, [])
+    
+    useEffect(() => {
+        fetchReels()
+    }, [tag])
 
     
     useEffect(() => {
@@ -298,7 +303,7 @@ export function ReelsPage() {
                             {
                                 popularTags && popularTags.map(
                                     (tag) => {
-                                        return <span key={tag._id} className="px-3 py-1 bg-white/20 border border-white/30 rounded-full text-sm font-medium hover:bg-white hover:text-primary cursor-pointer transition-colors">{`#${tag.name}`}</span>
+                                        return <span key={tag._id} className="px-3 py-1 bg-white/20 border border-white/30 rounded-full text-sm font-medium hover:bg-white hover:text-primary cursor-pointer transition-colors" onClick={()=>{setSelectedTag(tag.name)}}>{`#${tag.name}`}</span>
 
                                     }
                                 )

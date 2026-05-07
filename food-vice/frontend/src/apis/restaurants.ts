@@ -8,6 +8,7 @@ export type TopRatedRestaurant =
         avgOverall: number,
         cuisines: string[],
         priceCategory: string,
+        
         isOpen?: boolean,
         openingTime?: string
         media?: {
@@ -22,15 +23,38 @@ export type TopRatedRestaurant =
 
 export type RecommendedRestaurant = TopRatedRestaurant
 
+export type TrendingRestaurant =
+    {
+        _id: string,
+        name: string,
+        distKm: number,
+        avgOverall: number,
+        cuisines: string[],
+        priceCategory: string,
+        viewCount: number,
+        media?: {
+            _id: string,
+            url: string,
+        }
+    }
 
-export async function fetchTopRatedRestaurants({ userId, filters, location }: { userId: string, filters: Filter, location: [number, number] | null }) {
+
+export async function fetchTopRatedRestaurants({ userId, filters, location }: { userId: string, filters: Filter | null, location: [number, number] | null }) {
+
+    const searchfilters = {
+        cuisine: filters?.cuisine ?? 'All',
+        price: filters?.price ?? '',
+        rating: filters?.rating ?? 0,
+        dist: filters?.dist ?? 50
+    }
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${userId}`,
+            `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
             const { details } = await res.json();
+            console.log(details)
             return details
 
         }
@@ -39,10 +63,60 @@ export async function fetchTopRatedRestaurants({ userId, filters, location }: { 
     }
 }
 
-export async function fetchRecommendedRestaurants({ userId, filters, location }: { userId: string, filters: Filter, location: [number, number] | null }) {
+export async function fetchTrendingRestaurants({ location,maxDistance = null }: { location: [number, number] | null ,maxDistance:number|null}) {
+
+    
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${filters.cuisine}&price=${filters.price}&rating=${filters.rating}&dist=${filters.dist}&userId=${userId}`,
+            `http://localhost:3000/restaurant/trending?lat=${location?.[0]}&lon=${location?.[1]}&maxDistance=${maxDistance}`,
+            { credentials: "include" }
+        );
+        if (res.ok) {
+            const { details } = await res.json();
+            console.log(details)
+            return details
+
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function fetchNearbyRestaurants({ userId, filters, location }: { userId: string, filters: Filter | null, location: [number, number] | null }) {
+
+    const searchfilters = {
+        cuisine: filters?.cuisine ?? 'All',
+        price: filters?.price ?? '',
+        rating: filters?.rating ?? 0,
+        dist: filters?.dist ?? 5
+    }
+    try {
+        const res = await fetch(
+            `http://localhost:3000/restaurant/nearby?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
+            { credentials: "include" }
+        );
+        if (res.ok) {
+            const { details } = await res.json();
+            console.log(details)
+            return details
+
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function fetchRecommendedRestaurants({ userId, filters, location }: { userId: string, filters: Filter | null, location: [number, number] | null }) {
+    const searchfilters = {
+        cuisine: filters?.cuisine ?? 'All',
+        price: filters?.price ?? '',
+        rating: filters?.rating ?? 0,
+        dist: filters?.dist ?? 10
+    }
+
+    try {
+        const res = await fetch(
+            `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -137,3 +211,15 @@ export async function fetchSimilarRestaurants({ restaurantId, location }: { rest
     }
 }
 
+export async function updateViews({ restId,userId }: { restId: string,userId:string }) {
+    try {
+        await fetch(`http://localhost:3000/restaurant/${restId}/view`, {
+            method:"POST",
+           headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: userId}),
+            credentials: "include",
+        });
+    } catch (error) {
+        console.error("Error tracking view:", error);
+    }
+}

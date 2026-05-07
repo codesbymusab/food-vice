@@ -4,11 +4,19 @@ const mongoose = require('mongoose')
 
 class ReelRepoImpl {
 
-  async getReels(limit = 10, userId, source = "all") {
-    const pipeline = [];
+  async getReels(
+    limit = 10,
+    userId,
+    source = "all",
+    tag = null
+  ) {
 
+
+    const pipeline = [];
+   
 
     if (source === "followers") {
+
       pipeline.push({
         $lookup: {
           from: "followers",
@@ -28,9 +36,18 @@ class ReelRepoImpl {
           as: "followerMatch"
         }
       });
+
       pipeline.push({
-        $match: { $expr: { $gt: [{ $size: "$followerMatch" }, 0] } }
+        $match: {
+          $expr: {
+            $gt: [{ $size: "$followerMatch" }, 0]
+          }
+        }
       });
+    }
+
+
+    if (source === "savedRestaurants") {
 
       pipeline.push({
         $lookup: {
@@ -52,46 +69,84 @@ class ReelRepoImpl {
         }
       });
 
-      if (source === "saved") {
-        pipeline.push({
-          $lookup: {
-            from: "savedreels",
-            let: { reelId: "$_id" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ["$reelId", "$$reelId"] },
-                      { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] }
-                    ]
-                  }
-                }
-              }
-            ],
-            as: "savedMatch"
-          }
-        });
-        pipeline.push({
-          $match: { $expr: { $gt: [{ $size: "$savedMatch" }, 0] } }
-        });
-      }
-
-
-      if (source === "user") {
-        pipeline.push({
-          $match: { uid: new mongoose.Types.ObjectId(userId) }
-        });
-      }
       pipeline.push({
-        $match: { $expr: { $gt: [{ $size: "$savedRestaurantMatch" }, 0] } }
+        $match: {
+          $expr: {
+            $gt: [{ $size: "$savedRestaurantMatch" }, 0]
+          }
+        }
       });
     }
 
 
+    if (source === "saved") {
+
+      pipeline.push({
+        $lookup: {
+          from: "savedreels",
+          let: { reelId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$reelId", "$$reelId"] },
+                    { $eq: ["$uid", new mongoose.Types.ObjectId(userId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "savedMatch"
+        }
+      });
+
+      pipeline.push({
+        $match: {
+          $expr: {
+            $gt: [{ $size: "$savedMatch" }, 0]
+          }
+        }
+      });
+    }
+
+
+    if (source === "user") {
+
+      pipeline.push({
+        $match: {
+          uid: new mongoose.Types.ObjectId(userId)
+        }
+      });
+    }
+
+
+    pipeline.push({
+      $lookup: {
+        from: "reeltags",
+        localField: "tags",
+        foreignField: "_id",
+        as: "tags"
+      }
+    });
+
+
+    if (tag && tag!=='All') {
+      pipeline.push({
+        $match: {
+          "tags.name": {
+            $regex: new RegExp(tag, "i")
+          }
+        }
+      });
+    }
+
     pipeline.push(
+
       { $sort: { createdAt: -1 } },
+
       { $limit: limit },
+
 
       {
         $lookup: {
@@ -101,16 +156,9 @@ class ReelRepoImpl {
           as: "user"
         }
       },
+
       { $unwind: "$user" },
 
-      {
-        $lookup: {
-          from: "reeltags",
-          localField: "tags",
-          foreignField: "_id",
-          as: "tags"
-        }
-      },
 
       {
         $lookup: {
@@ -121,6 +169,7 @@ class ReelRepoImpl {
         }
       },
 
+
       {
         $lookup: {
           from: "reelcomments",
@@ -129,6 +178,7 @@ class ReelRepoImpl {
           as: "comments"
         }
       },
+
 
       {
         $lookup: {
@@ -159,43 +209,77 @@ class ReelRepoImpl {
           as: "media"
         }
       },
+
+      // COMPUTED
       {
-        $addFields: !userId ? 0 : {
-          videoUrl: { $arrayElemAt: ["$media.url", 0] },
-          likeCount: { $size: "$likes" },
-          commentCount: { $size: "$comments" },
-          saveCount: { $size: "$saves" },
-          isLikedByUser: {
-            $gt: [
-              {
-                $size: {
-                  $filter: {
-                    input: "$likes",
-                    as: "like",
-                    cond: { $eq: ["$$like.uid", new mongoose.Types.ObjectId(userId)] }
-                  }
-                }
-              },
-              0
-            ]
+        $addFields: {
+
+          videoUrl: {
+            $arrayElemAt: ["$media.url", 0]
           },
-          isSavedByUser: {
-            $gt: [
-              {
-                $size: {
-                  $filter: {
-                    input: "$saves",
-                    as: "save",
-                    cond: { $eq: ["$$save.uid", new mongoose.Types.ObjectId(userId)] }
-                  }
-                }
+
+          likeCount: {
+            $size: "$likes"
+          },
+
+          commentCount: {
+            $size: "$comments"
+          },
+
+          saveCount: {
+            $size: "$saves"
+          },
+
+          ...(userId
+            ? {
+              isLikedByUser: {
+                $gt: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: "$likes",
+                        as: "like",
+                        cond: {
+                          $eq: [
+                            "$$like.uid",
+                            new mongoose.Types.ObjectId(userId)
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  0
+                ]
               },
-              0
-            ]
-          }
+
+              isSavedByUser: {
+                $gt: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: "$saves",
+                        as: "save",
+                        cond: {
+                          $eq: [
+                            "$$save.uid",
+                            new mongoose.Types.ObjectId(userId)
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  0
+                ]
+              }
+            }
+            : {
+              isLikedByUser: false,
+              isSavedByUser: false
+            })
         }
       },
 
+      // PROJECT
       {
         $project: {
           _id: 1,
@@ -204,11 +288,17 @@ class ReelRepoImpl {
           videoUrl: 1,
           createdAt: 1,
           views: 1,
+
           "user._id": 1,
           "user.name": 1,
           "user.username": 1,
           "user.profilePhoto": 1,
-          tags: { _id: 1, name: 1 },
+
+          tags: {
+            _id: 1,
+            name: 1
+          },
+
           likeCount: 1,
           commentCount: 1,
           saveCount: 1,

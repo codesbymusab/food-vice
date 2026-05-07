@@ -9,6 +9,28 @@ interface MarkerProps {
   lng: number;
 }
 
+export function UserMarker({lat,lng}:{lat:number,lng:number}) {
+
+
+  return (
+    <div
+      className="absolute -translate-x-1/2 -translate-y-full cursor-pointer"
+
+    >
+
+      <div className="relative flex flex-col items-center">
+         <span className="absolute -top-4 left-8 w-20 text-blue-900 text-[0.8rem] font-extrabold"
+        >You</span>
+        <div className="w-6 h-6 bg-accent-cyan rounded-full shadow-md border border-white"></div>
+        <div className="w-0 h-0 border-l-3 border-r-3 border-t-6 border-transparent border-t-accent-cyan mx-auto"></div>
+      </div>
+
+
+    </div>
+  );
+}
+
+
 export function Marker({ restaurant }: MarkerProps) {
   const [showDetails, setShowDetails] = useState(false);
   const navigate = useNavigate();
@@ -58,12 +80,12 @@ export function Marker({ restaurant }: MarkerProps) {
   );
 }
 
-function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants: TopRatedRestaurant[], location: [number, number]|null }) {
+function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants: TopRatedRestaurant[], location: [number, number] | null }) {
   return (
 
     <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-3xl flex items-center justify-center">
-      { location ? <GoogleMapReact
-        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY as string}}
+      {location ? <GoogleMapReact
+        bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY as string }}
         defaultZoom={13}
         defaultCenter={{ lat: location[0], lng: location[1] }}>
         {
@@ -73,9 +95,9 @@ function ExploreMapView({ topRatedRestaurants, location }: { topRatedRestaurants
         }
 
       </GoogleMapReact>
-      :
-      <h3 className="text-3xl font-bold">Location not Supported</h3>
-}
+        :
+        <h3 className="text-3xl font-bold">Location not Supported</h3>
+      }
     </div>
 
 

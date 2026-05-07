@@ -10,7 +10,7 @@ class GetUserReviews {
         if(!userId) throw new Error("User id required")
         const result = {};
 
-        const reviews = await this.reviewRepo.getRecentReviews({userId:userId})
+        const reviews = await this.reviewRepo.getRecentReviews({userId:userId,currentUser:true})
        
         if (reviews) {
             

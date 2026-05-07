@@ -16,20 +16,8 @@ export function CommunitiesPage() {
     const [recommendedThreads, setRecommendedThreads] = useState([])
     const navigate = useNavigate()
 
-    useEffect(() => {
-        fetchJoinedCommunities()
-        fetchRecommendedCommunities()
-        fetchRecommendedThreads()
-    }, [])
-
-    useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            fetchRecommendedCommunities()
-        }, 300)
-
-        return () => clearTimeout(delayDebounceFn)
-    }, [searchQuery])
-
+   
+   
     const fetchJoinedCommunities = async () => {
         try {
             const response = await axios.get('http://localhost:3000/community/joined', { withCredentials: true })
@@ -50,14 +38,29 @@ export function CommunitiesPage() {
 
     const fetchRecommendedThreads = async () => {
         try {
-            // For now, let's just fetch some threads. 
-            // In a real app, this would be a recommendation engine endpoint.
+            
             const response = await axios.get('http://localhost:3000/thread/community/all', { withCredentials: true })
             setRecommendedThreads(response.data)
         } catch (error) {
             console.error('Error fetching recommended threads:', error)
         }
     }
+
+     useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            fetchRecommendedCommunities()
+        }, 300)
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [searchQuery])
+
+
+     useEffect(() => {
+        fetchJoinedCommunities()
+        fetchRecommendedCommunities()
+        fetchRecommendedThreads()
+    }, [])
+
 
     return (
         <main className="flex-1 px-4 md:px-10 py-8 max-w-7xl mx-auto">

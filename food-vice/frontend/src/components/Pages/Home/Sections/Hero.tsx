@@ -1,5 +1,5 @@
 import { useAppLocation } from '../../../../context/LocationContext'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef} from 'react'
 
 export function Hero() {
     const { setLocation } = useAppLocation();
@@ -132,14 +132,8 @@ export function Hero() {
                     </button>
                 </div>
 
-                {suggestions.length===0 && <div className="mt-8 flex flex-wrap justify-center gap-3">
-                    <span className="text-sm font-medium text-slate-200 uppercase tracking-wider self-center mr-2">Popular:</span>
-                    <a className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-primary text-white transition-all text-sm font-semibold border border-white/20 backdrop-blur-md" href="#">Burgers</a>
-                    <a className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-accent-cyan text-white transition-all text-sm font-semibold border border-white/20 backdrop-blur-md" href="#">Pizza</a>
-                    <a className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-primary text-white transition-all text-sm font-semibold border border-white/20 backdrop-blur-md" href="#">Sushi</a>
-                    <a className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-accent-cyan text-white transition-all text-sm font-semibold border border-white/20 backdrop-blur-md" href="#">Cafes</a>
-                </div>
-}
+                
+
             </div>
                 
         </section>
