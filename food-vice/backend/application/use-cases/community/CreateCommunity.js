@@ -1,9 +1,16 @@
 class CreateCommunity {
-  constructor(communityRepo) {
+  constructor(communityRepo, storageService) {
     this.communityRepo = communityRepo;
+    this.storageService = storageService;
   }
 
-  async execute({ name, description, guidelines, coverPhoto, category, userId }) {
+  async execute({ name, description, guidelines, file, category, userId }) {
+    let coverPhoto = null;
+    
+    if (file) {
+      coverPhoto = await this.storageService.uploadFile(file, 'communities/covers');
+    }
+
     const community = await this.communityRepo.create({
       name,
       description,
