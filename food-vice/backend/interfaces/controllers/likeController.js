@@ -13,14 +13,14 @@ exports.likeReview=async (req,res)=>{
         const result=await likeRev.execute(req.body)
 
         if(result){
-            res.status(200).json({message: result});
+            return res.status(200).json({message: result});
         }
 
-        res.status(400).json({ message: result });
+        return res.status(400).json({ message: result });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        return res.status(400).json({message:error.message})
     }
     
 
@@ -36,14 +36,14 @@ exports.likeReel=async (req,res)=>{
         const result=await likeReel.execute(req.body)
 
         if(result){
-            res.status(200).json({message: result});
+            return res.status(200).json({message: result});
         }
 
-        res.status(400).json({ message: result });
+        return res.status(400).json({ message: result });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        return res.status(400).json({message:error.message})
     }
     
 
@@ -61,6 +61,6 @@ exports.likeReelComment = async (req, res) => {
         res.json(result);
     } catch (err) {
         console.error(err);
-        res.status(400).json({ error: err.message });
+        return res.status(400).json({ error: err.message });
     }
 }

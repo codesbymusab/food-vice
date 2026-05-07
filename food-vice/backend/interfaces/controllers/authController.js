@@ -20,7 +20,7 @@ exports.signupUser = async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
 
     }
 
@@ -49,7 +49,7 @@ exports.loginUser = async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
 
     }
 
@@ -77,7 +77,7 @@ exports.googleSignIn = async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
 
     }
 
@@ -90,12 +90,12 @@ exports.signOut=async (req,res)=>{
     try {
         
         res.clearCookie('token')
-        res.status(201).json({ message: 'User logged out Successfully' })
+        return res.status(201).json({ message: 'User logged out Successfully' })
         
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
 
     }
     

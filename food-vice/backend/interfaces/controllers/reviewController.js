@@ -17,14 +17,14 @@ exports.restReviews = async (req, res) => {
         const result = await getReviews.execute({ restId: restId })
 
         if (result.reviews) {
-            res.status(200).json(result.reviews);
+            return res.status(200).json(result.reviews);
         }
 
-        res.status(400).json({ message: 'Failed to load reviews' });
+        return res.status(400).json({ message: 'Failed to load reviews' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -39,14 +39,14 @@ exports.recentReviews = async (req, res) => {
         const result = await getrecentReviews.execute({userId:userId})
 
         if (result) {
-            res.status(200).json(result.reviews);
+            return res.status(200).json(result.reviews);
         }
 
-        res.status(400).json({ message: 'Failed to load recent reviews' });
+        return res.status(400).json({ message: 'Failed to load recent reviews' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -60,14 +60,14 @@ exports.userReviews = async (req, res) => {
         const result = await getuserReviews.execute({userId})
 
         if (result) {
-            res.status(200).json(result.reviews);
+            return res.status(200).json(result.reviews);
         }
 
-        res.status(400).json({ message: 'Failed to load user reviews' });
+        return res.status(400).json({ message: 'Failed to load user reviews' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -89,10 +89,10 @@ exports.createReview= async (req, res) =>  {
       files
     });
 
-    res.status(201).json(result);
+    return res.status(201).json(result);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 }
 

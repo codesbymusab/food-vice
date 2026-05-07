@@ -43,11 +43,11 @@ exports.getUserProfile=async (req,res)=>{
             return res.status(200).json(profile[0]);
         }
 
-        res.status(400).json({ message: 'Failed to load profile' });
+        return res.status(400).json({ message: 'Failed to load profile' });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        return res.status(400).json({message:error.message})
     }
     
 

@@ -14,7 +14,7 @@ exports.getComments = async (req, res) => {
         res.json(comments);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -26,10 +26,10 @@ exports.postComment = async (req, res) => {
         const commentRepo = new CommentRepoImpl()
         const postComment = new PostReelComment(commentRepo)
         const comment = await postComment.execute({ reelId, userId, text });
-        res.status(201).json(comment);
+        return res.status(201).json(comment);
     } catch (err) {
         console.error(err);
-        res.status(400).json({ error: err.message });
+        return res.status(400).json({ error: err.message });
     }
 }
 

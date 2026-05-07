@@ -27,10 +27,10 @@ exports.upload = async (req, res) => {
 
         const media = await uploadReel.execute({ ...req.body, file });
 
-        res.status(201).json(media);
+        return res.status(201).json(media);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -47,7 +47,7 @@ exports.getRecent = async (req, res) => {
         res.json(reels);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -63,7 +63,7 @@ exports.getFollowers = async (req, res) => {
         res.json(reels);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -76,7 +76,7 @@ exports.getPopularTags = async (req, res) => {
         res.json(tags);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -90,7 +90,7 @@ exports.updateViews=async (req, res) => {
         );
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -105,6 +105,6 @@ exports.getUserReels = async (req, res) => {
         res.json(reels);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }

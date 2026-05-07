@@ -49,16 +49,16 @@ exports.recommendedRest = async (req, res) => {
         const result = await getRecRest.execute({ location: location, filters: filters, userId: userId })
 
         if (result) {
-            res.status(200).json({ details: result });
+            return res.status(200).json({ details: result });
         }
 
-        res.status(400).json({ message: 'Failed to load Restaurants' });
+        return res.status(400).json({ message: 'Failed to load Restaurants' });
 
 
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 
 }
@@ -99,16 +99,16 @@ exports.topRatedRest = async (req, res) => {
         const result = await getTopRest.execute({ location: location, filters: filters, userId: userId })
 
         if (result) {
-            res.status(200).json({ details: result });
+            return res.status(200).json({ details: result });
         }
 
-        res.status(400).json({ message: 'Failed to load Restaurants' });
+        return res.status(400).json({ message: 'Failed to load Restaurants' });
 
 
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 
 }
@@ -150,16 +150,16 @@ exports.nearbyRest = async (req, res) => {
         const result = await getNearRest.execute({ location: location, filters: filters, userId: userId })
 
         if (result) {
-            res.status(200).json({ details: result });
+            return res.status(200).json({ details: result });
         }
 
-        res.status(400).json({ message: 'Failed to load Restaurants' });
+        return res.status(400).json({ message: 'Failed to load Restaurants' });
 
 
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 
 }
@@ -197,16 +197,16 @@ exports.restDetails = async (req, res) => {
         const restDetails = await getRestDetails.execute({ id: restId, location: location, userId: userId })
 
         if (restDetails) {
-            res.status(200).json({ details: restDetails });
+            return res.status(200).json({ details: restDetails });
         }
 
-        res.status(400).json({ message: 'Restaurant not found' });
+        return res.status(400).json({ message: 'Restaurant not found' });
 
 
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 
 
@@ -244,16 +244,16 @@ exports.similarRest = async (req, res) => {
         const result = await getSimRest.execute({ id: restId, location: location })
 
         if (result) {
-            res.status(200).json({ details: result });
+            return res.status(200).json({ details: result });
         }
 
-        res.status(400).json({ message: 'Restaurant not found' });
+        return res.status(400).json({ message: 'Restaurant not found' });
 
 
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 
 
@@ -269,14 +269,14 @@ exports.restCuisines = async (req, res) => {
         const result = await getCus.execute()
 
         if (result) {
-            res.status(200).json({ result });
+            return res.status(200).json({ result });
         }
 
-        res.status(400).json({ message: 'Failed to load cuisines' });
+        return res.status(400).json({ message: 'Failed to load cuisines' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -291,14 +291,14 @@ exports.restPhotos = async (req, res) => {
         const photos = await getPhotos.execute({ restId: restId })
 
         if (photos) {
-            res.status(200).json({ photos });
+            return res.status(200).json({ photos });
         }
 
-        res.status(400).json({ message: 'Failed to load reviews' });
+        return res.status(400).json({ message: 'Failed to load reviews' });
     }
     catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        return res.status(400).json({ message: error.message })
     }
 }
 
@@ -314,7 +314,7 @@ exports.savedRestaurants=async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 }
 

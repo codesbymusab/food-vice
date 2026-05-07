@@ -12,9 +12,9 @@ exports.createCommunity = async (req, res) => {
   try {
     const createCommunity = new CreateCommunity(communityRepo, storageService);
     const community = await createCommunity.execute({ ...req.body, file: req.file, userId: req.userId });
-    res.status(201).json(community);
+    return res.status(201).json(community);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -22,9 +22,9 @@ exports.getCommunities = async (req, res) => {
   try {
     const getCommunities = new GetCommunities(communityRepo);
     const communities = await getCommunities.execute({ name: req.query.name });
-    res.status(200).json(communities);
+    return res.status(200).json(communities);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -32,9 +32,9 @@ exports.joinCommunity = async (req, res) => {
   try {
     const joinCommunity = new JoinCommunity(communityRepo);
     const membership = await joinCommunity.execute({ userId: req.userId, communityId: req.params.id });
-    res.status(200).json(membership);
+    return res.status(200).json(membership);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -42,9 +42,9 @@ exports.getJoinedCommunities = async (req, res) => {
   try {
     const getJoinedCommunities = new GetJoinedCommunities(communityRepo);
     const communities = await getJoinedCommunities.execute({ userId: req.userId });
-    res.status(200).json(communities);
+    return res.status(200).json(communities);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -54,8 +54,8 @@ exports.getCommunityById = async (req, res) => {
     if (!community) {
       return res.status(404).json({ message: 'Community not found' });
     }
-    res.status(200).json(community);
+    return res.status(200).json(community);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };

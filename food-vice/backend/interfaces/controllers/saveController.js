@@ -12,14 +12,14 @@ exports.saveRestaurant=async (req,res)=>{
         const result=await saveRest.execute(req.body)
 
         if(result){
-            res.status(200).json({message: result});
+            return res.status(200).json({message: result});
         }
 
-        res.status(400).json({ message: 'Failed to save restaurant' });
+        return res.status(400).json({ message: 'Failed to save restaurant' });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        return res.status(400).json({message:error.message})
     }
     
 
@@ -34,14 +34,14 @@ exports.saveReel=async (req,res)=>{
         const result=await saveReel.execute(req.body)
 
         if(result){
-            res.status(200).json({message: result});
+            return res.status(200).json({message: result});
         }
 
-        res.status(400).json({ message: 'Failed to save reel' });
+        return res.status(400).json({ message: 'Failed to save reel' });
     }
     catch(error){
         console.log(error)
-        res.status(400).json({message:error.message})
+        return res.status(400).json({message:error.message})
     }
     
 
