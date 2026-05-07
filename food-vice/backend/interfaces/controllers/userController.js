@@ -15,7 +15,7 @@ exports.getUser=async (req,res)=>{
         const user=await getUser.execute({userId:req.userId})
 
         if(user){
-            res.status(200).json({user:user});
+            return res.status(200).json({user:user});
         }
 
         return res.status(400).json({ message: 'User not logged in' });
@@ -40,7 +40,7 @@ exports.getUserProfile=async (req,res)=>{
         const profile=await getProfile.execute({userId:req.params.userId})
 
         if(profile[0]){
-            res.status(200).json(profile[0]);
+            return res.status(200).json(profile[0]);
         }
 
         res.status(400).json({ message: 'Failed to load profile' });
