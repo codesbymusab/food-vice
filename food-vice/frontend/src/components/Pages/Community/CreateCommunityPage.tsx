@@ -7,9 +7,23 @@ export function CreateCommunityPage() {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [category, setCategory] = useState('Recipes')
-    const [guidelines, setGuidelines] = useState<string[]>(['Authenticity over aesthetics: Share real kitchen moments.'])
+    const [guidelines, setGuidelines] = useState<string[]>([])
     const [newRule, setNewRule] = useState('')
     const [loading, setLoading] = useState(false)
+    const [file, setFile] = useState<File | null>(null)
+    const [preview, setPreview] = useState<string | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0]
+        if (selectedFile) {
+            setFile(selectedFile)
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setPreview(reader.result as string)
+            }
+            reader.readAsDataURL(selectedFile)
+        }
+    }
 
     const addRule = () => {
         if (newRule.trim()) {
@@ -26,12 +40,21 @@ export function CreateCommunityPage() {
         e.preventDefault()
         setLoading(true)
         try {
-            await axios.post('http://localhost:3000/community', {
-                name,
-                description,
-                category,
-                guidelines
-            }, { withCredentials: true })
+            const formData = new FormData()
+            formData.append('name', name)
+            formData.append('description', description)
+            formData.append('category', category)
+            guidelines.forEach(rule => formData.append('guidelines[]', rule))
+            if (file) {
+                formData.append('coverPhoto', file)
+            }
+
+            await axios.post('http://localhost:3000/community', formData, { 
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
             navigate('/community')
         } catch (error) {
             console.error('Error creating community:', error)
@@ -108,15 +131,25 @@ export function CreateCommunityPage() {
                                 </span>
                                 <h2 className="text-2xl font-bold tracking-tight">Visuals</h2>
                             </div>
-                            <div className="group relative w-full h-56 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer overflow-hidden flex flex-col items-center justify-center bg-gray-100">
+                            <div 
+                                className="group relative w-full h-56 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer overflow-hidden flex flex-col items-center justify-center bg-gray-100"
+                                onClick={() => document.getElementById('cover-upload')?.click()}
+                            >
                                 <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
-                                    <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmYG0bVKf_mclqimLqSr6rZtJS4UoFX9tJ-Vro7BqKdmx9jBFPPOO2DRpxN7gdjB72_eniNp_sUQPxq4V-UQBNOrnQlzo3ftqm0Jj5Sf9zEHlPApapd-rWsAHREzkweiTw_N_WvscKo9qp4O25UDCACwS_txbuqFQj1NGDpk-VtMP_wUjh_PhLQlBEGKgjLOeBMdo-7jfYUpxalfn0x8m8_EhwUv2ZIM0DcJHrrHSgvFpsYxqb6g97uaQTd2kE31rPUeDZTeDsjVq" />
+                                    <img className="w-full h-full object-cover" src={preview || "https://lh3.googleusercontent.com/aida-public/AB6AXuDmYG0bVKf_mclqimLqSr6rZtJS4UoFX9tJ-Vro7BqKdmx9jBFPPOO2DRpxN7gdjB72_eniNp_sUQPxq4V-UQBNOrnQlzo3ftqm0Jj5Sf9zEHlPApapd-rWsAHREzkweiTw_N_WvscKo9qp4O25UDCACwS_txbuqFQj1NGDpk-VtMP_wUjh_PhLQlBEGKgjLOeBMdo-7jfYUpxalfn0x8m8_EhwUv2ZIM0DcJHrrHSgvFpsYxqb6g97uaQTd2kE31rPUeDZTeDsjVq"} />
                                 </div>
                                 <div className="relative z-10 text-center">
                                     <span className="material-symbols-outlined text-4xl text-primary mb-2">cloud_upload</span>
-                                    <p className="text-on-surface font-bold">Upload Cover Photo</p>
+                                    <p className="text-on-surface font-bold">{file ? file.name : 'Upload Cover Photo'}</p>
                                     <p className="text-xs text-on-surface-variant">Recommended size: 1200 x 480px</p>
                                 </div>
+                                <input 
+                                    id="cover-upload"
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
                             </div>
                         </section>
                         <section className="space-y-6">

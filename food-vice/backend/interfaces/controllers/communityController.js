@@ -3,13 +3,15 @@ const CreateCommunity = require('../../application/use-cases/community/CreateCom
 const GetCommunities = require('../../application/use-cases/community/GetCommunities');
 const JoinCommunity = require('../../application/use-cases/community/JoinCommunity');
 const GetJoinedCommunities = require('../../application/use-cases/community/GetJoinedCommunities');
+const StorageServiceImpl = require('../../infrastructure/services/FirebaseStorage/StorageServiceImp');
 
 const communityRepo = new CommunityRepoImpl();
+const storageService = new StorageServiceImpl();
 
 exports.createCommunity = async (req, res) => {
   try {
-    const createCommunity = new CreateCommunity(communityRepo);
-    const community = await createCommunity.execute({ ...req.body, userId: req.userId });
+    const createCommunity = new CreateCommunity(communityRepo, storageService);
+    const community = await createCommunity.execute({ ...req.body, file: req.file, userId: req.userId });
     res.status(201).json(community);
   } catch (error) {
     res.status(400).json({ message: error.message });
