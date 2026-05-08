@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
 const ThreadSchema = new mongoose.Schema({
-  uid: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' },
+  uid: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true },
+  communityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Community',required:true },
   title: { type: String, required: true },
   content: { type: String, required: true },
   views: { type: Number, default: 0 },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  topics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }],
+  media: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Thread', ThreadSchema);

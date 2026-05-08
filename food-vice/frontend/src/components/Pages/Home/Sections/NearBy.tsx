@@ -48,9 +48,9 @@ export function Nearby() {
 
                 </div>
                 <div className="flex-[1.5] rounded-3xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl relative min-h-[300px]">
-                    { nearbyRestaurants && location ? <GoogleMapReact
+                    { nearbyRestaurants && nearbyRestaurants.length>0 && location ? <GoogleMapReact
                         bootstrapURLKeys={{ key: import.meta.env.VITE_GOOGLE_MAPS_KEY }}
-                        defaultZoom={14}
+                        defaultZoom={12}
                         defaultCenter={{ lat: nearbyRestaurants[0].latitude, lng: nearbyRestaurants[1].longitude }}
                         yesIWantToUseGoogleMapApiInternals
                         onGoogleApiLoaded={({ map, maps }) => {

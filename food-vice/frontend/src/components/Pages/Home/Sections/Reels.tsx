@@ -48,7 +48,7 @@ export function Reels() {
                             <ErrorScreen title="Could not load reels" message={error} onRetry={loadRecentReels} />
                         </div>
                     ) : reels && reels.length > 0 ? (
-                        reels.map((reel) => {
+                        reels.slice(0,5).map((reel) => {
                             return <ReelCard key={reel._id} reel={reel} />
                         })
                     ) : (

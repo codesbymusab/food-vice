@@ -143,10 +143,10 @@ export function SigninPage() {
                             {errors.email && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>}
                         </div>
                         <div>
-                            <div className="flex justify-between items-center mb-2">
+                            {/* <div className="flex justify-between items-center mb-2">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300" >Password</label>
                                 <a className="text-xs font-bold text-primary hover:underline" href="#" >Forgot password?</a>
-                            </div>
+                            </div> */}
                             <input 
                                 className={`w-full h-12 px-4 rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all ${
                                     errors.password 
@@ -161,10 +161,10 @@ export function SigninPage() {
                             />
                             {errors.password && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
                         </div>
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                             <input className="rounded border-slate-300 text-primary focus:ring-primary" id="remember" type="checkbox" disabled={isSigningIn} />
                             <label className="ml-2 text-sm text-slate-600 dark:text-slate-400 font-medium" >Remember me for 30 days</label>
-                        </div>
+                        </div> */}
                         <button 
                             className="w-full bg-primary hover:bg-orange-600 disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-4"
                             type="submit"

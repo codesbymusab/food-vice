@@ -21,6 +21,7 @@ export function Hero() {
                         { signal: controller.signal }
                     );
                     const data = await response.json();
+                    
                     setSuggestions(data);
                 } catch (err) {
                     console.error('Autocomplete error:', err);

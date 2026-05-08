@@ -2,9 +2,11 @@
 const GetFollowerReels = require("../../application/use-cases/reels/GetFollowerReels");
 const GetPopularTags = require("../../application/use-cases/reels/GetPopularTags");
 const GetRecentReels = require("../../application/use-cases/reels/GetRecentReels");
+const GetReel = require("../../application/use-cases/reels/GetReel");
 const GetReelComments = require("../../application/use-cases/reels/GetReelComments");
 const GetUserReels = require("../../application/use-cases/reels/GetUserReels");
 const PostReelComment = require("../../application/use-cases/reels/PostReelComment");
+const SuggestAccounts = require("../../application/use-cases/reels/SuggestAccounts");
 const UploadReel = require("../../application/use-cases/reels/UploadReel");
 const ReelModel = require("../../infrastructure/database/mongodb/models/Reels/ReelModel");
 const Reel = require("../../infrastructure/database/mongodb/models/Reels/ReelModel");
@@ -107,4 +109,37 @@ exports.getUserReels = async (req, res) => {
         console.error(err);
         return res.status(500).json({ error: err.message });
     }
+}
+
+exports.getById = async (req, res) => {
+    try {
+        const reelId=req.params.reelId
+        const userId = req.params.userId
+       
+        const reelRepo = new ReelRepoImpl()
+        const getReel = new GetReel(reelRepo)
+        const reel = await getReel.execute({ reelId, userId });
+        res.json(reel);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+
+
+exports.suggestAccounts= async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const limit = req.query.limit ? parseInt(req.query.limit, 5) : 5;
+
+    const reelRepo = new ReelRepoImpl()
+    const suggestAcc=new SuggestAccounts(reelRepo)
+    const suggestions = await suggestAcc.execute(userId);
+
+    return res.status(200).json({ suggestions });
+  } catch (error) {
+    console.error("Error suggesting accounts:", error);
+    return res.status(500).json({ error: "Failed to suggest accounts" });
+  }
 }

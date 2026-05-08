@@ -17,7 +17,7 @@ const MediaSchema = new mongoose.Schema({
 
   ownerId: { 
     type:mongoose.Schema.Types.ObjectId, 
-    required: true 
+    
   },
 
   uploadedBy: { 

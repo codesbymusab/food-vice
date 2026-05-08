@@ -1,10 +1,52 @@
 const ThreadRepoImpl = require('../../infrastructure/database/mongodb/repositories/ThreadRepoImpl');
+const MediaRepoImpl = require('../../infrastructure/database/mongodb/repositories/MediaRepoImpl');
+const StorageServiceImpl = require('../../infrastructure/services/FirebaseStorage/StorageServiceImp');
 
 const threadRepo = new ThreadRepoImpl();
+const mediaRepo = new MediaRepoImpl();
+const storageService = new StorageServiceImpl();
 
 exports.createThread = async (req, res) => {
   try {
-    const thread = await threadRepo.create({ ...req.body, uid: req.userId });
+
+
+    const { communityId, title, content, topics } = req.body;
+    
+    let mediaIds = [];
+    
+    // Handle media uploads
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const url = await storageService.uploadFile(file, 'threads');
+        const media = await mediaRepo.save({
+          url,
+          type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+          ownerType: 'thread',
+          ownerId: null,
+          uploadedBy: req.userId
+        });
+        mediaIds.push(media._id);
+      }
+    }
+
+    const threadData = {
+      uid: req.userId,
+      communityId,
+      title,
+      content,
+      topics: topics ? JSON.parse(topics) : []
+    };
+
+    const thread = await threadRepo.create(threadData);
+
+    
+    if (mediaIds.length > 0) {
+      await require('mongoose').model('Media').updateMany(
+        { _id: { $in: mediaIds } },
+        { ownerId: thread._id }
+      );
+    }
+
     return res.status(201).json(thread);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -13,7 +55,9 @@ exports.createThread = async (req, res) => {
 
 exports.getThreadsByCommunity = async (req, res) => {
   try {
-    const threads = await threadRepo.findByCommunity(req.params.communityId);
+    const { search, topics } = req.query;
+    const topicIds = topics ? topics.split(',').filter(id => id) : [];
+    const threads = await threadRepo.findByCommunity(req.params.communityId, search, topicIds);
     return res.status(200).json(threads);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -50,9 +94,55 @@ exports.likeThread = async (req, res) => {
   }
 };
 
+exports.dislikeThread = async (req, res) => {
+  try {
+    const thread = await threadRepo.toggleDislike(req.params.id, req.userId);
+    return res.status(200).json(thread);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+exports.toggleCommentLike = async (req, res) => {
+  try {
+    const comment = await threadRepo.toggleCommentLike(req.params.commentId, req.userId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    return res.status(200).json(comment);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 exports.addComment = async (req, res) => {
   try {
-    const comment = await threadRepo.addComment({ ...req.body, uid: req.userId, threadId: req.params.id });
+    const { content } = req.body;
+    let mediaIds = [];
+
+    // Handle media uploads
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const url = await storageService.uploadFile(file, 'comments');
+        const media = await mediaRepo.save({
+          url,
+          type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+          ownerType: 'thread',
+          ownerId: req.params.id, // Thread ID
+          uploadedBy: req.userId
+        });
+        mediaIds.push(media._id);
+      }
+    }
+
+    const commentData = {
+      uid: req.userId,
+      threadId: req.params.id,
+      content,
+      media: mediaIds
+    };
+
+    const comment = await threadRepo.addComment(commentData);
     return res.status(201).json(comment);
   } catch (error) {
     return res.status(400).json({ message: error.message });

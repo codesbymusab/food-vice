@@ -6,10 +6,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
-export type SelectedTopic = 'recpie' | 'review' | 'discussion' | 'street-food' | 'cooking-tip'
+export type SelectedTopic = string; // Can be 'all' or topic ID
 
 export function CommunitiesPage() {
-    const [selectedTopic, setSelectedTopic] = useState<SelectedTopic>('recpie')
+    const [selectedTopic, setSelectedTopic] = useState<SelectedTopic>('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [joinedCommunities, setJoinedCommunities] = useState([])
     const [recommendedCommunities, setRecommendedCommunities] = useState([])
@@ -38,8 +38,8 @@ export function CommunitiesPage() {
 
     const fetchRecommendedThreads = async () => {
         try {
-            
-            const response = await axios.get('http://localhost:3000/thread/community/all', { withCredentials: true })
+            const topicIds = selectedTopic !== 'all' ? [selectedTopic] : []
+            const response = await axios.get(`http://localhost:3000/thread/community/all?topics=${topicIds.join(',')}`, { withCredentials: true })
             setRecommendedThreads(response.data)
         } catch (error) {
             console.error('Error fetching recommended threads:', error)
@@ -61,6 +61,10 @@ export function CommunitiesPage() {
         fetchRecommendedThreads()
     }, [])
 
+    useEffect(() => {
+        fetchRecommendedThreads()
+    }, [selectedTopic])
+
 
     return (
         <main className="flex-1 px-4 md:px-10 py-8 max-w-7xl mx-auto">
@@ -75,8 +79,8 @@ export function CommunitiesPage() {
                         <span>Start a Community</span>
                     </button>
 
-                    <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
-                    
+                    {/* <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
+                     */}
                     <CommunitiesCard title="Joined Communities" communities={joinedCommunities} />
                     <CommunitiesCard title="Recommendations" communities={recommendedCommunities} />
 
@@ -98,10 +102,10 @@ export function CommunitiesPage() {
                     </div>
 
                     <div className="flex justify-center pt-4">
-                        <button
+                        {/* <button
                             className="px-8 py-3 rounded-xl border border-primary text-primary font-bold hover:bg-primary/5 transition-colors">
                             Load More Discussions
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>

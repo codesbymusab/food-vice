@@ -60,6 +60,8 @@ function MainLayout() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/profile/:id" element={<UserProfilePage />} />
+         
+        <Route path="/reels/:id" element={<ReelsPage />} />
         <Route path="/reels" element={<ReelsPage />} />
         <Route path="/community" element={<CommunitiesPage />} />
         <Route path="/community/:id" element={<CommunityDetailPage />} />

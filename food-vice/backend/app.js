@@ -1,102 +1,183 @@
-// testUploadReels.js
-const fs = require("fs");
-const path = require("path");
 
-const MediaRepoImpl = require("./infrastructure/database/mongodb/repositories/MediaRepoImpl");
-const StorageServiceImpl = require("./infrastructure/services/FirebaseStorage/StorageServiceImp");
-const ReelRepoImpl = require("./infrastructure/database/mongodb/repositories/ReelRepoImpl");
-const UploadReel = require("./application/use-cases/reels/UploadReel");
+const mongoose = require("mongoose");
+const axios = require("axios");
 
-// Hardcoded metadata for each reel file
-const reelsData = {
-  "1.mp4": {
-    title: "Philadelphia Cheesesteak Sandwiches",
-    description: "Juicy beef and melted cheese — authentic Philly cheesesteak vibes captured in Lahore.",
-    tags: ["trending", "shorts", "ytshorts", "youtubeshorts", "food", "lahore", "vlog"]
-  },
-  "2.mp4": {
-    title: "The Best Gulab Jamun by Usman Sweets",
-    description: "Soft, syrupy Gulab Jamun from Usman Sweets Township Lahore — a dessert lover’s dream.",
-    tags: ["food", "foodie", "shorts"]
-  },
-  "3.mp4": {
-    title: "HN Foods Authentic Desi Cuisine",
-    description: "Authentic Desi flavors served fresh at HN Foods Lahore.",
-    tags: ["food", "desi", "lahore", "authentic"]
-  },
-  "4.mp4": {
-    title: "Lal Qila Restaurant Lahore",
-    description: "Grand dining experience at Lal Qila Lahore — Lahori food, street food vibes, and viral taste.",
-    tags: ["lahore", "lahorifood", "food", "foodie", "viral", "shorts", "streetfood"]
-  },
-  "5.mp4": {
-    title: "ETEN Fine Dining Lahore",
-    description: "ETEN offers the best economical fine dining in Lahore — quality meets affordability.",
-    tags: ["shorts", "food", "lahore"]
-  },
-  "6.mp4": {
-    title: "Haveli Restaurant Lahore",
-    description: "Traditional Lahori cuisine with stunning views at Haveli Restaurant Lahore.",
-    tags: ["haveli", "lahore", "shorts"]
-  },
-  "7.mp4": {
-    title: "Best Momos in Lahore",
-    description: "Discover the tastiest Momos in Lahore — a fusion of flavors loved by locals.",
-    tags: ["momos", "lahore", "food", "streetfood"]
-  },
-  "8.mp4": {
-    title: "Chinese Food Hits Different at The Great Blend",
-    description: "Bold Chinese flavors at The Great Blend, Valencia Lahore — food that truly hits different.",
-    tags: ["food", "foodie", "shorts", "chinese", "lahore"]
-  },
-  "9.mp4": {
-    title: "Ao Jashan Manaen at Jashan Restaurant",
-    description: "Celebrate with friends and family at Jashan Restaurant Lahore — festive vibes and great food.",
-    tags: ["jashan", "lahore", "restaurant", "food"]
+// =========================
+// MODELS
+// =========================
+
+const Restaurant = require("./infrastructure/database/mongodb/models/Restaurant/RestaurantModel");
+const Location = require("./infrastructure/database/mongodb/models/LocationModel");
+const Review = require("./infrastructure/database/mongodb/models/Reviews/ReviewModel");
+const Rating = require("./infrastructure/database/mongodb/models/Reviews/RatingModel");
+
+// =========================
+// DB CONNECT
+
+
+// =========================
+// USERS POOL
+// =========================
+
+const USERS = [
+  "69e33bf33120c3c8951309d7",
+  "69f0f79d2daa64883fae238b",
+  "69f7559204cc4c4c385c53fc",
+];
+
+// =========================
+// GROQ AI REVIEW GENERATOR
+// =========================
+
+async function generateReview(prompt) {
+  const res = await axios.post(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      model: "llama-3.1-8b-instant",
+      messages: [{ role: "user", content: prompt }],
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return res.data.choices[0].message.content;
+}
+
+// =========================
+// RATING GENERATOR
+// =========================
+
+function generateRating() {
+  const base = 3 + Math.random() * 2;
+
+  return {
+    food: Math.round(base),
+    service: Math.round(base),
+    ambience: Math.round(base),
+    price: Math.round(base),
+    overall: Math.round(base),
+  };
+}
+
+// =========================
+// MAIN PIPELINE
+// =========================
+
+exports.run = async () => {
+  try {
+    console.log("🚀 Running geo-based location query...");
+
+    // =========================
+    // STEP 1: GEO QUERY (LOCATION)
+    // =========================
+
+    const nearbyLocations = await Location.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [
+              74.26158778531845,
+              31.402624376104274,
+            ],
+          },
+          distanceField: "distKm",
+          spherical: true,
+          distanceMultiplier: 0.001,
+          maxDistance: 50 * 1000,
+        },
+      },
+      { $project: { _id: 1 } },
+    ]);
+
+    const locationIds = nearbyLocations.map((l) => l._id);
+
+    console.log(
+      "📍 Nearby locations found:",
+      locationIds.length
+    );
+
+    // =========================
+    // STEP 2: RESTAURANTS FROM LOCATIONS
+    // =========================
+
+    const restaurants = await Restaurant.find({
+      locationId: { $in: locationIds },
+    }).populate("locationId");
+
+    console.log(
+      "🍽 Restaurants found:",
+      restaurants.length
+    );
+
+    // =========================
+    // STEP 3: GENERATE REVIEWS
+    // =========================
+
+    for (const r of restaurants) {
+      if (!r.locationId) continue;
+
+      const loc = r.locationId;
+
+      for (let i = 0; i < 2; i++) {
+        const user =
+          USERS[Math.floor(Math.random() * USERS.length)];
+
+        const prompt = `
+You are a real customer in Lahore Pakistan.
+
+Write a natural restaurant review.
+
+Restaurant:
+Name: ${r.name}
+Description: ${r.description || "N/A"}
+Price Category: ${r.priceCategory || "Medium"}
+
+Location:
+Address: ${loc.address}
+City: ${loc.city}
+Distance: ${loc.distKm || "unknown"} km
+
+Rules:
+- 1 short paragraph
+- human tone (NOT AI-like)
+- realistic opinion (balanced positivity)
+- mention food experience
+`;
+
+        const text = await generateReview(prompt);
+
+        const review = await Review.create({
+          uid: user,
+          restaurantId: r._id,
+          text,
+        });
+
+        await Rating.create({
+          reviewId: review._id,
+          ...generateRating(),
+        });
+
+        console.log(
+          `✔ Review created for: ${r.name}`
+        );
+      }
+    }
+
+    console.log("✅ DONE: Geo-based AI reviews generated");
+
+    process.exit(0);
+  } catch (err) {
+    console.error(
+      "❌ ERROR:",
+      err.response?.data || err.message
+    );
+    process.exit(1);
   }
 };
 
-exports.testUploadReels= async () => {
- console.log('started')
-  const mediaRepo = new MediaRepoImpl();
-  const storageService = new StorageServiceImpl();
-  const reelRepo = new ReelRepoImpl();
-  const uploadReel = new UploadReel(mediaRepo, reelRepo, storageService);
-
-  const folderPath = `C:/Users/kaptop collection/Downloads/Reels`;
-  const files = fs.readdirSync(folderPath);
-
-  const userId = "69e1f767bf83c83874c9ddf8"; // replace with valid ObjectId
-console.log('loaded')
-  for (const filename of files) {
-    console.log('uploading')
-    const filePath = path.join(folderPath, filename);
-    const buffer = fs.readFileSync(filePath);
-
-    const fakeFile = {
-      originalname: filename,
-      mimetype: "video/mp4",
-      buffer,
-    };
-
-    const meta = reelsData[filename];
-    if (!meta) {
-      console.warn(`⚠️ No metadata found for ${filename}, skipping...`);
-      continue;
-    }
-
-    console.log(`Uploading reel: ${meta.title}`);
-
-    const media = await uploadReel.execute({
-      userId,
-      title: meta.title,
-      description: meta.description,
-      tags: meta.tags,
-      file: fakeFile,
-    });
-
-    console.log("✅ Uploaded:", media);
-  }
-}
-
-
+// Run

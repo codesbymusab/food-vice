@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router"
-import axios from "axios"
+import { likeThread, dislikeThread } from "../../../apis/community"
+import { useAuth } from "../../../context/AuthContext"
 
 interface Thread {
     _id: string;
@@ -11,12 +12,15 @@ interface Thread {
         profilePicture?: string;
     };
     likes: string[];
+    dislikes: string[];
     createdAt: string;
     communityId: string;
+    media?: any[];
 }
 
 export function FeedCard({ thread, onUpdate }: { thread?: Thread, onUpdate?: () => void }) {
     const navigate = useNavigate()
+    const { user } = useAuth()
 
     if (!thread) {
         // Fallback or placeholder if no thread is passed (for initial UI compatibility)
@@ -28,15 +32,29 @@ export function FeedCard({ thread, onUpdate }: { thread?: Thread, onUpdate?: () 
     }
 
     function goToDetailsPage() {
-        navigate(`/community/${thread.communityId}/${thread._id}`)
+        if (thread) {
+            navigate(`/community/${thread.communityId}/${thread._id}`)
+        }
     }
+
+    const isLikedByUser = user ? thread.likes.includes(user.userId) : false
+    const isDislikedByUser = user ? thread.dislikes.includes(user.userId) : false
 
     const handleLike = async () => {
         try {
-            await axios.post(`http://localhost:3000/thread/${thread._id}/like`, {}, { withCredentials: true })
+            await likeThread(thread._id)
             if (onUpdate) onUpdate()
         } catch (error) {
             console.error('Error liking thread:', error)
+        }
+    }
+
+    const handleDislike = async () => {
+        try {
+            await dislikeThread(thread._id)
+            if (onUpdate) onUpdate()
+        } catch (error) {
+            console.error('Error disliking thread:', error)
         }
     }
 
@@ -45,23 +63,32 @@ export function FeedCard({ thread, onUpdate }: { thread?: Thread, onUpdate?: () 
             className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex gap-6">
                 <div className="flex flex-col items-center gap-1">
-                    <button 
-                        className="p-1 rounded hover:bg-primary/10 text-primary transition-colors"
+                    <button
+                        className={`p-1 rounded transition-colors ${isLikedByUser ? 'bg-primary/20 text-primary' : 'hover:bg-primary/10 text-slate-500'}`}
                         onClick={handleLike}
                     >
                         <span className="material-symbols-outlined">expand_less</span>
                     </button>
-                    <span className="text-base font-bold">{thread.likes?.length || 0}</span>
-                    <button className="p-1 rounded hover:bg-cyan-500/10 text-cyan-500 transition-colors">
+                    <span className="text-base font-bold">{(thread.likes?.length || 0) - (thread.dislikes?.length || 0)}</span>
+                    <button
+                        className={`p-1 rounded transition-colors ${isDislikedByUser ? 'bg-red-500/20 text-red-500' : 'hover:bg-red-500/10 text-red-500'}`}
+                        onClick={handleDislike}
+                    >
                         <span className="material-symbols-outlined">expand_more</span>
                     </button>
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="size-8 rounded-full bg-cover bg-gray-200" 
-                            style={{backgroundImage: thread.uid?.profilePicture ? `url('${thread.uid.profilePicture}')` : "none"}}>
-                            {!thread.uid?.profilePicture && <span className="material-symbols-outlined text-slate-400 m-auto">person</span>}
+                        {!thread.uid?.profilePicture ?  <div
+                            className="flex-shrink-0 size-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-primary">person</span>
                         </div>
+                            :
+                            <div className="size-10 rounded-full bg-cover bg-center border-2 border-primary/20 bg-gray-200"
+                                style={{ backgroundImage: `url('${thread.uid?.profilePicture}')` }}>
+                                {!thread.uid?.profilePicture && <span className="material-symbols-outlined text-slate-400 m-auto">person</span>}
+                            </div>
+                        }
                         <span className="text-sm font-semibold">@{thread.uid?.name || 'anonymous'}</span>
                         <span className="text-xs text-slate-500">• {new Date(thread.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -71,9 +98,38 @@ export function FeedCard({ thread, onUpdate }: { thread?: Thread, onUpdate?: () 
                     <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 mb-4 leading-relaxed">
                         {thread.content}
                     </p>
+
+                    {/* Media attachments */}
+                    {thread.media && thread.media.length > 0 && (
+                        <div className="mb-4 grid grid-cols-2 gap-2">
+                            {thread.media.slice(0, 4).map((media: any, index: number) => (
+                                <div key={media._id} className="relative">
+                                    {media.type === 'image' ? (
+                                        <img
+                                            src={media.url}
+                                            alt={`Attachment ${index + 1}`}
+                                            className="w-full h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                                        />
+                                    ) : (
+                                        <video
+                                            src={media.url}
+                                            className="w-full h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                                            controls
+                                        />
+                                    )}
+                                    {thread.media && thread.media.length > 4 && index === 3 && (
+                                        <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                                            <span className="text-white font-bold">+{thread.media.length - 4} more</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-6">
                         <button
-                            className="flex items-center gap-2 text-slate-500 hover:text-primary text-sm font-medium transition-colors" 
+                            className="flex items-center gap-2 text-slate-500 hover:text-primary text-sm font-medium transition-colors"
                             onClick={goToDetailsPage}
                         >
                             <span className="material-symbols-outlined text-lg">chat_bubble_outline</span> Comments

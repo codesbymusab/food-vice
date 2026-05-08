@@ -1,7 +1,42 @@
 import type { SelectedTopic } from "./CommunitiesPage";
+import { useState, useEffect, type Dispatch, type SetStateAction } from "react";
+import { getTopics, type Topic } from "../../../apis/community";
 
-export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSelectedTopic}:{selectedTopic:SelectedTopic,setSelectedTopic:React.Dispatch<React.SetStateAction<SelectedTopic>>}) {
+export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSelectedTopic}:{selectedTopic:SelectedTopic,setSelectedTopic:Dispatch<SetStateAction<SelectedTopic>>}) {
     
+    const [topics, setTopics] = useState<Topic[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const fetchedTopics = await getTopics();
+                setTopics(fetchedTopics);
+            } catch (error) {
+                console.error('Error fetching topics:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTopics();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="text-slate-900 dark:text-slate-100 font-bold mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">auto_stories</span>Topics
+                </h3>
+                <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div
             className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -9,39 +44,36 @@ export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSe
                 <span className="material-symbols-outlined text-primary">auto_stories</span>Topics
             </h3>
             <div className="flex flex-col gap-1">
-                <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='recpie' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
-                    onClick={()=>setSelectedTopic('recpie')}>
-                    <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">menu_book</span>
-                        Recipes</span>
-                    <span className="text-xs opacity-60">2.4k</span>
+                <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='all' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
+                    onClick={()=>setSelectedTopic('all')}>
+                    <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">forum</span>
+                        All Topics</span>
+                    <span className="text-xs opacity-60">6.9k</span>
                 </div>
-                <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='review' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
-                 onClick={()=>setSelectedTopic('review')}>
-                    <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">star</span>
-                        Restaurant Reviews</span>
-                    <span className="text-xs opacity-60">1.8k</span>
-                </div>
-                 <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='discussion' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
-                    onClick={()=>setSelectedTopic('discussion')}>
-                    <span className="flex items-center gap-3"><span
-                        className="material-symbols-outlined text-xl">chat</span> Discussions</span>
-                    <span className="text-xs opacity-60">560</span>
-                </div>
-                <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='street-food' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
-                    onClick={()=>setSelectedTopic('street-food')}>
-                    <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">map</span>
-                        Street Food</span>
-                    <span className="text-xs opacity-60">942</span>
-                </div>
-                <div className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic==='cooking-tip' ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
-                     onClick={()=>setSelectedTopic('cooking-tip')}>
-                    <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">lightbulb</span>
-                        Cooking Tips</span>
-                    <span className="text-xs opacity-60">1.1k</span>
-                </div>
+                {topics.map((topic) => (
+                    <div key={topic._id} className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic===topic._id ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
+                        onClick={()=>setSelectedTopic(topic._id)}>
+                        <span className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-xl">
+                                {topic.name === 'Recipes' ? 'menu_book' :
+                                 topic.name === 'Restaurant Reviews' ? 'star' :
+                                 topic.name === 'Discussions' ? 'chat' :
+                                 topic.name === 'Street Food' ? 'map' :
+                                 topic.name === 'Cooking Tips' ? 'lightbulb' : 'topic'}
+                            </span>
+                            {topic.name}
+                        </span>
+                        <span className="text-xs opacity-60">
+                            {topic.name === 'Recipes' ? '2.4k' :
+                             topic.name === 'Restaurant Reviews' ? '1.8k' :
+                             topic.name === 'Discussions' ? '560' :
+                             topic.name === 'Street Food' ? '942' :
+                             topic.name === 'Cooking Tips' ? '1.1k' : '0'}
+                        </span>
+                    </div>
+                ))}
                
             </div>
         </div>
-
     )
 }

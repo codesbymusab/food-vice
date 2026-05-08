@@ -18,7 +18,7 @@ export type Reel = {
         _id: string,
         name: string,
         username: string,
-        profilePhoto: string
+        profilePhoto?: string
     },
     likeCount: number,
     commentCount: number,
@@ -29,8 +29,13 @@ export type Reel = {
     views: number
 
 }
+export type SuggestedAccount = {
 
-export async function fetchRecentReels({ userId,tag }: { userId: string,tag:string|null }) {
+    _id: string,
+    name: string,
+    profilePhoto?: string
+}
+export async function fetchRecentReels({ userId, tag }: { userId: string, tag: string | null }) {
     try {
 
         const res = await fetch(
@@ -44,6 +49,28 @@ export async function fetchRecentReels({ userId,tag }: { userId: string,tag:stri
         }
         else {
             throw new Error('Failed to load recent reels')
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+}
+
+export async function fetchReelById({ reelId, userId }: { userId: string, reelId: string }) {
+    try {
+
+        const res = await fetch(
+            `http://localhost:3000/reels/reel/${reelId}/${userId}`,
+            { credentials: "include" }
+        );
+        if (res.ok) {
+            const reel = await res.json();
+            console.log(reel)
+            return reel
+
+        }
+        else {
+            throw new Error('Failed to load reel')
         }
     } catch (error) {
         console.error(error);
@@ -154,8 +181,30 @@ export async function fetchPopularTags() {
 
 }
 
+export async function fetchSuggestedAccounts({ userId }: { userId: string }) {
+    try {
 
-export async function fetchFollowersReels({ userId,tag }: { userId: string,tag:string|null }) {
+        const res = await fetch(
+            `http://localhost:3000/reels/suggestions/accounts?userId=${userId}`,
+            { credentials: "include" }
+        );
+        if (res.ok) {
+            const { suggestions } = await res.json();
+            console.log(suggestions)
+            return suggestions
+        }
+        else {
+            throw new Error('Failed to load tags')
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+}
+
+
+
+export async function fetchFollowersReels({ userId, tag }: { userId: string, tag: string | null }) {
     try {
 
         const res = await fetch(

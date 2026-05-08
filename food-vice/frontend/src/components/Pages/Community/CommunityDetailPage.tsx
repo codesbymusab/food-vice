@@ -3,7 +3,9 @@ import { SearchBar } from "../../SearchBar";
 import { useNavigate, useParams } from "react-router";
 import { CommunityGuidelines } from "./CommunityGuidelinesCard";
 import { CommunityCover } from "./CommunityCover";
+import { TopicsCard } from "./TopicsCard";
 import { useState, useEffect } from "react";
+import { getThreadsByCommunity } from "../../../apis/community";
 import axios from "axios";
 
 export function CommunityDetailPage() {
@@ -13,6 +15,8 @@ export function CommunityDetailPage() {
     const [threads, setThreads] = useState<any[]>([])
     const [isMember, setIsMember] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [selectedTopic, setSelectedTopic] = useState<string>('all')
 
     useEffect(() => {
         if (id) {
@@ -21,6 +25,14 @@ export function CommunityDetailPage() {
             checkMembership()
         }
     }, [id])
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            fetchThreads()
+        }, 300)
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [searchQuery, selectedTopic])
 
     const fetchCommunityDetails = async () => {
         try {
@@ -45,7 +57,7 @@ export function CommunityDetailPage() {
         try {
             await axios.post(`http://localhost:3000/community/${id}/join`, {}, { withCredentials: true })
             setIsMember(true)
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error joining community:', error)
             alert(error.response?.data?.message || 'Failed to join community')
         }
@@ -53,8 +65,11 @@ export function CommunityDetailPage() {
 
     const fetchThreads = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/thread/community/${id}`, { withCredentials: true })
-            setThreads(response.data)
+            if (id) {
+                const topicIds = selectedTopic !== 'all' ? [selectedTopic] : []
+                const fetchedThreads = await getThreadsByCommunity(id, searchQuery, topicIds)
+                setThreads(fetchedThreads)
+            }
         } catch (error) {
             console.error('Error fetching threads:', error)
         } finally {
@@ -81,12 +96,18 @@ export function CommunityDetailPage() {
                         <span>Create Thread</span>
                     </button>
 
+                    <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
+
                     <CommunityGuidelines guidelines={community.guidelines} />
 
                 </aside>
 
                 <div className="lg:col-span-9 order-1 lg:order-2 flex flex-col gap-6">
-                    <SearchBar placeHolder="Search for threads..." />
+                    <SearchBar 
+                        placeHolder="Search for threads..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
 
                     <div className="flex flex-col gap-4">
                         {threads.length === 0 && <p className="text-center py-10 text-slate-500 italic">By default no threads. Be the first to start a conversation!</p>}
@@ -125,4 +146,4 @@ export function CommunityDetailPage() {
             </aside>
         </main>
     )
-}
+}

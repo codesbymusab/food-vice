@@ -35,6 +35,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setLocation([position.coords.latitude, position.coords.longitude]);
+          console.log([position.coords.latitude, position.coords.longitude])
           setLoading(false);
           resolve();
         },

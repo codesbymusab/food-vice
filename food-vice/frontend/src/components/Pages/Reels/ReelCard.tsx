@@ -44,14 +44,14 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
     function togglePlay() {
         const video = videoRef.current;
         if (!video) return;
-      
+
         if (video.paused) {
             video.play();
-            video.muted=false
+            video.muted = false
             updateView()
         } else {
             video.pause();
-            video.muted=true
+            video.muted = true
         }
     };
 
@@ -63,9 +63,10 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
         }
     }
     return (
-        <div className="max-w-[500px] mx-auto my-12 snap-start" onMouseEnter={() => setShowButton(true)}
+        <div
+            className="max-w-[350px] h-screen max-h-[90vh] mx-auto mb-2 snap-start overflow-hidden"
+            onMouseEnter={() => setShowButton(true)}
             onMouseLeave={() => setShowButton(false)}
-
         >
 
             <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl" onClick={togglePlay} >
@@ -81,7 +82,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                     loop
                     muted
                     preload="auto"
-                    
+
                 />
 
 
@@ -100,8 +101,8 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
 
                 <button
-                    onClick={(e)=>{e.stopPropagation(); togglePlay()}}
-                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-16 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center transition-transform ${isPlaying && !showButton ? "opacity-0 hover:opacity-100" : "opacity-100"
+                    onClick={(e) => { e.stopPropagation(); togglePlay() }}
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-12 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center transition-transform ${isPlaying && !showButton ? "opacity-0 hover:opacity-100" : "opacity-100"
                         }`}
                 >
                     <span className="material-symbols-outlined text-4xl fill-current">
@@ -109,64 +110,83 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                     </span>
                 </button>
 
+                {
 
-                <div className="absolute right-4 bottom-24 flex flex-col gap-6 text-white">
+                    (!isPlaying || showButton) &&
 
-                    <div className="flex flex-col items-center gap-1">
-                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isLikedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) =>{e.stopPropagation(); await toggleReelLike(user!.userId, reel._id, reel.isLikedByUser)}}>
-                            <span className="material-symbols-outlined text-2xl">favorite</span>
-                        </button>
-                        <span className="text-xs font-bold">{reel.likeCount}</span>
-                    </div>
+                    <div className="absolute right-4 bottom-24 flex flex-col gap-6 text-white">
 
-                    <div className="flex flex-col items-center gap-1">
-                        <button className="size-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-accent-cyan transition-colors" onClick={(e) => {e.stopPropagation(); setShowComments(prev => !prev)}}>
-                            <span className="material-symbols-outlined text-2xl">chat</span>
-                        </button>
-                        <span className="text-xs font-bold">{commentCount}</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1">
-                        <button className="size-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-primary transition-colors">
-                            <span className="material-symbols-outlined text-2xl">share</span>
-                        </button>
-                        <span className="text-xs font-bold">2.1k</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1">
-                        <button className={`size-12 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isSavedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) => {e.stopPropagation(); await saveReel(user!.userId, reel._id)}}>
-                            <span className="material-symbols-outlined text-2xl">bookmark</span>
-                        </button>
-                        <span className="text-xs font-bold">{reel.saveCount}</span>
-                    </div>
-                </div>
-
-
-                <div className="absolute bottom-4 inset-x-4 flex flex-col gap-2">
-                    <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-full border-2 border-primary bg-white overflow-hidden">
-                            <img
-                                className="w-full h-full object-cover"
-                                src={reel.user.profilePhoto}
-                                alt="User profile"
-                            />
+                        <div className="flex flex-col items-center gap-1">
+                            <button className={`size-10 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isLikedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) => { e.stopPropagation(); await toggleReelLike(user!.userId, reel._id, reel.isLikedByUser) }}>
+                                <span className="material-symbols-outlined text-2xl">favorite</span>
+                            </button>
+                            <span className="text-xs font-bold">{reel.likeCount}</span>
                         </div>
-                        <div className="flex flex-col">
-                            <h3 className="text-white font-bold text-sm">
-                                {reel.user.name}
-                                <span className="text-accent-cyan text-xs ml-1">· Follow</span>
-                            </h3>
-                            <p className="text-white/80 text-xs line-clamp-1">
-                                {reel.description}{" "}
-                                {reel.tags.map((tag) => `#${tag.name} `)}
-                            </p>
+
+                        <div className="flex flex-col items-center gap-1">
+                            <button className="size-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-accent-cyan transition-colors" onClick={(e) => { e.stopPropagation(); setShowComments(prev => !prev) }}>
+                                <span className="material-symbols-outlined text-2xl">chat</span>
+                            </button>
+                            <span className="text-xs font-bold">{commentCount}</span>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-1">
+                            <button className="size-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:text-primary transition-colors">
+                                <span className="material-symbols-outlined text-2xl">share</span>
+                            </button>
+                            <span className="text-xs font-bold">2.1k</span>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-1">
+                            <button className={`size-10 rounded-full  backdrop-blur-sm flex items-center justify-center ${reel.isSavedByUser ? 'bg-primary/20 hover:bg-white/20 text-primary' : 'bg-black/40 hover:text-primary text-white'}  transition-colors`} onClick={async (e) => { e.stopPropagation(); await saveReel(user!.userId, reel._id) }}>
+                                <span className="material-symbols-outlined text-2xl">bookmark</span>
+                            </button>
+                            <span className="text-xs font-bold">{reel.saveCount}</span>
                         </div>
                     </div>
-                    <div className="w-full bg-white/20 h-1 rounded-full overflow-hidden mt-2">
-                        <div className="bg-primary h-full" style={{ width: `${progress}%` }}></div>
-                    </div>
-                </div>
+                }
 
+                {
+
+                    (!isPlaying || showButton) &&
+
+                    <div className="absolute bottom-4 inset-x-4 flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                            {!reel.user.profilePhoto || reel.user.profilePhoto === "PP1" && <div
+                                className="flex-shrink-0 size-10 rounded-full bg-slate/20 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary">person</span>
+                            </div>
+                            }
+                            {reel.user.profilePhoto && <div className="max-w-fit rounded-full border-2 border-primary bg-white overflow-hidden">
+                                <img
+                                    className="w-full h-full object-cover"
+                                    src={reel.user.profilePhoto}
+                                    alt="User profile"
+                                />
+                            </div>
+
+                            }
+
+
+
+
+                            <div className="flex flex-col">
+                                <h3 className="text-white font-bold text-sm">
+                                    {reel.user.name}
+                                    <span className="text-accent-cyan text-xs ml-1">· Follow</span>
+                                </h3>
+                                <p className="text-white/80 text-xs line-clamp-2">
+                                    {reel.description}{" "}
+                                    {reel.tags.map((tag) => `#${tag.name} `)}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="w-full bg-white/20 h-1 rounded-full overflow-hidden mt-2">
+                            <div className="bg-primary h-full" style={{ width: `${progress}%` }}></div>
+                        </div>
+                    </div>
+
+                }
                 {showComments && <ReelCommentsSheet reelId={reel._id} setShowComments={setShowComments} setCommentCount={setCommentCount} />}
 
             </div>

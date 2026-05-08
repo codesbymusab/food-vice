@@ -1,13 +1,29 @@
+import { useAuth } from "../../../../context/AuthContext"
+import { toggleCommentLike } from "../../../../apis/community"
+
 interface Comment {
     _id: string;
     uid: {
         name: string;
     };
     content: string;
+    media?: any[];
+    likes?: string[];
     createdAt: string;
 }
 
-export function RepliesCard({ comments }: { comments: Comment[] }) {
+export function RepliesCard({ comments, onCommentsUpdated }: { comments: Comment[]; onCommentsUpdated: () => void }) {
+    const { user } = useAuth()
+
+    const handleToggleLike = async (commentId: string) => {
+        try {
+            await toggleCommentLike(commentId)
+            onCommentsUpdated()
+        } catch (error) {
+            console.error('Error toggling comment like:', error)
+        }
+    }
+
     return (
         <div className="space-y-6 bg-white dark:bg-slate-900/50 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800" >
             <div className="flex items-center justify-between">
@@ -36,20 +52,49 @@ export function RepliesCard({ comments }: { comments: Comment[] }) {
                             <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
                                 {comment.content}
                             </p>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1 bg-primary/5 rounded-full px-2 py-0.5">
-                                    <button className="hover:text-primary"><span
-                                        className="material-symbols-outlined text-base">thumb_up</span></button>
-                                    <span className="text-xs font-bold">0</span>
-                                    <button className="hover:text-primary"><span
-                                        className="material-symbols-outlined text-base">thumb_down</span></button>
+
+                            {/* Media attachments */}
+                            {comment.media && comment.media.length > 0 && (
+                                <div className="mb-3 grid grid-cols-2 gap-2">
+                                    {comment.media.slice(0, 4).map((media: any, index: number) => (
+                                        <div key={media._id}>
+                                            {media.type === 'image' ? (
+                                                <img
+                                                    src={media.url}
+                                                    alt={`Attachment ${index + 1}`}
+                                                    className="w-full h-24 object-cover rounded border border-slate-200"
+                                                />
+                                            ) : (
+                                                <video
+                                                    src={media.url}
+                                                    className="w-full h-24 object-cover rounded border border-slate-200"
+                                                    controls
+                                                />
+                                            )}
+                                            {comment.media && comment.media.length > 4 && index === 3 && (
+                                                <div className="absolute inset-0 bg-black/50 rounded flex items-center justify-center">
+                                                    <span className="text-white text-xs">+{comment.media.length - 4}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
-                                <button className="text-xs font-bold text-slate-500 hover:text-primary">Reply</button>
+                            )}
+                            <div className="flex items-center gap-4">
+
+                                <button className={`flex items-center gap-1 text-lg ${comment.likes?.includes(user?.userId ?? '') ? 'text-primary hover:text-slate-500' : 'hover:text-primary text-slate-500'}  transition-colors`}
+                                    onClick={async () => await handleToggleLike(comment._id)}
+                                ><span className="material-symbols-outlined text-xl">thumb_up</span> {`(${comment.likes?.length ?? 0})`}</button>
+                                
                             </div>
+
+
                         </div>
                     </div>
+                
+                    
                 ))}
-            </div>
         </div>
+        </div >
     )
 }

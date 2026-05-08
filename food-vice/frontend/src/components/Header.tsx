@@ -53,11 +53,11 @@ export function Header() {
 
                 <div className="flex items-center gap-3">
 
-
+{/* 
                     <button className={`${showNotif === true ? 'bg-primary/30 text-primary' : 'text-slate-600'} p-2 pt-4 rounded-full hover:bg-primary/10  dark:text-slate-400 hover:text-primary transition-all relative`} onClick={() => { setShowNotif((prev) => !prev) }}>
                         <span className="material-symbols-outlined">notifications</span>
                         <span className="absolute top-3 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background-light"></span>
-                    </button>
+                    </button> */}
                     <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
                         <NavLink to={`/profile/${user?.userId}`}>
 
@@ -72,10 +72,10 @@ export function Header() {
                     </button>
                 </div>
 
-                <div
+                {/* <div
                     className={`${showNotif === true ? "flex flex-col" : "hidden"} max-w-96 absolute top-10 right-12 z-50 bg-white/95 dark:bg-slate-900/50 rounded-xl p-4 shadow-sm border border-primary/50 dark:border-slate-800 overflow-y-auto w-fit`} onMouseLeave={() => setShowNotif((prev) => !prev)}>
                     <NotificationsDropDown />
-                </div>
+                </div> */}
 
             </div>
 

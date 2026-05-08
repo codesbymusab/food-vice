@@ -9,6 +9,7 @@ import { fetchUserProfile as loadUserProfileData, fetchSavedRestaurants, fetchUs
 import type { Restaurant } from "../RestaurantDetail/RestaurantDetailPage";
 import type { Reel } from "../Reels/ReelsPage";
 import type { Review } from "../RestaurantDetail/ReviewTile";
+import { useAuth } from "../../../context/AuthContext";
 
 type UserReels={
     saved: Reel[],
@@ -44,7 +45,7 @@ export function UserProfilePage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [showEditForm, setShowEditForm] = useState<boolean>(false);
     const [selectedTab,setSelectedTab]=useState<SelectedTab>('restaurants')
-
+    const {user}=useAuth()
     async function fetchUserProfile() {
         try {
             setLoading(true);
@@ -69,7 +70,7 @@ export function UserProfilePage() {
 
     useEffect(() => {
         fetchUserProfile();
-    }, []);
+    }, [params.id]);
 
 
     function changeTab(tab: SelectedTab): void {
@@ -86,6 +87,7 @@ export function UserProfilePage() {
     }
 
     if(!userProfile) return <div>Fialed to load user</div>
+
     return (
 
 
@@ -97,7 +99,7 @@ export function UserProfilePage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                         <div className="relative size-32 md:size-40 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
-                            {userProfile!.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> : userProfile!.name?.charAt(0)}
+                            {userProfile!.profilePhoto  ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> : userProfile!.name?.charAt(0)}
 
                         </div>
                         <div className="absolute bottom-2 right-2 bg-accent text-white p-1.5 rounded-full border-4 border-white dark:border-slate-800 shadow-lg">
@@ -119,7 +121,7 @@ export function UserProfilePage() {
                         </div>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4">
 
-                            {params.id !== userProfile!.userId ? (<button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
+                            {user!.userId !== userProfile!.userId ? (<button className="inline-flex items-center gap-2 px-6 py-2 bg-accent-cyan text-white rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-md">
                                 <span className="material-symbols-outlined text-sm">person_add</span> Follow
 
                             </button>
@@ -150,7 +152,7 @@ export function UserProfilePage() {
                     <div className="flex justify-between items-end mb-4">
                         <div className="text-left">
                             <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Trust Score</p>
-                            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100">850<span className="text-lg text-slate-400 font-normal">/1000</span></h3>
+                            <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100">100<span className="text-lg text-slate-400 font-normal">/1000</span></h3>
                         </div>
                         <div className="text-right">
                             <span className="inline-flex items-center gap-1 bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-bold">
@@ -159,7 +161,7 @@ export function UserProfilePage() {
                         </div>
                     </div>
                     <div className="h-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-primary to-accent transition-all" style={{ width: "85%" }}></div>
+                        <div className="h-full bg-gradient-to-r from-primary to-accent transition-all" style={{ width: "10%" }}></div>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-3 italic text-center">Calculated based on review quality, community helpfulness, and verified visits.</p>
                 </div>
@@ -176,7 +178,7 @@ export function UserProfilePage() {
                 </div>
             </div>
 
-            <div className="mb-12">
+            {/* <div className="mb-12">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-lg font-bold flex items-center gap-2">
                         <span className="material-symbols-outlined text-primary">military_tech</span>
@@ -191,7 +193,7 @@ export function UserProfilePage() {
                     <AchievementBadge />
                     <AchievementBadgeAlt />
                 </div>
-            </div>
+            </div> */}
 
             <div className="mt-12">
                 <div className="flex border-b border-slate-200 dark:border-slate-700 mb-8">
@@ -266,11 +268,11 @@ export function UserProfilePage() {
 
                     </div>
                 )}
-                <div className="mt-8 text-center">
+                {/* <div className="mt-8 text-center">
                     <button className="px-6 py-2 border border-primary text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors">
                         Load More
                     </button>
-                </div>
+                </div> */}
             </div>
 
         </main>

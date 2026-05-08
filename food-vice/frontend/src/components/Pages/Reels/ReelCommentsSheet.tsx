@@ -68,7 +68,7 @@ export function ReelCommentsSheet({
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-tertiary">Comments</h2>
           <button
-            onClick={() => setShowComments(false)}
+            onClick={(e) => {e.stopPropagation(); setShowComments(false)}}
             className="text-sm text-red-500 hover:bg-red-200 p-2 rounded font-bold"
           >
             Close
@@ -94,7 +94,7 @@ export function ReelCommentsSheet({
                         ? "bg-primary/20 text-primary"
                         : "bg-black/10 text-slate-600"
                     }`}
-                    onClick={() => toggleCommentLikeHandler(c._id)}
+                    onClick={(e) => {e.stopPropagation(); toggleCommentLikeHandler(c._id)}}
                   >
                     <span className="material-symbols-outlined text-lg">thumb_up</span>
                   </button>
@@ -115,12 +115,12 @@ export function ReelCommentsSheet({
           <input
             type="text"
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={(e) =>{e.stopPropagation(); setNewComment(e.target.value)}}
             placeholder="Add a comment..."
             className="flex-1 border border-outline rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <button
-            onClick={postCommentHandler}
+            onClick={(e)=>{e.stopPropagation(); postCommentHandler()}}
             className="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary/80 transition-colors"
           >
             Post

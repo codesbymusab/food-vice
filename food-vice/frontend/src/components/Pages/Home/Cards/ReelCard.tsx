@@ -22,7 +22,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
   return (
     <div
       className="aspect-[9/16] relative rounded-2xl overflow-hidden group cursor-pointer"
-      onClick={() => navigate("/reels")}
+      onClick={() => navigate(`/reels/${reel._id}`)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

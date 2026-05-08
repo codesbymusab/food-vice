@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { ReelCard } from "./ReelCard";
-import { SearchBar } from "../../SearchBar";
 import { UploadReelForm } from "./UploadForm";
 import { useAuth } from "../../../context/AuthContext";
 import { UploadProgressDialog } from "./ProgressDialouge";
 import { ErrorScreen, SkeletonList } from "../../Shared/Feedback";
-import { fetchRecentReels, fetchFollowersReels, fetchPopularTags, uploadReel as uploadReelApi, saveReel as saveReelApi, toggleLikeReel as toggleLikeReelApi } from "../../../apis/reels";
+import { fetchRecentReels, fetchFollowersReels, fetchPopularTags, uploadReel as uploadReelApi, saveReel as saveReelApi, toggleLikeReel as toggleLikeReelApi, fetchReelById, fetchSuggestedAccounts, type SuggestedAccount } from "../../../apis/reels";
+import { useNavigate, useParams } from "react-router";
 
 type ReelsMode = 'for-you' | 'following' | 'discover'
 export type ReelTag = {
@@ -40,7 +40,8 @@ export type Reel = {
 }
 export function ReelsPage() {
 
-    const [reelsMode, setReelsMode] = useState<ReelsMode>('for-you')
+    const params = useParams()
+    const [reelsMode, setReelsMode] = useState<ReelsMode | null>(params.id ? null : 'for-you')
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false)
     const [uploading, setUploading] = useState<boolean>(false)
     const [progress, setProgress] = useState<number>(0)
@@ -48,9 +49,9 @@ export function ReelsPage() {
     const [reels, setReels] = useState<Reel[] | null>(null)
     const [popularTags, setPopularTags] = useState<ReelTag[] | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [tagError, setTagError] = useState<string | null>(null)
-    const [tag,setSelectedTag]=useState<string>('All')
-
+    const [selectedtag, setSelectedTag] = useState<string | null>(params.id ? null : 'All')
+    const [suggestedAccounts, setSuggestedAccounts] = useState<SuggestedAccount[] | null>(null)
+    const navigate = useNavigate()
     const { user } = useAuth()
 
     function changeMode(mode: ReelsMode) {
@@ -85,7 +86,17 @@ export function ReelsPage() {
             setPopularTags(tags ?? null);
         } catch (error) {
             console.error(error);
-            setTagError("Unable to load popular tags right now.");
+            setError("Unable to load popular tags right now.");
+        }
+    }
+
+    async function loadSuggestedAccounts(userId: string) {
+        try {
+            const accounts = await fetchSuggestedAccounts({ userId });
+            setSuggestedAccounts(accounts ?? null);
+        } catch (error) {
+            console.error(error);
+            setError("Unable to load accounts suggestions.");
         }
     }
 
@@ -93,7 +104,7 @@ export function ReelsPage() {
         setError(null)
         try {
             setLoading(true)
-            const reels = await fetchRecentReels({ userId: user?.userId ?? '', tag: tag});
+            const reels = await fetchRecentReels({ userId: user?.userId ?? '', tag: selectedtag });
             setReels(reels ?? null)
         } catch (error) {
             console.error(error);
@@ -104,11 +115,26 @@ export function ReelsPage() {
         }
     }
 
+    async function loadReel(reelId: string) {
+        setError(null)
+        try {
+            setLoading(true)
+            const reels = await fetchReelById({ userId: user!.userId, reelId: reelId });
+            setReels(reels ?? null)
+        } catch (error) {
+            console.error(error);
+            setError("Unable to load reel. Please try again.");
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
     async function loadFollowersReels() {
         setError(null)
         try {
             setLoading(true)
-            const reels = await fetchFollowersReels({ userId: user?.userId ?? '',tag:tag });
+            const reels = await fetchFollowersReels({ userId: user?.userId ?? '', tag: selectedtag });
             if (reels && reels.length > 0) {
                 setReels(reels);
             } else {
@@ -167,18 +193,27 @@ export function ReelsPage() {
         }
     }
 
-     useEffect(() => {
-        loadRecentReels()
+
+    useEffect(() => {
+
+        if (params.id) {
+            loadReel(params.id)
+        }
+        loadSuggestedAccounts(user!.userId)
         loadPopularTags()
     }, [])
-    
-    useEffect(() => {
-        fetchReels()
-    }, [tag])
 
-    
     useEffect(() => {
-        fetchReels();
+
+        if (selectedtag) fetchReels()
+
+    }, [selectedtag])
+
+
+    useEffect(() => {
+
+        if (reelsMode) fetchReels();
+
     }, [reelsMode]);
 
 
@@ -187,6 +222,7 @@ export function ReelsPage() {
         if (reelsMode === "following") loadFollowersReels()
         if (reelsMode === "for-you") loadRecentReels()
         if (reelsMode === "discover") loadRecentReels()
+
 
     }
 
@@ -252,33 +288,34 @@ export function ReelsPage() {
                 <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
                     <p className="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Suggested Accounts</p>
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3 px-3 cursor-pointer hover:scale-110">
-                            <div className="size-8 rounded-full bg-slate-200 overflow-hidden">
-                                <img className="w-full h-full object-cover" data-alt="Female chef portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMZwUbpcv6sU_fuyfAcHkQygO5yJ-L5S7890fP7VUbBEIyGOo45SwdrtdWQoi4C2a_JJJv1fM5U2RP0FZrNQ095xqNC7TuyDStVc2revtNr5qQBBHWj5SsVzVDIJzz0b6wAleupz8Y87JjkFLrOVkWsIozQK0I8NowWJ3G6SelSk3U5N6RLyhy7MZCLJKEwMQPPFCKvhVPxUOP0KS2P4GRI51rv-hqzuU4E4g5qzZODysS0IgFSIPpjpCSrpTJbuFwuzAmuz51s_E" />
-                            </div>
-                            <div className="flex-1 min-w-0 hover:text-primary">
-                                <p className="text-sm font-bold truncate ">Chef Isabella</p>
-                                <p className="text-xs text-slate-500 truncate">Pasta Specialist</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 px-3 cursor-pointer hover:scale-110">
-                            <div className="size-8 rounded-full bg-slate-200 overflow-hidden">
-                                <img className="w-full h-full object-cover" data-alt="Male cook portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxJV5Mcv3xySfjJsKBq0g6Gk2GLv0Q40xj-PiijBkWPNptHdWUp4swrMItg1HKKyd6oFghB5pk5D8MVnYlX351xC8gxrJBbiDT2WFk6yIiDlNzfhr1AmwrZTZBbznFl3yI7HGdZt89s_yvILoXznduIKJ5VQ2_LIRb3ERNIMbbyckfQ8SujJqwi-VqCC1vUdwfDWDVDURvi8kgiwzUHUDbyt-qfb2__fuFuHnxnMStk4PR3Y4F-guH8-EuVnQvcCAkNtGqTy5Ov-g" />
-                            </div>
-                            <div className="flex-1 min-w-0 hover:text-primary">
-                                <p className="text-sm font-bold truncate">GourmetGuy</p>
-                                <p className="text-xs text-slate-500 truncate">Street Food Reviews</p>
-                            </div>
-                        </div>
+                        {
+                            suggestedAccounts && suggestedAccounts.map((account) => {
+                                return (
+                                    <div key={account._id} className="flex items-center gap-3 px-3 cursor-pointer hover:scale-110" >
+
+                                        <div className="size-8 rounded-full bg-slate-200 overflow-hidden">
+                                            {!account.profilePhoto || account.profilePhoto === "PP1" ?
+                                                <div className="flex items-center justify-center bg-primary/20">
+                                                    <span className="material-symbols-outlined text-primary">person</span></div>
+                                                : <img className="w-full h-full object-cover" data-alt="Female chef portrait" src={account.profilePhoto} />}
+                                        </div>
+                                        <div className="flex-1 min-w-0 hover:text-primary" onClick={() => navigate(`/profile/${account._id}`)}>
+                                            <p className="text-sm font-bold truncate ">{account.name}</p>
+
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+
                     </div>
                 </div>
             </aside>
             }
-            <section className="flex-1 flex flex-col md:flex-row min-w-0 overflow-hidden mt-2">
+            <section className="flex-1 flex flex-col md:flex-row min-w-0 overflow-hidden">
                 {showUploadForm ? <UploadReelForm setShowReelForm={setShowUploadForm} onSubmit={uploadReel} /> :
-                    <div className="flex-1 overflow-y-auto dark:bg-black/20 p-4 md:p-6 snap-y snap-mandatory scroll-smooth">
+                    <div className="mt-6 flex-1 overflow-y-auto dark:bg-black/20 px-4 md:px-6 snap-y snap-mandatory scroll-smooth">
 
-                        <SearchBar placeHolder="Search reels, creators, or food tags..." />
 
                         {
                             reels && reels.map((reel) => {
@@ -303,7 +340,7 @@ export function ReelsPage() {
                             {
                                 popularTags && popularTags.map(
                                     (tag) => {
-                                        return <span key={tag._id} className="px-3 py-1 bg-white/20 border border-white/30 rounded-full text-sm font-medium hover:bg-white hover:text-primary cursor-pointer transition-colors" onClick={()=>{setSelectedTag(tag.name)}}>{`#${tag.name}`}</span>
+                                        return <span key={tag._id} className={`px-3 py-1 border border-white/30 rounded-full text-sm font-medium ${selectedtag !== tag.name ? 'hover:bg-white hover:text-primary text-white' : 'hover:text-white hover:bg-primary bg-white text-primary '} cursor-pointer transition-colors`} onClick={() => { setSelectedTag(selectedtag === tag.name ? 'All' : tag.name) }}>{`#${tag.name}`}</span>
 
                                     }
                                 )

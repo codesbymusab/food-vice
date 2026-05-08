@@ -61,10 +61,10 @@ export function HomePage() {
 
             <Nearby />
 
-            <section className="px-4 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* <section className="px-4 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <LatestDiscussion />
                 <Leaderbaord />
-            </section>
+            </section> */}
 
             <Reviews />
 

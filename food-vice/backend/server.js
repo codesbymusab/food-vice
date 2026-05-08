@@ -12,8 +12,10 @@ const likeRoute = require('./interfaces/routes/likeRoute')
 const reviewRoute= require('./interfaces/routes/reviewRoute')
 const reelRoute= require('./interfaces/routes/reelRoute')
 const commentRoute= require('./interfaces/routes/commentRoute')
+const topicRoute= require('./interfaces/routes/topicRoute')
 const { verifyAuth } = require('./interfaces/middlewares/authMiddleware')
 const cookieParser = require('cookie-parser');
+const { testUploadReels, seedRestaurantImages, seedImages, run } = require('./app')
 
 
 
@@ -35,6 +37,8 @@ mongodbConfig.connectDB()
 
 
 app.use('/auth', authRoute)
+
+app.use(verifyAuth)
 app.use('/user', userRoute)
 app.use('/community', communityRoute)
 app.use('/thread', threadRoute)
@@ -44,4 +48,4 @@ app.use('/like', likeRoute)
 app.use('/reviews',reviewRoute)
 app.use('/reels',reelRoute)
 app.use('/comments',commentRoute)
-
+app.use('/topics',topicRoute)

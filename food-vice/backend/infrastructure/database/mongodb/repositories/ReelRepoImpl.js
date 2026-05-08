@@ -1,6 +1,7 @@
 const Reel = require("../models/Reels/ReelModel");
 const ReelTagModel = require("../models/Reels/ReelTagModel");
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const User = require('../models/User/UserModel')
 
 class ReelRepoImpl {
 
@@ -8,12 +9,13 @@ class ReelRepoImpl {
     limit = 10,
     userId,
     source = "all",
-    tag = null
+    tag = null,
+
   ) {
 
 
     const pipeline = [];
-   
+
 
     if (source === "followers") {
 
@@ -131,7 +133,7 @@ class ReelRepoImpl {
     });
 
 
-    if (tag && tag!=='All') {
+    if (tag && tag !== 'All') {
       pipeline.push({
         $match: {
           "tags.name": {
@@ -518,6 +520,333 @@ class ReelRepoImpl {
 
 
 
+  async getById(
+
+    reelId,
+    userId
+  ) {
+
+
+    const pipeline = [];
+
+
+
+    pipeline.push(
+
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(reelId)
+        },
+      },
+      { $sort: { createdAt: -1 } },
+
+      { $limit: 1 },
+
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "uid",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+
+      { $unwind: "$user" },
+
+
+      {
+        $lookup: {
+          from: "reellikes",
+          localField: "_id",
+          foreignField: "reelId",
+          as: "likes"
+        }
+      },
+
+
+      {
+        $lookup: {
+          from: "reelcomments",
+          localField: "_id",
+          foreignField: "rid",
+          as: "comments"
+        }
+      },
+
+
+      {
+        $lookup: {
+          from: "savedreels",
+          localField: "_id",
+          foreignField: "reelId",
+          as: "saves"
+        }
+      },
+      {
+        $lookup: {
+          from: "reeltags",
+          localField: "tags",
+          foreignField: "_id",
+          as: "tags"
+        }
+      },
+
+
+      {
+        $lookup: {
+          from: "media",
+          let: { reelId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$ownerId", "$$reelId"] },
+                    { $eq: ["$ownerType", "reel"] },
+                    { $eq: ["$type", "video"] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "media"
+        }
+      },
+
+      // COMPUTED
+      {
+        $addFields: {
+
+          videoUrl: {
+            $arrayElemAt: ["$media.url", 0]
+          },
+
+          likeCount: {
+            $size: "$likes"
+          },
+
+          commentCount: {
+            $size: "$comments"
+          },
+
+          saveCount: {
+            $size: "$saves"
+          },
+
+          ...(userId
+            ? {
+              isLikedByUser: {
+                $gt: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: "$likes",
+                        as: "like",
+                        cond: {
+                          $eq: [
+                            "$$like.uid",
+                            new mongoose.Types.ObjectId(userId)
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  0
+                ]
+              },
+
+              isSavedByUser: {
+                $gt: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: "$saves",
+                        as: "save",
+                        cond: {
+                          $eq: [
+                            "$$save.uid",
+                            new mongoose.Types.ObjectId(userId)
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  0
+                ]
+              }
+            }
+            : {
+              isLikedByUser: false,
+              isSavedByUser: false
+            })
+        }
+      },
+
+      // PROJECT
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          videoUrl: 1,
+          createdAt: 1,
+          views: 1,
+          tags: {
+            _id: 1,
+            name: 1
+          },
+          "user._id": 1,
+          "user.name": 1,
+          "user.username": 1,
+          "user.profilePhoto": 1,
+          likeCount: 1,
+          commentCount: 1,
+          saveCount: 1,
+          isLikedByUser: 1,
+          isSavedByUser: 1
+        }
+      }
+    );
+
+    return await Reel.aggregate(pipeline);
+  }
+
+  async suggestAccounts(userId, limit = 5) {
+    return await User.aggregate([
+      { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
+      {
+        $lookup: {
+          from: "reellikes",
+          localField: "_id",
+          foreignField: "uid",
+          as: "likes"
+        }
+      },
+      {
+        $lookup: {
+          from: "savedreels",
+          localField: "_id",
+          foreignField: "uid",
+          as: "saves"
+        }
+      },
+      {
+        $lookup: {
+          from: "reels",
+          let: { likedIds: "$likes.reelId", savedIds: "$saves.reelId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $in: ["$_id", "$$likedIds"] },
+                    { $in: ["$_id", "$$savedIds"] }
+                  ]
+                }
+              }
+            },
+            { $project: { tags: 1 } }
+          ],
+          as: "userReels"
+        }
+      },
+      { $unwind: "$userReels" },
+      { $unwind: "$userReels.tags" },
+      { $group: { _id: "$_id", tagSet: { $addToSet: "$userReels.tags" } } },
+
+      {
+        $lookup: {
+          from: "users",
+          pipeline: [
+            {
+              $lookup: {
+                from: "reellikes",
+                localField: "_id",
+                foreignField: "uid",
+                as: "likes"
+              }
+            },
+            {
+              $lookup: {
+                from: "savedreels",
+                localField: "_id",
+                foreignField: "uid",
+                as: "saves"
+              }
+            },
+            {
+              $lookup: {
+                from: "reels",
+                let: { likedIds: "$likes.reelId", savedIds: "$saves.reelId" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $or: [
+                          { $in: ["$_id", "$$likedIds"] },
+                          { $in: ["$_id", "$$savedIds"] }
+                        ]
+                      }
+                    }
+                  },
+                  { $project: { tags: 1 } }
+                ],
+                as: "otherReels"
+              }
+            },
+            { $unwind: "$otherReels" },
+            { $unwind: "$otherReels.tags" },
+            { $group: { _id: "$_id", tagSet: { $addToSet: "$otherReels.tags" } } }
+          ],
+          as: "others"
+        }
+      },
+
+      // Step 3: Compute overlap and join user info
+      {
+        $project: {
+          others: {
+            $map: {
+              input: "$others",
+              as: "o",
+              in: {
+                userId: "$$o._id",
+                overlapCount: {
+                  $size: { $setIntersection: ["$tagSet", "$$o.tagSet"] }
+                }
+              }
+            }
+          }
+        }
+      },
+      { $unwind: "$others" },
+
+      // Lookup user info for each suggested account
+      {
+        $lookup: {
+          from: "users",
+          localField: "others.userId",
+          foreignField: "_id",
+          as: "userInfo"
+        }
+      },
+      { $unwind: "$userInfo" },
+
+      // Final projection
+      {
+        $project: {
+          _id: "$others.userId",
+          name: "$userInfo.name",
+          profilePhoto: "$userInfo.profilePhoto",
+          overlapCount: "$others.overlapCount"
+        }
+      },
+      { $sort: { overlapCount: -1 } },
+      { $limit: limit }
+    ]);
+
+  }
 
 
 
@@ -525,3 +854,5 @@ class ReelRepoImpl {
 
 
 module.exports = ReelRepoImpl;
+
+
