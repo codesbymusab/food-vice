@@ -13,7 +13,7 @@ class LikeReel
         if(!data.reelId){
             throw new Error('Reel id required')
         }
-        console.log(reelId,userId)
+    
         const like=await this.likeRepo.getByReelId({reelId:data.reelId,userId:data.userId})
 
         

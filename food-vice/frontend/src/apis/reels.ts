@@ -260,13 +260,14 @@ export async function toggleLikeReel({ userId, reelId }: {
 
 
     try {
+       
         const res = await fetch("http://localhost:3000/like/reel", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, reelId: reelId }),
             credentials: "include",
         });
-
+      
         if (!res.ok) {
             throw new Error("Failed to update like");
         }

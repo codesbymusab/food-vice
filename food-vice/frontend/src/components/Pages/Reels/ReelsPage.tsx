@@ -106,6 +106,7 @@ export function ReelsPage() {
             setLoading(true)
             const reels = await fetchRecentReels({ userId: user?.userId ?? '', tag: selectedtag });
             setReels(reels ?? null)
+            console.log(reels)
         } catch (error) {
             console.error(error);
             setError("Unable to load reels. Please try again.");
@@ -170,7 +171,7 @@ export function ReelsPage() {
         userId: string,
         reelId: string,
         currentLiked: boolean
-    ) {
+    ) { 
         setReels(prev =>
             prev
                 ? prev.map(r =>

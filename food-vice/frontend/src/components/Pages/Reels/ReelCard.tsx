@@ -11,7 +11,7 @@ type ReelProps = {
 }
 export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
-
+    console.log(reel)
     const videoRef = useRef<HTMLVideoElement>(null);
     const [progress, setProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
