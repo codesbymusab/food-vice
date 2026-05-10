@@ -4,10 +4,11 @@ export interface User {
     name?: string;
     username: string;
     profilePhoto: string;
-    address?: string,
-    bio?: string,
-    level: number,
-    dateJoined: Date
+    address?: string;
+    bio?: string;
+    level: number;
+    role?: 'user' | 'moderator' | 'admin';
+    dateJoined: Date;
 
 }
 

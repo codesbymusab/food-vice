@@ -6,7 +6,14 @@ const RestaurantSchema = new mongoose.Schema({
   website: String,
   description: String,
   priceCategory: String,
-  locationId: { type:mongoose.Schema.Types.ObjectId, ref: 'Location' }
-});
+  locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' },
+  flags: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      reason: String,
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
+}, { timestamps: true });
 
 module.exports = mongoose.model('Restaurant', RestaurantSchema);
