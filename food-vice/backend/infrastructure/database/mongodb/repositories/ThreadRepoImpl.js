@@ -21,11 +21,11 @@ class ThreadRepoImpl {
       query.topics = { $in: topicIds };
     }
 
-    return await Thread.find(query).populate('uid', 'name profilePicture').populate('media').sort({ createdAt: -1 });
+    return await Thread.find(query).populate('uid', 'name profilePhoto').populate('media', 'url type').sort({ createdAt: -1 });
   }
 
   async findById(id) {
-    return await Thread.findById(id).populate('uid', 'name profilePicture').populate('media');
+    return await Thread.findById(id).populate('uid', 'name profilePhoto').populate('media', 'url type');
   }
 
   async toggleLike(threadId, userId) {
@@ -87,12 +87,30 @@ class ThreadRepoImpl {
   }
 
   async getComments(threadId) {
-    return await ThreadComment.find({ threadId }).populate('uid', 'name profilePicture').populate('media').sort({ createdAt: 1 });
+    return await ThreadComment.find({ threadId }).populate('uid', 'name profilePhoto').populate('media', 'url type').sort({ createdAt: 1 });
   }
 
-  async findAll() {
-    return await Thread.find().populate('uid', 'name profilePicture').populate('media').sort({ createdAt: -1 });
+  async findAll(searchQuery = '', topicIds = []) {
+
+    let query = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { content: { $regex: searchQuery, $options: 'i' } }
+      ];
+    }
+
+    if (topicIds.length > 0) {
+      query.topics = { $in: topicIds };
+    }
+
+
+
+    return await Thread.find(query).populate('uid', 'name profilePhoto').populate('media', 'url type').sort({ createdAt: -1 });
   }
+
+
 }
 
 module.exports = ThreadRepoImpl;

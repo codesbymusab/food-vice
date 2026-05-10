@@ -21,7 +21,7 @@ exports.getComments = async (req, res) => {
 exports.postComment = async (req, res) => {
     try {
         const { reelId } = req.params
-        console.log(reelId)
+        
         const { userId, text } = req.body;
         const commentRepo = new CommentRepoImpl()
         const postComment = new PostReelComment(commentRepo)

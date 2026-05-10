@@ -16,7 +16,7 @@ export function Reviews() {
             setError(null)
             try {
                 const reviewsData = await fetchRecentReviews({userId:user!.userId});
-                console.log(reviewsData)
+            
                 setReviews(reviewsData ?? null);
             } catch (error) {
                 console.error(error);

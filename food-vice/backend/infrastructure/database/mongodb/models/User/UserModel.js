@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     }
   },
   
-  profilePhoto: String,
+  profilePhoto: {type:String,default:"https://firebasestorage.googleapis.com/v0/b/foodvice-838f6.firebasestorage.app/o/profile%2Fdafault.jpg?alt=media&token=2d96d6d2-346e-4996-bfd9-6fd664268a85"},
   address: String,
   bio: String,
   level: { type: Number, default: 1 },

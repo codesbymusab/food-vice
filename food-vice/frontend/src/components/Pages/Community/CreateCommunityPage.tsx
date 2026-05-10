@@ -43,13 +43,12 @@ export function CreateCommunityPage() {
             const formData = new FormData()
             formData.append('name', name)
             formData.append('description', description)
-            formData.append('category', category)
             guidelines.forEach(rule => formData.append('guidelines[]', rule))
             if (file) {
                 formData.append('coverPhoto', file)
             }
 
-            await axios.post('http://localhost:3000/community', formData, { 
+            await axios.post('http://localhost:3000/community', formData, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -78,45 +77,29 @@ export function CreateCommunityPage() {
                         <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                 <span className="p-2 bg-accent-cyan/20 text-accent-cyan text-secondary rounded-xl">
-                                    <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1;"}}>groups</span>
+                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1;" }}>groups</span>
                                 </span>
                                 <h2 className="text-2xl font-bold tracking-tight">Identity</h2>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-4">Community Name</label>
-                                    <input 
-                                        className="w-full px-6 py-4 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" 
-                                        placeholder="e.g. Midnight Ramen Society" 
-                                        type="text" 
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-4">Category</label>
-                                    <div className="relative">
-                                        <select 
-                                            className="w-full appearance-none px-6 py-4 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
-                                            value={category}
-                                            onChange={(e) => setCategory(e.target.value)}
-                                        >
-                                            <option>Recipes</option>
-                                            <option>Restaurant Reviews</option>
-                                            <option>Discussions</option>
-                                            <option>Street Food</option>
-                                            <option>Cooking Tips</option>
-                                        </select>
-                                        <span className="material-symbols-outlined absolute right-6 top-4 text-on-surface-variant pointer-events-none">expand_more</span>
-                                    </div>
-                                </div>
+                            <div className="space-y-2">
+
+                                <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-4">Community Name</label>
+                                <input
+                                    className="w-full px-6 py-4 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
+                                    placeholder="e.g. Midnight Ramen Society"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                />
+
+
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-4">Description</label>
-                                <textarea 
-                                    className="w-full px-6 py-4 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none resize-none" 
-                                    placeholder="Tell the world what your collective is about..." 
+                                <textarea
+                                    className="w-full px-6 py-4 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none resize-none"
+                                    placeholder="Tell the world what your collective is about..."
                                     rows={4}
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -127,11 +110,11 @@ export function CreateCommunityPage() {
                         <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                 <span className="p-2 bg-accent-cyan/20 text-accent-cyan text-secondary rounded-xl">
-                                    <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1;"}}>image</span>
+                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1;" }}>image</span>
                                 </span>
                                 <h2 className="text-2xl font-bold tracking-tight">Visuals</h2>
                             </div>
-                            <div 
+                            <div
                                 className="group relative w-full h-56 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer overflow-hidden flex flex-col items-center justify-center bg-gray-100"
                                 onClick={() => document.getElementById('cover-upload')?.click()}
                             >
@@ -143,7 +126,7 @@ export function CreateCommunityPage() {
                                     <p className="text-on-surface font-bold">{file ? file.name : 'Upload Cover Photo'}</p>
                                     <p className="text-xs text-on-surface-variant">Recommended size: 1200 x 480px</p>
                                 </div>
-                                <input 
+                                <input
                                     id="cover-upload"
                                     type="file"
                                     className="hidden"
@@ -155,24 +138,24 @@ export function CreateCommunityPage() {
                         <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                 <span className="p-2 bg-accent-cyan/20 text-accent-cyan text-secondary rounded-xl">
-                                    <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1;"}}>gavel</span>
+                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1;" }}>gavel</span>
                                 </span>
                                 <h2 className="text-2xl font-bold tracking-tight">Community Guidelines</h2>
                             </div>
                             <div className="p-6 bg-surface-container rounded-xl space-y-4">
                                 <div className="flex items-center gap-4">
                                     <div className="flex-grow space-y-2">
-                                        <input 
-                                            className="w-full px-6 py-3 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" 
-                                            placeholder="Rule #1: Be respectful to all chefs..." 
-                                            type="text" 
+                                        <input
+                                            className="w-full px-6 py-3 rounded-xl border-outline bg-gray-100 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                            placeholder="Rule #1: Be respectful to all chefs..."
+                                            type="text"
                                             value={newRule}
                                             onChange={(e) => setNewRule(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRule())}
                                         />
                                     </div>
-                                    <button 
-                                        className="bg-accent-cyan text-white hover:shadow-lg transition-all active:scale-95 rounded-xl py-3 px-4" 
+                                    <button
+                                        className="bg-accent-cyan text-white hover:shadow-lg transition-all active:scale-95 rounded-xl py-3 px-4"
                                         type="button"
                                         onClick={addRule}
                                     >
@@ -185,8 +168,8 @@ export function CreateCommunityPage() {
                                             <span className="text-primary font-black">{(index + 1).toString().padStart(2, '0')}</span>
                                             <span className="text-sm font-medium">{rule}</span>
                                         </div>
-                                        <button 
-                                            className="text-error hover:bg-red-100 px-2 py-1 rounded-xl transition-colors" 
+                                        <button
+                                            className="text-error hover:bg-red-100 px-2 py-1 rounded-xl transition-colors"
                                             type="button"
                                             onClick={() => removeRule(index)}
                                         >
@@ -196,16 +179,16 @@ export function CreateCommunityPage() {
                                 ))}
                             </div>
                         </section>
-                         <div className="pt-4 flex gap-3">
-                            <button 
-                                className="w-full py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50" 
+                        <div className="pt-4 flex gap-3">
+                            <button
+                                className="w-full py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                                 type="submit"
                                 disabled={loading}
                             >
                                 {loading ? 'Creating...' : 'Create'}
                             </button>
-                            <button 
-                                className="w-full py-4 rounded-xl border-2 border-stone-100 text-stone-500 font-black uppercase tracking-widest text-xs hover:bg-red-200/70 active:scale-95 hover:scale-[1.02] transition-all" 
+                            <button
+                                className="w-full py-4 rounded-xl border-2 border-stone-100 text-stone-500 font-black uppercase tracking-widest text-xs hover:bg-red-200/70 active:scale-95 hover:scale-[1.02] transition-all"
                                 type="button"
                                 onClick={() => navigate('/community')}
                             >
@@ -217,4 +200,4 @@ export function CreateCommunityPage() {
             </div>
         </main>
     )
-}
+}

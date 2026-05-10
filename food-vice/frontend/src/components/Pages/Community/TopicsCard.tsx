@@ -48,7 +48,7 @@ export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSe
                     onClick={()=>setSelectedTopic('all')}>
                     <span className="flex items-center gap-3"><span className="material-symbols-outlined text-xl">forum</span>
                         All Topics</span>
-                    <span className="text-xs opacity-60">6.9k</span>
+            
                 </div>
                 {topics.map((topic) => (
                     <div key={topic._id} className={`flex items-center justify-between p-2 rounded-lg ${selectedTopic===topic._id ? "bg-primary/10 text-primary" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"} font-medium group cursor-pointer`}
@@ -63,13 +63,7 @@ export function TopicsCard({selectedTopic: selectedTopic,setSelectedTopic: setSe
                             </span>
                             {topic.name}
                         </span>
-                        <span className="text-xs opacity-60">
-                            {topic.name === 'Recipes' ? '2.4k' :
-                             topic.name === 'Restaurant Reviews' ? '1.8k' :
-                             topic.name === 'Discussions' ? '560' :
-                             topic.name === 'Street Food' ? '942' :
-                             topic.name === 'Cooking Tips' ? '1.1k' : '0'}
-                        </span>
+                        
                     </div>
                 ))}
                

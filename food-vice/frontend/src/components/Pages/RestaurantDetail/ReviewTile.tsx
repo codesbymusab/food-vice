@@ -40,12 +40,12 @@ export function ReviewTile({ review, setReviews }: { review: Review, setReviews:
     return (
         <div className="border-b-2 border-slate-200 dark:border-slate-800 pb-2 bg-white">
             <div className="flex items-center gap-4 mb-4">
-                {review.user.profilePhoto && (<div className="size-12 rounded-full overflow-hidden bg-slate-200">
+                <div className="size-12 rounded-full overflow-hidden bg-slate-200">
                     <img alt={review.user.username}
                         src={review.user.profilePhoto} />
                 </div>
-                )
-                }
+
+
                 <div>
                     <h4 className="font-bold">{review.user.name}</h4>
                     <p className="text-xs text-slate-500"><span className="text-primary font-semibold">Level {review.user.level} Foodie</span> • {review.user.reviewCount} reviews</p>

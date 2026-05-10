@@ -7,6 +7,7 @@ import { TopicsCard } from "./TopicsCard";
 import { useState, useEffect } from "react";
 import { getThreadsByCommunity } from "../../../apis/community";
 import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
 
 export function CommunityDetailPage() {
     const { id } = useParams()
@@ -17,7 +18,7 @@ export function CommunityDetailPage() {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedTopic, setSelectedTopic] = useState<string>('all')
-
+    const { user } = useAuth()
     useEffect(() => {
         if (id) {
             fetchCommunityDetails()
@@ -45,7 +46,7 @@ export function CommunityDetailPage() {
 
     const checkMembership = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/community/joined', { withCredentials: true })
+            const response = await axios.get(`http://localhost:3000/community/joined?userId=${user?.userId}`, { withCredentials: true })
             const joined = response.data.some((c: any) => c._id === id)
             setIsMember(joined)
         } catch (error) {
@@ -88,13 +89,35 @@ export function CommunityDetailPage() {
             <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                 <aside className="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
-                    <button
-                        className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 border-2 border-primary text-white bg-primary gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110 transition-all shadow-lg shadow-primary/20" 
-                        onClick={() => navigate(`/community/${id}/create-thread`)}
-                    >
-                        <span className="material-symbols-outlined">add</span>
-                        <span>Create Thread</span>
-                    </button>
+
+                    {isMember ?
+
+                        <button
+                            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 border-2 border-primary text-white bg-primary gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110 transition-all shadow-lg shadow-primary/20"
+                            onClick={() => navigate(`/community/${id}/create-thread`)}
+                        >
+                            <span className="material-symbols-outlined">add</span>
+                            <span>Create Thread</span>
+                        </button>
+                        :
+                        <div className="bg-primary rounded-xl p-6 text-white shadow-2xl shadow-primary/40 border border-white/20">
+                            <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                                <span className="material-symbols-outlined">groups</span>
+                                Join {community.name}
+                            </h3>
+                            <p className="text-primary-100 text-sm leading-normal mb-4">
+                                Become a member to post threads and interact with others!
+                            </p>
+                            <button
+                                className="w-full py-3 bg-white text-primary font-black uppercase tracking-widest text-xs rounded-xl hover:bg-slate-100 transition-all active:scale-95 shadow-lg"
+                                onClick={handleJoin}
+                            >
+                                Join Community
+                            </button>
+                        </div>
+                    }
+
+
 
                     <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
 
@@ -103,8 +126,8 @@ export function CommunityDetailPage() {
                 </aside>
 
                 <div className="lg:col-span-9 order-1 lg:order-2 flex flex-col gap-6">
-                    <SearchBar 
-                        placeHolder="Search for threads..." 
+                    <SearchBar
+                        placeHolder="Search for threads..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -116,34 +139,11 @@ export function CommunityDetailPage() {
                         ))}
                     </div>
 
-                    <div className="flex justify-center pt-4">
-                        <button
-                            className="px-8 py-3 rounded-xl border border-primary text-primary font-bold hover:bg-primary/5 transition-colors">
-                            Load More Discussions
-                        </button>
-                    </div>
+
                 </div>
             </div>
 
-            <aside className="fixed bottom-8 right-8 w-80 z-50">
-                {community && !isMember && (
-                    <div className="bg-primary rounded-xl p-6 text-white shadow-2xl shadow-primary/40 border border-white/20">
-                        <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                            <span className="material-symbols-outlined">groups</span>
-                            Join {community.name}
-                        </h3>
-                        <p className="text-primary-100 text-sm leading-normal mb-4">
-                            Become a member to post threads and interact with others!
-                        </p>
-                        <button
-                            className="w-full py-3 bg-white text-primary font-black uppercase tracking-widest text-xs rounded-xl hover:bg-slate-100 transition-all active:scale-95 shadow-lg"
-                            onClick={handleJoin}
-                        >
-                            Join Community
-                        </button>
-                    </div>
-                )}
-            </aside>
+           
         </main>
     )
 }

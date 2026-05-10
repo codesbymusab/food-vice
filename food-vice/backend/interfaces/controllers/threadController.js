@@ -34,7 +34,8 @@ exports.createThread = async (req, res) => {
       communityId,
       title,
       content,
-      topics: topics ? JSON.parse(topics) : []
+      topics: topics ? JSON.parse(topics) : [],
+      media: mediaIds 
     };
 
     const thread = await threadRepo.create(threadData);
@@ -66,7 +67,9 @@ exports.getThreadsByCommunity = async (req, res) => {
 
 exports.getAllThreads = async (req, res) => {
   try {
-    const threads = await threadRepo.findAll();
+    const { search, topics } = req.query;
+    const topicIds = topics ? topics.split(',').filter(id => id) : [];
+    const threads = await threadRepo.findAll(search,topicIds);
     return res.status(200).json(threads);
   } catch (error) {
     return res.status(400).json({ message: error.message });

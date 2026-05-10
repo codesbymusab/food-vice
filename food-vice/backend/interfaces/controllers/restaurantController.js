@@ -235,7 +235,6 @@ exports.similarRest = async (req, res) => {
             }
         }
 
-        console.log(location)
 
         const restRepo = new RestaurantRepoImpl()
         const mediaRepo = new MediaRepoImpl()

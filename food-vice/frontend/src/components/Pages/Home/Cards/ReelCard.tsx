@@ -42,7 +42,7 @@ export function ReelCard({ reel }: { reel: Reel }) {
           </span>
           <span className="flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">visibility</span>
-            {reel.saveCount}
+            {reel.views}
           </span>
         </div>
       </div>

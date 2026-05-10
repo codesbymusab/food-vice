@@ -99,7 +99,7 @@ export function UserProfilePage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                         <div className="relative size-32 md:size-40 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
-                            {userProfile!.profilePhoto  ? <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> : userProfile!.name?.charAt(0)}
+                             <img alt="Profile" className="w-full h-full object-cover" src={userProfile!.profilePhoto} /> 
 
                         </div>
                         <div className="absolute bottom-2 right-2 bg-accent text-white p-1.5 rounded-full border-4 border-white dark:border-slate-800 shadow-lg">
@@ -110,6 +110,10 @@ export function UserProfilePage() {
                     <div className="flex-1 text-center md:text-left space-y-4">
                         <div>
                             <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{userProfile!.name}</h1>
+                            {userProfile?.username  && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
+                                <span className="material-symbols-outlined text-xl">person</span> {userProfile.username}
+                            </p>
+                            }
                             {userProfile?.bio && userProfile.bio !== '' && <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
                                 <span className="material-symbols-outlined text-xl">account_box</span> {userProfile.bio}
                             </p>

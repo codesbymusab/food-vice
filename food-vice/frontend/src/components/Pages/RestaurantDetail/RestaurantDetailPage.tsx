@@ -121,7 +121,7 @@ export function RestaurantDetailPage() {
             setRestaurantDetails(details);
             if (details?.recentReviews) setRecentReviews(details.recentReviews)
             if (details?.userReview) setUserReview([details.userReview])
-            console.log(details)
+       
         } catch (error) {
             console.error(error);
         }
@@ -132,7 +132,7 @@ export function RestaurantDetailPage() {
         try {
             const details = await fetchSimilarRestaurants({ restaurantId: params.id!, location });
             setSimilarRestaurants(details)
-            console.log(details)
+  
         } catch (error) {
             console.error(error);
         }

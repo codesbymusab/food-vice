@@ -35,7 +35,7 @@ exports.recentReviews = async (req, res) => {
         const reviewRepo = new ReviewRepoImpl()
         const getrecentReviews = new GetRecentReviews(reviewRepo)
         const userId=req.query.userId
-        console.log(userId)
+     
         const result = await getrecentReviews.execute({userId:userId})
 
         if (result) {

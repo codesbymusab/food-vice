@@ -6,10 +6,11 @@ const multer = require('multer');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.post('/', verifyAuth, upload.single('coverPhoto'), communityController.createCommunity);
-router.get('/', verifyAuth, communityController.getCommunities);
-router.get('/joined', verifyAuth, communityController.getJoinedCommunities);
-router.get('/:id', verifyAuth, communityController.getCommunityById);
-router.post('/:id/join', verifyAuth, communityController.joinCommunity);
+router.post('/',upload.single('coverPhoto'), communityController.createCommunity);
+router.get('/',communityController.getCommunities);
+router.get('/joined',communityController.getJoinedCommunities);
+router.get('/recommended',communityController.getRecommendedCommunities);
+router.get('/:id',communityController.getCommunityById);
+router.post('/:id/join',communityController.joinCommunity);
 
 module.exports = router;

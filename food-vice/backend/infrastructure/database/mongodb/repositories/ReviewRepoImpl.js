@@ -161,17 +161,17 @@ class ReviewRepoImpl {
     }
 
     async getRecentReviews({ limitCount = 3, userId, currentUser = false }) {
-        console.log('reviews')
-        console.log(userId)
+        
+        
         const matchStage={}
 
-            if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
+        if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
             
          return await RestaurantReviews.aggregate([
             { $match: matchStage },
            
 
-            {
+              {
                 $lookup: {
                     from: "users",
                     localField: "uid",
@@ -180,6 +180,15 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
+						{
+                $lookup: {
+                    from: "restaurants",
+                    localField: "restaurantId",
+                    foreignField: "_id",
+                    as: "restaurant",
+                },
+            },
+            { $unwind: "$restaurant" },
 
             {
                 $lookup: {
@@ -251,7 +260,9 @@ class ReviewRepoImpl {
                     _id: 1,
                     text: 1,
                     createdAt: 1,
-                    restaurantId: 1,
+                    restaurantId:1,
+                  	"restaurant.name":1,
+                  	"restaurant._id":1,
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,

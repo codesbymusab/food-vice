@@ -9,7 +9,7 @@ interface Thread {
     uid: {
         _id: string;
         name: string;
-        profilePicture?: string;
+        profilePhoto: string;
     };
     likes: string[];
     dislikes: string[];
@@ -79,16 +79,12 @@ export function FeedCard({ thread, onUpdate }: { thread?: Thread, onUpdate?: () 
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                        {!thread.uid?.profilePicture ?  <div
-                            className="flex-shrink-0 size-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-primary">person</span>
-                        </div>
-                            :
-                            <div className="size-10 rounded-full bg-cover bg-center border-2 border-primary/20 bg-gray-200"
-                                style={{ backgroundImage: `url('${thread.uid?.profilePicture}')` }}>
-                                {!thread.uid?.profilePicture && <span className="material-symbols-outlined text-slate-400 m-auto">person</span>}
-                            </div>
-                        }
+
+
+                        <div className="w-10 h-10 rounded-full overflow-hidden" data-alt="Reviewer profile picture">
+                        <img className="w-full h-full object-cover" src={thread.uid.profilePhoto} />
+                    </div>
+
                         <span className="text-sm font-semibold">@{thread.uid?.name || 'anonymous'}</span>
                         <span className="text-xs text-slate-500">• {new Date(thread.createdAt).toLocaleDateString()}</span>
                     </div>

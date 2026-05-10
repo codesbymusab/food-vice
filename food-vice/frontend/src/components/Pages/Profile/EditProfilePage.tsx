@@ -6,7 +6,6 @@ import { ConfirmationDialog, OperationLoadingDialog } from "../../Shared/Feedbac
 
 export function EditProfilePage({ profile, setShowEditForm, fetchProfile }: { profile: UserProfile, setShowEditForm: React.Dispatch<React.SetStateAction<boolean>>, fetchProfile: () => Promise<void> }) {
 
-    console.log(profile)
 
     const [form, setForm] = useState({
         name: profile.name || "",
@@ -83,7 +82,7 @@ export function EditProfilePage({ profile, setShowEditForm, fetchProfile }: { pr
 
             const finalData = {
                 name: form.name || profile.name,
-                username: form.username || profile.username,
+                username: form.username ? `@${form.username}` : profile.username,
                 email: form.email || profile.email,
                 bio: form.bio || profile.bio || "",
                 address:
@@ -109,7 +108,6 @@ export function EditProfilePage({ profile, setShowEditForm, fetchProfile }: { pr
                 data.append("profilePhoto", imageFile)
             }
 
-            console.log([...data.entries()])
 
             await editUserProfile(data)
             setShowEditForm(false)

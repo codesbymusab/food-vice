@@ -1,18 +1,8 @@
 import { useAuth } from "../../../../context/AuthContext"
-import { toggleCommentLike } from "../../../../apis/community"
+import { toggleCommentLike, type ThreadComment } from "../../../../apis/community"
 
-interface Comment {
-    _id: string;
-    uid: {
-        name: string;
-    };
-    content: string;
-    media?: any[];
-    likes?: string[];
-    createdAt: string;
-}
 
-export function RepliesCard({ comments, onCommentsUpdated }: { comments: Comment[]; onCommentsUpdated: () => void }) {
+export function RepliesCard({ comments, onCommentsUpdated }: { comments: ThreadComment[]; onCommentsUpdated: () => void }) {
     const { user } = useAuth()
 
     const handleToggleLike = async (commentId: string) => {
@@ -40,10 +30,9 @@ export function RepliesCard({ comments, onCommentsUpdated }: { comments: Comment
                 {comments.length === 0 && <p className="text-slate-500 italic text-sm">No comments yet.</p>}
                 {comments.map((comment) => (
                     <div key={comment._id} className="flex gap-4 border-b border-slate-100 dark:border-slate-800 pb-4 last:border-0">
-                        <div
-                            className="flex-shrink-0 size-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-primary">person</span>
-                        </div>
+                       <div className="w-10 h-10 rounded-full overflow-hidden" data-alt="Reviewer profile picture">
+                        <img className="w-full h-full object-cover" src={comment.uid.profilePhoto} />
+                    </div>
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                                 <span className="font-bold text-sm text-slate-900 dark:text-slate-100">{comment.uid?.name || 'Anonymous'}</span>

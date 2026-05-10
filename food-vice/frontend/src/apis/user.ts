@@ -3,7 +3,7 @@ export interface User {
     email: string;
     name?: string;
     username: string;
-    profilePhoto?: string;
+    profilePhoto: string;
     address?: string,
     bio?: string,
     level: number,

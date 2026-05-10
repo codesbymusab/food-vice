@@ -36,7 +36,7 @@ exports.getUserProfile=async (req,res)=>{
        
         const userRepo = new UserRepoImpl()
         const getProfile=new GetUserProfile(userRepo)
-        console.log(req.params.userId)
+   
         const profile=await getProfile.execute({userId:req.params.userId})
 
         if(profile[0]){

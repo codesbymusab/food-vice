@@ -100,7 +100,7 @@ class GetRestaurantDetails {
         const time = openingTime(result.openingHours);
         if (time) result.openingTime = time;
 
-        console.log(saveStatus)
+    
 
         if (saveStatus) {
             result.isSaved=true

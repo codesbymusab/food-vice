@@ -82,7 +82,8 @@ export async function fetchReelById({ reelId, userId }: { userId: string, reelId
 export async function updateViews({ reelId }: { reelId: string }) {
     try {
         await fetch(`http://localhost:3000/reels/${reelId}/view`, {
-            method: "POST"
+            method: "POST",
+            credentials: "include"
         });
     } catch (error) {
         console.error("Error tracking view:", error);
@@ -93,7 +94,8 @@ export async function updateViews({ reelId }: { reelId: string }) {
 export async function fetchComments({ userId, reelId }: { userId: string, reelId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/comments/${reelId}?userId=${userId}`
+            `http://localhost:3000/comments/${reelId}?userId=${userId}`,
+            {credentials: "include"}
         );
         if (res.ok) {
             const data = await res.json();
@@ -113,6 +115,7 @@ export async function postComment({ reelId, userId, newComment }: { reelId: stri
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, text: newComment }),
+            credentials: "include"
         });
         if (!res.ok) throw new Error("Failed to post comment");
 
@@ -128,6 +131,7 @@ export async function toggleCommentLike({ commentId, userId }: { commentId: stri
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ commentId, userId: userId }),
+            credentials: "include"
         });
         if (!res.ok) throw new Error("Failed to toggle comment like");
 
@@ -190,7 +194,6 @@ export async function fetchSuggestedAccounts({ userId }: { userId: string }) {
         );
         if (res.ok) {
             const { suggestions } = await res.json();
-            console.log(suggestions)
             return suggestions
         }
         else {

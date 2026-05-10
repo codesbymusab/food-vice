@@ -22,7 +22,7 @@ export function TopRated({ filters, cuisines, setFilters }: { cuisines: Cuisine[
         setLoading(true);
         setError(null);
         try {
-            console.log(filters)
+        
             const details = await fetchTopRatedRestaurants({
                 userId: user!.userId,
                 filters: filters ? filters : { cuisine: 'All', price: '', rating: 0, dist: 50 },

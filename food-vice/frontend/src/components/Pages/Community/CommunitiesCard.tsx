@@ -3,6 +3,7 @@ import { Link } from "react-router"
 interface Community {
     _id: string;
     name: string;
+    coverPhoto: string;
 }
 
 export function CommunitiesCard({ title, communities }: { title: string, communities: Community[] }) {
@@ -15,12 +16,12 @@ export function CommunitiesCard({ title, communities }: { title: string, communi
                 {communities.length === 0 && <p className="text-xs text-slate-500 italic">No communities found</p>}
                 {communities.map((community) => (
                     <Link key={community._id} className="group cursor-pointer flex items-center gap-3" to={`/community/${community._id}`}>
-                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                            <span className="material-symbols-outlined">groups</span>
+                        <div className="w-10 h-10 rounded-full overflow-hidden" data-alt="Reviewer profile picture">
+                            <img className="w-full h-full object-cover" src={community.coverPhoto} />
                         </div>
                         <div className="flex-1">
                             <p className="text-sm font-semibold group-hover:text-primary transition-colors">{community.name}</p>
-                            <p className="text-[10px] text-slate-500">Member</p>
+                            {title!=='Recommendations' && <p className="text-[10px] text-slate-500">Member</p>}
                         </div>
                     </Link>
                 ))}

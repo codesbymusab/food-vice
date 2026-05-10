@@ -3,7 +3,7 @@ export type Review = {
     text: string,
     createdAt: string,
     restaurantId: string,
-    name:string,
+    name: string,
     user: {
         username: string,
         name: string,
@@ -11,7 +11,7 @@ export type Review = {
         level: number,
         reviewCount: number
     },
-    restaurant?: {name: string},
+    restaurant?: { _id: string, name: string },
     photos: {
         _id: string,
         url: string
@@ -53,7 +53,7 @@ export async function toggleLikeReview(
 }
 
 
-export async function fetchReviews({restId}:{restId:string}) {
+export async function fetchReviews({ restId }: { restId: string }) {
     try {
         const res = await fetch(
             `http://localhost:3000/reviews/${restId}`,
@@ -74,7 +74,7 @@ export async function fetchReviews({restId}:{restId:string}) {
 
 
 
-export async function fetchRecentReviews({userId}:{userId:string}) {
+export async function fetchRecentReviews({ userId }: { userId: string }) {
     try {
         const res = await fetch(
             `http://localhost:3000/reviews/recent?userId=${userId}`,

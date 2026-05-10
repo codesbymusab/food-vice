@@ -7,8 +7,8 @@ import { signOutUser } from "../apis/user";
 export function Header() {
 
     const [showNotif, setShowNotif] = useState<boolean>(false)
-    const navigate=useNavigate()
-    const {user,setUser}=useAuth()
+    const navigate = useNavigate()
+    const { user, setUser } = useAuth()
 
     async function onSignOutClick() {
         try {
@@ -53,21 +53,22 @@ export function Header() {
 
                 <div className="flex items-center gap-3">
 
-{/* 
+                    {/* 
                     <button className={`${showNotif === true ? 'bg-primary/30 text-primary' : 'text-slate-600'} p-2 pt-4 rounded-full hover:bg-primary/10  dark:text-slate-400 hover:text-primary transition-all relative`} onClick={() => { setShowNotif((prev) => !prev) }}>
                         <span className="material-symbols-outlined">notifications</span>
                         <span className="absolute top-3 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background-light"></span>
                     </button> */}
-                    <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
-                        <NavLink to={`/profile/${user?.userId}`}>
+                    <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle" onClick={() => navigate(`/profile/${user?.userId}`)}>
 
-                            {user?.profilePhoto ? <img alt="Profile" className="w-full h-full object-cover" src={user?.profilePhoto}/> : user?.name?.charAt(0)}
-                            
 
-                        </NavLink>
+                        <img className="w-full h-full object-cover" src={user!.profilePhoto} />
+
+
+
+
                     </div>
 
-                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-400 dark:hover:bg-slate-800 transition-colors" onClick={async ()=> await onSignOutClick()}>
+                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-400 dark:hover:bg-slate-800 transition-colors" onClick={async () => await onSignOutClick()}>
                         <span className="material-symbols-outlined text-sm text-primary">logout</span> Sign Out
                     </button>
                 </div>

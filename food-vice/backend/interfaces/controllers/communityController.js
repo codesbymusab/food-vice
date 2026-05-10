@@ -4,6 +4,7 @@ const GetCommunities = require('../../application/use-cases/community/GetCommuni
 const JoinCommunity = require('../../application/use-cases/community/JoinCommunity');
 const GetJoinedCommunities = require('../../application/use-cases/community/GetJoinedCommunities');
 const StorageServiceImpl = require('../../infrastructure/services/FirebaseStorage/StorageServiceImp');
+const GetRecommendedCommunities = require('../../application/use-cases/community/GetRecommendedCommunities');
 
 const communityRepo = new CommunityRepoImpl();
 const storageService = new StorageServiceImpl();
@@ -28,6 +29,16 @@ exports.getCommunities = async (req, res) => {
   }
 };
 
+exports.getRecommendedCommunities = async (req, res) => {
+  try {
+    const getCommunities = new GetRecommendedCommunities(communityRepo);
+    const communities = await getCommunities.execute({ userId: req.query.userId });
+    return res.status(200).json(communities);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 exports.joinCommunity = async (req, res) => {
   try {
     const joinCommunity = new JoinCommunity(communityRepo);
@@ -40,8 +51,10 @@ exports.joinCommunity = async (req, res) => {
 
 exports.getJoinedCommunities = async (req, res) => {
   try {
+
     const getJoinedCommunities = new GetJoinedCommunities(communityRepo);
-    const communities = await getJoinedCommunities.execute({ userId: req.userId });
+    const communities = await getJoinedCommunities.execute({ userId: req.query.userId });
+   
     return res.status(200).json(communities);
   } catch (error) {
     return res.status(400).json({ message: error.message });

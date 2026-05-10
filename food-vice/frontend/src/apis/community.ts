@@ -211,8 +211,14 @@ export async function getThreadsByCommunity(communityId: string, searchQuery?: s
   return response.json();
 }
 
-export async function getAllThreads(): Promise<Thread[]> {
-  const response = await fetch('http://localhost:3000/thread/community/all', {
+export async function getAllThreads(searchQuery?: string, topicIds?: string[]): Promise<Thread[]> {
+  const params = new URLSearchParams();
+  if (searchQuery) params.append('search', searchQuery);
+  if (topicIds && topicIds.length > 0) params.append('topics', topicIds.join(','));
+
+  const url = `http://localhost:3000/thread/community/all${params.toString() ? `?${params.toString()}` : ''}`;
+
+  const response = await fetch(url, {
     credentials: 'include',
   });
 

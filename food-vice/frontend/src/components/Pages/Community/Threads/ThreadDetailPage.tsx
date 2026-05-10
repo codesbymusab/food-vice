@@ -14,7 +14,7 @@ interface ThreadDetailData {
     uid: {
         _id: string;
         name: string;
-        profilePicture?: string;
+        profilePhoto?: string;
     };
     media: {
         _id: string,
@@ -46,7 +46,7 @@ export function ThreadDetailPage() {
     const fetchThreadDetails = useCallback(async () => {
         try {
             const response = await axios.get(`http://localhost:3000/thread/${threadId}`, { withCredentials: true })
-            console.log(response.data)
+        
             setThread(response.data)
         } catch (error) {
             console.error('Error fetching thread details:', error)
@@ -109,15 +109,9 @@ export function ThreadDetailPage() {
 
     return (
         <main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col px-4 md:px-10 lg:px-40 py-8 lg:flex-row gap-8">
-
+           
             <div className="flex-1 space-y-8">
-                {thread.media && thread.media.length>0 && <div className="relative w-full h-48 md:h-64 rounded-3xl overflow-hidden shadow-xl mb-8">
-                    <img
-
-                        className="w-full h-full object-cover"
-                        src={thread.media[0].url}
-                    />
-                </div>}
+                
                 <article
                     className="bg-white dark:bg-slate-900/50 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
                     <div className="flex gap-6">
@@ -141,16 +135,11 @@ export function ThreadDetailPage() {
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
 
-                                    {!thread.uid.profilePicture ? <div
-                                        className="flex-shrink-0 size-10 rounded-full bg-primary/20 flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-primary">person</span>
+
+                                    <div className="w-10 h-10 rounded-full overflow-hidden" data-alt="Reviewer profile picture">
+                                        <img className="w-full h-full object-cover" src={thread.uid.profilePhoto} />
                                     </div>
-                                        :
-                                        <div className="size-10 rounded-full bg-cover bg-center border-2 border-primary/20 bg-gray-200"
-                                            style={{ backgroundImage: `url('${thread.uid.profilePicture}')` }}>
-                                            {!thread.uid?.profilePicture && <span className="material-symbols-outlined text-slate-400 m-auto">person</span>}
-                                        </div>
-                                    }
+
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <span className="font-bold text-slate-900 dark:text-slate-100">{thread.uid?.name || 'Anonymous'}</span>
@@ -190,6 +179,14 @@ export function ThreadDetailPage() {
                         </div>
                     </div>
                 </article>
+
+                {thread.media && thread.media.length > 0 && <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-xl mb-8">
+                    <img
+
+                        className="w-full h-full object-cover"
+                        src={thread.media[0].url}
+                    />
+                </div>}
 
                 <AddCommentCard threadId={threadId!} onCommentAdded={fetchComments} />
 

@@ -54,7 +54,7 @@ export async function fetchTopRatedRestaurants({ userId, filters, location }: { 
         );
         if (res.ok) {
             const { details } = await res.json();
-            console.log(details)
+      
             return details
 
         }
@@ -73,7 +73,7 @@ export async function fetchTrendingRestaurants({ location,maxDistance = null }: 
         );
         if (res.ok) {
             const { details } = await res.json();
-            console.log(details)
+      
             return details
 
         }
@@ -97,7 +97,7 @@ export async function fetchNearbyRestaurants({ userId, filters, location }: { us
         );
         if (res.ok) {
             const { details } = await res.json();
-            console.log(details)
+
             return details
 
         }
@@ -121,7 +121,7 @@ export async function fetchRecommendedRestaurants({ userId, filters, location }:
         );
         if (res.ok) {
             const { details } = await res.json();
-            console.log(details)
+        
             return details;
 
         }

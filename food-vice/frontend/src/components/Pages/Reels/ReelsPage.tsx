@@ -106,7 +106,7 @@ export function ReelsPage() {
             setLoading(true)
             const reels = await fetchRecentReels({ userId: user?.userId ?? '', tag: selectedtag });
             setReels(reels ?? null)
-            console.log(reels)
+        
         } catch (error) {
             console.error(error);
             setError("Unable to load reels. Please try again.");
@@ -295,10 +295,7 @@ export function ReelsPage() {
                                     <div key={account._id} className="flex items-center gap-3 px-3 cursor-pointer hover:scale-110" >
 
                                         <div className="size-8 rounded-full bg-slate-200 overflow-hidden">
-                                            {!account.profilePhoto || account.profilePhoto === "PP1" ?
-                                                <div className="flex items-center justify-center bg-primary/20">
-                                                    <span className="material-symbols-outlined text-primary">person</span></div>
-                                                : <img className="w-full h-full object-cover" data-alt="Female chef portrait" src={account.profilePhoto} />}
+                                         <img className="w-full h-full object-cover" data-alt="Female chef portrait" src={account.profilePhoto} />
                                         </div>
                                         <div className="flex-1 min-w-0 hover:text-primary" onClick={() => navigate(`/profile/${account._id}`)}>
                                             <p className="text-sm font-bold truncate ">{account.name}</p>

@@ -11,7 +11,6 @@ type ReelProps = {
 }
 export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
-    console.log(reel)
     const videoRef = useRef<HTMLVideoElement>(null);
     const [progress, setProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -152,12 +151,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
 
                     <div className="absolute bottom-4 inset-x-4 flex flex-col gap-2">
                         <div className="flex items-center gap-3">
-                            {!reel.user.profilePhoto || reel.user.profilePhoto === "PP1" && <div
-                                className="flex-shrink-0 size-10 rounded-full bg-slate/20 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-primary">person</span>
-                            </div>
-                            }
-                            {reel.user.profilePhoto && <div className="max-w-fit rounded-full border-2 border-primary bg-white overflow-hidden">
+                            <div className="max-w-fit rounded-full border-2 border-primary bg-white overflow-hidden">
                                 <img
                                     className="w-full h-full object-cover"
                                     src={reel.user.profilePhoto}
@@ -165,7 +159,7 @@ export function ReelCard({ reel, saveReel, toggleReelLike }: ReelProps) {
                                 />
                             </div>
 
-                            }
+
 
 
 

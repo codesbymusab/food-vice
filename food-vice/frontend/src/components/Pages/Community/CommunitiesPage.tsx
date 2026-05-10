@@ -5,6 +5,8 @@ import { SearchBar } from "../../SearchBar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
+import { getAllThreads, type Thread } from "../../../apis/community";
 
 export type SelectedTopic = string; // Can be 'all' or topic ID
 
@@ -13,15 +15,18 @@ export function CommunitiesPage() {
     const [searchQuery, setSearchQuery] = useState('')
     const [joinedCommunities, setJoinedCommunities] = useState([])
     const [recommendedCommunities, setRecommendedCommunities] = useState([])
-    const [recommendedThreads, setRecommendedThreads] = useState([])
+    const [recommendedThreads, setRecommendedThreads] = useState<Thread[]>([])
     const navigate = useNavigate()
+    const { user } = useAuth()
 
-   
-   
+
+
+
     const fetchJoinedCommunities = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/community/joined', { withCredentials: true })
+            const response = await axios.get(`http://localhost:3000/community/joined?userId=${user?.userId}`, { withCredentials: true })
             setJoinedCommunities(response.data)
+      
         } catch (error) {
             console.error('Error fetching joined communities:', error)
         }
@@ -29,7 +34,8 @@ export function CommunitiesPage() {
 
     const fetchRecommendedCommunities = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community?name=${searchQuery}`, { withCredentials: true })
+            const response = await axios.get(`http://localhost:3000/community/recommended?userId=${user?.userId}`, { withCredentials: true })
+      
             setRecommendedCommunities(response.data)
         } catch (error) {
             console.error('Error fetching recommended communities:', error)
@@ -38,15 +44,18 @@ export function CommunitiesPage() {
 
     const fetchRecommendedThreads = async () => {
         try {
+
             const topicIds = selectedTopic !== 'all' ? [selectedTopic] : []
-            const response = await axios.get(`http://localhost:3000/thread/community/all?topics=${topicIds.join(',')}`, { withCredentials: true })
-            setRecommendedThreads(response.data)
+            const fetchedThreads = await getAllThreads(searchQuery, topicIds)
+      
+            setRecommendedThreads(fetchedThreads)
+
         } catch (error) {
-            console.error('Error fetching recommended threads:', error)
+            console.error('Error fetching threads:', error)
         }
     }
 
-     useEffect(() => {
+    useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             fetchRecommendedCommunities()
         }, 300)
@@ -55,16 +64,19 @@ export function CommunitiesPage() {
     }, [searchQuery])
 
 
-     useEffect(() => {
+    useEffect(() => {
         fetchJoinedCommunities()
         fetchRecommendedCommunities()
         fetchRecommendedThreads()
     }, [])
 
     useEffect(() => {
-        fetchRecommendedThreads()
-    }, [selectedTopic])
+        const delayDebounceFn = setTimeout(() => {
+            fetchRecommendedThreads()
+        }, 300)
 
+        return () => clearTimeout(delayDebounceFn)
+    }, [searchQuery, selectedTopic])
 
     return (
         <main className="flex-1 px-4 md:px-10 py-8 max-w-7xl mx-auto">
@@ -72,23 +84,23 @@ export function CommunitiesPage() {
 
                 <aside className="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
                     <button
-                        className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-primary text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:border-slate-800 hover:brightness-110 transition-all shadow-lg shadow-primary/20" 
+                        className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-primary text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:border-slate-800 hover:brightness-110 transition-all shadow-lg shadow-primary/20"
                         onClick={() => navigate('create')}
                     >
                         <span className="material-symbols-outlined">add_circle</span>
                         <span>Start a Community</span>
                     </button>
 
-                    {/* <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
-                     */}
+                    <TopicsCard selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} />
+
                     <CommunitiesCard title="Joined Communities" communities={joinedCommunities} />
                     <CommunitiesCard title="Recommendations" communities={recommendedCommunities} />
 
                 </aside>
 
                 <div className="lg:col-span-9 order-1 lg:order-2 flex flex-col gap-6">
-                    <SearchBar 
-                        placeHolder="Search for communities..." 
+                    <SearchBar
+                        placeHolder="Search for communities..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
