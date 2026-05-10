@@ -1,26 +1,30 @@
-import { useEffect, useState, type Dispatch } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { Restaurant } from "./RestaurantDetailPage";
-import { ReviewTile, type Review } from "./ReviewTile";
+import { ReviewTile } from "./ReviewTile";
 import { AddReviewForm } from "./AddReviewForm";
 import { RatingSummaryCard } from "./RatingSummaryCard";
+import { AIVerdictCard } from "./AIVerdictCard";
+import type { AISummary } from '../../../apis/ai';
+import type { Review } from "../../../apis/reviews";
 
 
-type OverviewProps={
-    restaurantDetails:Restaurant,
-    userReview:Review[]|null,
-    recentReviews:Review[]|null,
-    setUserReview:Dispatch<React.SetStateAction<Review[] | null>>,
-    setRecentReviews:Dispatch<React.SetStateAction<Review[] | null>>
-    fetchRestaurant:(location: [number, number] | null) => Promise<void>,
-    location:[number,number] | null
+type OverviewProps = {
+    restaurantDetails: Restaurant,
+    userReview: Review[] | null,
+    recentReviews: Review[] | null,
+    setUserReview: Dispatch<SetStateAction<Review[] | null>>,
+    setRecentReviews: Dispatch<SetStateAction<Review[] | null>>,
+    aiSummary?: AISummary | null,
+    fetchRestaurant: (location: [number, number] | null) => Promise<void>,
+    location: [number, number] | null
 
 }
 
-export function Overview({restaurantDetails,userReview,recentReviews,setUserReview,setRecentReviews,fetchRestaurant,location}:OverviewProps){
+export function Overview({ restaurantDetails, userReview, recentReviews, setUserReview, setRecentReviews, aiSummary, fetchRestaurant, location }: OverviewProps) {
 
     const [showReviewForm, setShowReviewForm] = useState(false);
-    
-     useEffect(() => {
+
+    useEffect(() => {
         if (!showReviewForm) {
             window.scrollTo(0, 0);
         }
@@ -57,10 +61,15 @@ export function Overview({restaurantDetails,userReview,recentReviews,setUserRevi
                     <RatingSummaryCard rating={restaurantDetails.rating} />
                 </section>
             }
+            {aiSummary ? (
+                <section className="rounded-3xl border border-slate-200 bg-slate-100 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <AIVerdictCard summary={aiSummary} />
+                </section>
+            ) : null}
 
             <section>
 
-                {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} fetchRestaurant={fetchRestaurant} location={location}  />
+                {showReviewForm ? <AddReviewForm setShowReviewForm={setShowReviewForm} fetchRestaurant={fetchRestaurant} location={location} />
 
                     : (
 

@@ -4,8 +4,9 @@ import { useParams } from "react-router";
 import { createReview } from "../../../apis/reviews";
 import { validateReviewForm, hasErrors } from "../../../utils/validators";
 import { ConfirmationDialog, OperationLoadingDialog } from "../../Shared/Feedback";
+import StarRating from "./StarRating";
 
-export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: { setShowReviewForm: React.Dispatch<React.SetStateAction<boolean>>,fetchRestaurant:(location: [number, number] | null) => Promise<void>,location:[number,number] | null }) {
+export function AddReviewForm({ setShowReviewForm, fetchRestaurant, location }: { setShowReviewForm: React.Dispatch<React.SetStateAction<boolean>>, fetchRestaurant: (location: [number, number] | null) => Promise<void>, location: [number, number] | null }) {
   const [food, setFood] = useState(0);
   const [service, setService] = useState(0);
   const [ambience, setAmbience] = useState(0);
@@ -15,12 +16,12 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const {user}=useAuth()
-  const params=useParams()
-  
+  const { user } = useAuth()
+  const params = useParams()
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
     // Validate form
     const validationErrors = validateReviewForm(text, food, service, ambience, price)
     if (hasErrors(validationErrors)) {
@@ -38,10 +39,10 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
 
     try {
       const formData = new FormData();
-      formData.append("userId", `${user?.userId}`); 
+      formData.append("userId", `${user?.userId}`);
       formData.append("restaurantId", `${params.id}`);
       formData.append("text", text);
-      formData.append("rating", JSON.stringify({ food, service, ambience, price, overall: (food+service+ambience+price)/4 }));
+      formData.append("rating", JSON.stringify({ food, service, ambience, price, overall: (food + service + ambience + price) / 4 }));
 
       files.forEach(file => formData.append("files", file));
 
@@ -77,7 +78,7 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
 
       <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-outline/50">
         <form className="space-y-12" onSubmit={handleSubmit}>
-          
+
           {/* Error alert */}
           {errors.submit && (
             <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
@@ -91,26 +92,25 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
           {/* Ratings UI (replace stars with interactive handlers) */}
           {/* Example: */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Food Quality
-              {errors.rating && <span className="text-red-600 ml-2">{errors.rating}</span>}
-            </label>
-            <input type="number" value={food} onChange={e => setFood(Number(e.target.value))} min={1} max={5} className="w-full p-2 border rounded" disabled={loading} />
+            <label className="block text-sm font-semibold mb-2">Food Quality</label>
+            <StarRating value={food} onChange={setFood} disabled={loading} />
           </div>
 
           <div>
             <label className="block text-sm font-semibold mb-2">Service</label>
-            <input type="number" value={service} onChange={e => setService(Number(e.target.value))} min={1} max={5} className="w-full p-2 border rounded" disabled={loading} />
+            <StarRating value={service} onChange={setService} disabled={loading} />
           </div>
 
           <div>
             <label className="block text-sm font-semibold mb-2">Ambience</label>
-            <input type="number" value={ambience} onChange={e => setAmbience(Number(e.target.value))} min={1} max={5} className="w-full p-2 border rounded" disabled={loading} />
+            <StarRating value={ambience} onChange={setAmbience} disabled={loading} />
           </div>
 
           <div>
             <label className="block text-sm font-semibold mb-2">Value for Money</label>
-            <input type="number" value={price} onChange={e => setPrice(Number(e.target.value))} min={1} max={5} className="w-full p-2 border rounded" disabled={loading} />
+            <StarRating value={price} onChange={setPrice} disabled={loading} />
           </div>
+
 
           {/* Review text */}
           <div>
@@ -119,7 +119,7 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
             </label>
             <textarea
               value={text}
-              onChange={e => {setText(e.target.value); if (errors.text) setErrors({...errors, text: ""})}}
+              onChange={e => { setText(e.target.value); if (errors.text) setErrors({ ...errors, text: "" }) }}
               placeholder="Describe your dining experience..."
               rows={6}
               className={`w-full rounded-2xl border p-4 ${errors.text ? 'border-red-500' : 'border-gray-300'}`}
@@ -130,10 +130,10 @@ export function AddReviewForm( { setShowReviewForm,fetchRestaurant,location }: {
           {/* File upload */}
           <div>
             <label className="block text-sm font-semibold mb-2">Upload Photos (Optional)</label>
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*" 
+            <input
+              type="file"
+              multiple
+              accept="image/*"
               onChange={e => setFiles(Array.from(e.target.files || []))}
               disabled={loading}
             />

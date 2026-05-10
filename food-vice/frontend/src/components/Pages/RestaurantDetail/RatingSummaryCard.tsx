@@ -12,7 +12,7 @@ export function RatingSummaryCard({ rating }: { rating: Rating }) {
     return (
         <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="text-center md:border-r border-slate-200 dark:border-slate-800 md:pr-12">
-                <div className="text-5xl font-bold text-primary mb-1">{(rating!.overallRating / 2).toFixed(1)}</div>
+                <div className="text-5xl font-bold text-primary mb-1">{(rating!.overallRating).toFixed(1)}</div>
                 <div className="flex justify-center text-primary mb-2">
                     
                     <span className="material-symbols-outlined fill-1">star</span>

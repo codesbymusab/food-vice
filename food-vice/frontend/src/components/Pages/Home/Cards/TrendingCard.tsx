@@ -4,7 +4,7 @@ import type { TrendingRestaurant } from "../../../../apis/restaurants"
 export function TrendingCard({restaurant}:{restaurant:TrendingRestaurant}) {
     const navigate=useNavigate()
     return (
-        <div className="rounded-2xl bg-white min-w-[300px] snap-start group cursor-pointer hover:mt-5 transition-mt duration-300" onClick={()=>navigate(`/restaurant/${restaurant._id}`)}>
+        <div className="rounded-2xl bg-white min-w-[300px] snap-start group cursor-pointer hover:mt-5 transition-mt duration-300" onClick={()=>navigate(`/explore/restaurant/${restaurant._id}`)}>
             <div className="relative h-48 rounded-t-2xl overflow-hidden mb-3" data-alt="restaurant cover photo ">
                 <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={restaurant.media?.url} />
                 <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">

@@ -48,7 +48,7 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                     </div>
                     <div >
                         <h6 className="font-bold text-sm hover:text-accent-cyan cursor-pointer" onClick={() => navigate(`/profile/${user?.userId}`)}>{review.user.name}</h6>
-                        <p className="text-xs text-slate-500" onClick={() => navigate(`/restaurant/${review.restaurantId}`)}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">{review.restaurant && review.restaurant.name}</span></p>
+                        <p className="text-xs text-slate-500" onClick={() => navigate(`/explore/restaurant/${review.restaurantId}`)}>reviewed <span className="text-primary font-bold cursor-pointer hover:underline">{review.restaurant && review.restaurant.name}</span></p>
                     </div>
                 </div>
                 <div className="flex gap-0.5">
@@ -63,7 +63,7 @@ export function ReviewCard({ review, setReviews }: { review: Review, setReviews:
                     ))}
                 </div>
             </div>
-            <div className="cursor-pointer" onClick={() => navigate(`/restaurant/${review.restaurantId}`)}>
+            <div className="cursor-pointer" onClick={() => navigate(`/explore/restaurant/${review.restaurantId}`)}>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4 ">
                     {review.text}
                 </p>

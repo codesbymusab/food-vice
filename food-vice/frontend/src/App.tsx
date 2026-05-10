@@ -58,7 +58,9 @@ function MainLayout() {
       <Routes location={location}>
         
         <Route path="/home" element={<HomePage />} />
-        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/explore" element={<ExplorePage />}>
+          <Route path="restaurant/:id" element={<RestaurantDetailPage />} />
+        </Route>
         <Route path="/profile/:id" element={<UserProfilePage />} />
          
         <Route path="/reels/:id" element={<ReelsPage />} />
@@ -69,7 +71,7 @@ function MainLayout() {
         <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       
         
-        <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} />
+        {/* <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} /> */}
         <Route path="/community/create" element={<CreateCommunityPage />} />
         <Route path="/community/:id/create-thread" element={<CreateThreadPage />} />
 

@@ -54,7 +54,7 @@ export function Marker({ restaurant }: MarkerProps) {
         <div
           className="z-50 absolute -top-32 left-1/2 -translate-x-1/2 w-24 rounded-full border border-primary/10 bg-white dark:bg-slate-800 shadow-lg p-3"
           onMouseLeave={() => setShowDetails(!showDetails)}
-          onClick={() => navigate(`/restaurant/${restaurant._id}`)}
+          onClick={() => navigate(`/explore/restaurant/${restaurant._id}`)}
         >
           <div
             className="h-20 bg-cover mb-2 rounded-full"

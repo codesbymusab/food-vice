@@ -1,4 +1,6 @@
-export function SearchBar({ placeHolder, value, onChange }: { placeHolder: string, value?: string, onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+import type { ChangeEvent } from 'react';
+
+export function SearchBar({ placeHolder, value, onChange }: { placeHolder: string, value?: string, onChange?: (e: ChangeEvent<HTMLInputElement>) => void }) {
     return (
         <div className="w-full">
             <label className="relative flex flex-col w-full group">

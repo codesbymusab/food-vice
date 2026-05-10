@@ -7,6 +7,10 @@ import { useAppLocation } from '../../../context/LocationContext';
 import { ErrorScreen, SkeletonList } from '../../Shared/Feedback';
 import { fetchTopRatedRestaurants as loadTopRatedRestaurantsAPI, fetchRecommendedRestaurants as loadRecommendedRestaurantsAPI } from '../../../apis/restaurants';
 import { fetchCuisines } from '../../../apis/cuisines';
+import { SearchBar } from '../../SearchBar';
+import { ExploreChatBot } from './ExploreChatBot';
+import { fetchAIRecommendations, type AIRecommendation } from '../../../apis/ai';
+import { Outlet, useNavigate, useParams } from 'react-router';
 
 export type Cuisine = {
   _id: string,
@@ -27,6 +31,10 @@ function ExplorePage() {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState<RecommendedRestaurant[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [aiRecommendations, setAIRecommendations] = useState<AIRecommendation[] | null>(null);
+  const [aiLoading, setAILoading] = useState<boolean>(false);
+  const [aiError, setAIError] = useState<string | null>(null);
   const [mapView, setMapView] = useState<boolean>(false)
   const [cuisines, setCuisines] = useState<Cuisine[] | null>(null)
   const [filters, setFilters] = useState<Filter>({
@@ -36,7 +44,9 @@ function ExplorePage() {
     dist: 50,
 
   })
-
+  const navigate= useNavigate()
+  const params=useParams()
+  
   async function loadTopRatedRestaurants(location: [number, number] | null) {
     try {
       const details = await loadTopRatedRestaurantsAPI({ userId: user?.userId ?? '', filters, location });
@@ -51,7 +61,7 @@ function ExplorePage() {
 
   async function loadRecommendedRestaurants(location: [number, number] | null) {
     try {
-      const details = await loadRecommendedRestaurantsAPI({ userId: user?.userId ?? '',location,filters:null });
+      const details = await loadRecommendedRestaurantsAPI({ userId: user?.userId ?? '', location, filters: null });
       setRecommendedRestaurants(details ?? null);
     } catch (error) {
       console.error(error);
@@ -90,7 +100,39 @@ function ExplorePage() {
     await Promise.all([loadTopRatedRestaurants(location), loadRecommendedRestaurants(location)]);
   }
 
+  async function loadAIRecommendations() {
+    if (!searchQuery.trim()) {
+      setAIRecommendations(null);
+      setAIError(null);
+      return;
+    }
 
+    if (!location) {
+      setAIError('Location is required for AI recommendations.');
+      setAIRecommendations(null);
+      return;
+    }
+
+    try {
+      setAILoading(true);
+      setAIError(null);
+      const results = await fetchAIRecommendations({
+        query: searchQuery.trim(),
+        location,
+        userId: user?.userId,
+      });
+      setAIRecommendations(results);
+      if (!results || results.length === 0) {
+        setAIError('No AI recommendations were found for that query.');
+      }
+    } catch (error) {
+      console.error(error);
+      setAIRecommendations(null);
+      setAIError('Unable to fetch AI recommendations.');
+    } finally {
+      setAILoading(false);
+    }
+  }
 
   const displayError = error ?? locationError;
 
@@ -114,6 +156,9 @@ function ExplorePage() {
     )
   }
 
+  if(params.id){
+    return <Outlet />
+  }
   return (
     <>
 
@@ -147,12 +192,50 @@ function ExplorePage() {
               </button>
             </div>
           </div>
+
           {!mapView ?
             <>
               <div className="space-y-6">
+
+                <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+                  <SearchBar placeHolder="Search nearby restaurants, cuisine, or mood" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                  <button onClick={() => void loadAIRecommendations()} className="my-1 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-primary-dark transition-all">
+                    Search AI
+                  </button>
+                </div>
+                {searchQuery.trim() ? (
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                        AI Recommendations
+                      </h2>
+                    </div>
+                    {aiLoading ? (
+                      <p className="text-sm text-slate-500">Fetching AI recommendations...</p>
+                    ) : aiError ? (
+                      <p className="text-sm text-red-500">{aiError}</p>
+                    ) : null}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {aiRecommendations?.map((item) => (
+                        <div key={item.id} className="hover:cursor-pointer hover:border-2 hover:border-primary rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all" onClick={()=>navigate(`/explore/restaurant/${item.id}`)}>
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <div>
+                              <h3 className="font-bold text-lg">{item.name}</h3>
+                              <p className="text-sm text-slate-500">{item.cuisine} • {item.priceCategory}</p>
+                            </div>
+                            <span className="text-sm font-semibold text-primary">{item.distanceKm.toFixed(1)} km</span>
+                          </div>
+                          <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{item.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                    <span className="material-symbols-outlined text-primary">lightbulb</span>
                     Recommendations
                   </h2>
                   <a className="text-primary font-bold text-sm hover:underline" href="#">
@@ -180,22 +263,22 @@ function ExplorePage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 overflow-x-auto">
-                  { 
+                  {
                     recommendedRestaurants ?
-                    topRatedRestaurants && topRatedRestaurants
-                      .filter(
-                        top =>
-                          !recommendedRestaurants.some(
-                            rec => rec._id.toString() === top._id.toString()
-                          )
-                      )
-                      .map(restaurant => (
-                        <RestaurantCard
-                          key={restaurant._id}
-                          restaurant={restaurant}
-                          setTopRatedRestaurants={setTopRatedRestaurants}
-                        />
-                      ))
+                      topRatedRestaurants && topRatedRestaurants
+                        .filter(
+                          top =>
+                            !recommendedRestaurants.some(
+                              rec => rec._id.toString() === top._id.toString()
+                            )
+                        )
+                        .map(restaurant => (
+                          <RestaurantCard
+                            key={restaurant._id}
+                            restaurant={restaurant}
+                            setTopRatedRestaurants={setTopRatedRestaurants}
+                          />
+                        ))
                       :
                       topRatedRestaurants && topRatedRestaurants.map(restaurant => (
                         <RestaurantCard
@@ -216,9 +299,8 @@ function ExplorePage() {
 
 
       </main>
-
-
-
+      <ExploreChatBot location={location} userId={user?.userId} />
+    
     </>
   );
 };

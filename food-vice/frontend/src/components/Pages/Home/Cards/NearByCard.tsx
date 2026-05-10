@@ -4,7 +4,7 @@ import type { TopRatedRestaurant } from "../../Explore/RestaurantCard"
 export function NearByCard({ restaurant }: { restaurant: TopRatedRestaurant }) {
     const navigate = useNavigate()
     return (
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl flex items-center gap-4 hover:ring-2 ring-primary/30 transition-all cursor-pointer border border-slate-100 dark:border-slate-800 shadow-sm" onClick={() => navigate(`/restaurant/${restaurant._id}`)}>
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl flex items-center gap-4 hover:ring-2 ring-primary/30 transition-all cursor-pointer border border-slate-100 dark:border-slate-800 shadow-sm" onClick={() => navigate(`/explore/restaurant/${restaurant._id}`)}>
             <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-200" data-alt="Mexican street taco stand">
                 <img className="w-full h-full object-cover" src={restaurant.media?.url} />
             </div>

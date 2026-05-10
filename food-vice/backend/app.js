@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const axios = require("axios");
 
@@ -10,10 +9,6 @@ const Restaurant = require("./infrastructure/database/mongodb/models/Restaurant/
 const Location = require("./infrastructure/database/mongodb/models/LocationModel");
 const Review = require("./infrastructure/database/mongodb/models/Reviews/ReviewModel");
 const Rating = require("./infrastructure/database/mongodb/models/Reviews/RatingModel");
-
-// =========================
-// DB CONNECT
-
 
 // =========================
 // USERS POOL
@@ -44,7 +39,7 @@ async function generateReview(prompt) {
     }
   );
 
-  return res.data.choices[0].message.content;
+  return res.data.choices[0].message.content.trim();
 }
 
 // =========================
@@ -53,7 +48,6 @@ async function generateReview(prompt) {
 
 function generateRating() {
   const base = 3 + Math.random() * 2;
-
   return {
     food: Math.round(base),
     service: Math.round(base),
@@ -71,19 +65,13 @@ exports.run = async () => {
   try {
     console.log("🚀 Running geo-based location query...");
 
-    // =========================
     // STEP 1: GEO QUERY (LOCATION)
-    // =========================
-
     const nearbyLocations = await Location.aggregate([
       {
         $geoNear: {
           near: {
             type: "Point",
-            coordinates: [
-              74.26158778531845,
-              31.402624376104274,
-            ],
+            coordinates: [74.26158778531845, 31.402624376104274],
           },
           distanceField: "distKm",
           spherical: true,
@@ -95,89 +83,63 @@ exports.run = async () => {
     ]);
 
     const locationIds = nearbyLocations.map((l) => l._id);
+    console.log("📍 Nearby locations found:", locationIds.length);
 
-    console.log(
-      "📍 Nearby locations found:",
-      locationIds.length
-    );
-
-    // =========================
     // STEP 2: RESTAURANTS FROM LOCATIONS
-    // =========================
-
     const restaurants = await Restaurant.find({
       locationId: { $in: locationIds },
     }).populate("locationId");
 
-    console.log(
-      "🍽 Restaurants found:",
-      restaurants.length
-    );
+    console.log("🍽 Restaurants found:", restaurants.length);
 
-    // =========================
-    // STEP 3: GENERATE REVIEWS
-    // =========================
-
+    // STEP 3: GENERATE REVIEWS ONLY IF NONE EXIST
     for (const r of restaurants) {
+
+      
+
       if (!r.locationId) continue;
+      console.log(r._id)
 
-      const loc = r.locationId;
+      const existingReview = await Review.findOne({ restaurantId: r._id });
 
-      for (let i = 0; i < 2; i++) {
-        const user =
-          USERS[Math.floor(Math.random() * USERS.length)];
+      if (existingReview) {
+        console.log(`⏩ Skipping ${r.name}, already has reviews`);
+        continue;
+      }
 
-        const prompt = `
-You are a real customer in Lahore Pakistan.
+      const user = USERS[Math.floor(Math.random() * USERS.length)];
+      const prompt = `
+You are a Lahori Pakistani giving a casual restaurant review. 
+Keep it under 2 lines, natural desi tone, not AI-like. 
+Mention food experience briefly.
 
-Write a natural restaurant review.
-
-Restaurant:
-Name: ${r.name}
+Restaurant: ${r.name}
 Description: ${r.description || "N/A"}
 Price Category: ${r.priceCategory || "Medium"}
-
-Location:
-Address: ${loc.address}
-City: ${loc.city}
-Distance: ${loc.distKm || "unknown"} km
-
-Rules:
-- 1 short paragraph
-- human tone (NOT AI-like)
-- realistic opinion (balanced positivity)
-- mention food experience
+Location: ${r.locationId.address}, ${r.locationId.city}
 `;
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-        const text = await generateReview(prompt);
+      const text = await generateReview(prompt);
 
-        const review = await Review.create({
-          uid: user,
-          restaurantId: r._id,
-          text,
-        });
+      const review = await Review.create({
+        uid: user,
+        restaurantId: r._id,
+        text,
+      });
 
-        await Rating.create({
-          reviewId: review._id,
-          ...generateRating(),
-        });
+      await Rating.create({
+        reviewId: review._id,
+        ...generateRating(),
+      });
 
-        console.log(
-          `✔ Review created for: ${r.name}`
-        );
-      }
+      console.log(`✔ Review created for: ${r.name}`);
     }
 
-    console.log("✅ DONE: Geo-based AI reviews generated");
-
+    console.log("✅ DONE: Reviews generated for restaurants without any");
     process.exit(0);
   } catch (err) {
-    console.error(
-      "❌ ERROR:",
-      err.response?.data || err.message
-    );
+    console.error("❌ ERROR:", err.response?.data || err.message);
     process.exit(1);
   }
 };
-
-// Run

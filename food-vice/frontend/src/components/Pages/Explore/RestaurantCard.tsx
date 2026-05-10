@@ -54,12 +54,12 @@ export function RestaurantCard({ restaurant, setTopRatedRestaurants }: { restaur
                 style={{
                     backgroundImage: `url(${restaurant.media?.url})`
                 }}
-                onClick={() => navigate(`/restaurant/${restaurant._id}`)}
+                onClick={() => navigate(`/explore/restaurant/${restaurant._id}`)}
             >
 
 
             </div>
-            <div className="p-4 flex flex-col flex-1" onClick={() => navigate(`/restaurant/${restaurant._id}`)}>
+            <div className="p-4 flex flex-col flex-1" onClick={() => navigate(`/explore/restaurant/${restaurant._id}`)}>
                 <div className="flex items-center justify-between mb-1">
                     <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
                         {restaurant.name}

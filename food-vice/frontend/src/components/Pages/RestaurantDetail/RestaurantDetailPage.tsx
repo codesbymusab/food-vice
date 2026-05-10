@@ -9,6 +9,7 @@ import { Reviews } from "./Reviews";
 import { Photos } from "./Photos";
 import { Reels } from "./RestaurantReels";
 import { fetchRestaurantDetails, fetchSimilarRestaurants, saveRestaurant as saveRestaurantApi, updateViews } from "../../../apis/restaurants";
+import { fetchAISummary, type AISummary } from "../../../apis/ai";
 import type { Review } from "../../../apis/reviews";
 
 
@@ -108,11 +109,11 @@ export function RestaurantDetailPage() {
     const [similarRestaurants, setSimilarRestaurants] = useState<SimilarRestaurant | null>(null);
     const [recentReviews, setRecentReviews] = useState<Review[] | null>(null)
     const [userReview, setUserReview] = useState<Review[] | null>(null)
-    const [loading, setLoading] = useState<boolean>(true)
+    const [aiSummary, setAiSummary] = useState<AISummary | null>(null)
     const [selectedTab,setSelectedTab]=useState<SelectedTab>('Overview')
 
     const { user } = useAuth()
-
+    const {id} =useParams()
     const navigate = useNavigate()
 
     async function loadRestaurant(location: [number, number] | null) {
@@ -121,6 +122,13 @@ export function RestaurantDetailPage() {
             setRestaurantDetails(details);
             if (details?.recentReviews) setRecentReviews(details.recentReviews)
             if (details?.userReview) setUserReview([details.userReview])
+            if (details && details.restaurant?._id && details.restaurant?.name) {
+              const summary = await fetchAISummary({
+                restaurantId: details.restaurant._id,
+                restaurantName: details.restaurant.name,
+              });
+              setAiSummary(summary);
+            }
        
         } catch (error) {
             console.error(error);
@@ -165,10 +173,10 @@ export function RestaurantDetailPage() {
     useEffect(() => {
         if (!locationLoading) {
             loadRestaurant(location);
-             updateView()
+            updateView()
             loadSimilarRestaurants(location)
         }
-    }, [locationLoading, location]);
+    }, [locationLoading, location,id]);
 
 
     if (!restaurantDetails) {
@@ -249,7 +257,7 @@ export function RestaurantDetailPage() {
             <div className="mx-auto max-w-7xl px-4 md:px-10 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
-                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview}  fetchRestaurant={loadRestaurant} location={location}/>}
+                    {selectedTab==='Overview' && <Overview restaurantDetails={restaurantDetails} recentReviews={recentReviews} userReview={userReview} setRecentReviews={setRecentReviews} setUserReview={setUserReview} aiSummary={aiSummary} fetchRestaurant={loadRestaurant} location={location}/>}
                     {selectedTab==='Reviews' && <Reviews userReview={userReview} setUserReview={setUserReview}/>}
                     {selectedTab==='Photos' && <Photos/>}
                     {selectedTab==='Reels' && <Reels/>}

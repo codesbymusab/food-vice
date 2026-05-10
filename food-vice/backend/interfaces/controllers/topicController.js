@@ -1,4 +1,4 @@
-const TopicServiceImpl = require('../../infrastructure/services/TopicServiceImpl');
+const TopicServiceImpl = require('../../infrastructure/services/TopicRepoImpl');
 const TopicRepoImpl = require('../../infrastructure/database/mongodb/repositories/TopicRepoImpl');
 
 const topicService = new TopicServiceImpl(new TopicRepoImpl());

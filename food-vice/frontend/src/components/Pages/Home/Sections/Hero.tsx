@@ -6,6 +6,7 @@ export function Hero() {
     const [locationInput, setLocationInput] = useState('');
     const [searching, setSearching] = useState(false);
     const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [showSuggestion,setShowSuggestions]=useState<boolean>(true)
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Fetch suggestions from Nominatim
@@ -23,6 +24,7 @@ export function Hero() {
                     const data = await response.json();
                     
                     setSuggestions(data);
+                    setShowSuggestions(true)
                 } catch (err) {
                     console.error('Autocomplete error:', err);
                 } finally {
@@ -42,6 +44,9 @@ export function Hero() {
         setLocation([parseFloat(place.lat), parseFloat(place.lon)]);
         setLocationInput(place.display_name);
         setSuggestions([]);
+        setShowSuggestions(false)
+        setSearching(false)
+
     };
 
     const handleLocationSubmit = async () => {
@@ -54,6 +59,7 @@ export function Hero() {
         if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
             setLocation([parts[0], parts[1]]);
             setSearching(false);
+            setSuggestions([])
             return;
         }
 
@@ -65,6 +71,7 @@ export function Hero() {
             if (data?.length > 0) {
                 const { lat, lon } = data[0];
                 setLocation([parseFloat(lat), parseFloat(lon)]);
+                setSuggestions([])
             } else {
                 alert('Location not found. Please try a different search term.');
             }
