@@ -6,7 +6,7 @@ class AuthServiceImpl {
 
 
         return jwt.sign({ userId: userId },process.env.JWT_SECRET, {
-            expiresIn: '1h'
+            expiresIn:'30d'
         });
 
     }

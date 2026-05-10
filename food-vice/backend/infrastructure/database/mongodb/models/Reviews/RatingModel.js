@@ -1,7 +1,7 @@
 const mongoose=require('mongoose')
 
 const RatingSchema = new mongoose.Schema({
-  reviewId: { type: Schema.Types.ObjectId, ref: 'Review' },
+  reviewId: { type:mongoose.Schema.Types.ObjectId, ref: 'Review' },
   food: Number,
   service: Number,
   ambience: Number,

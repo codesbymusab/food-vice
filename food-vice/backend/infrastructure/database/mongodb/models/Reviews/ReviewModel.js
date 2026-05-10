@@ -1,8 +1,8 @@
 const mongoose=require('mongoose')
 
 const ReviewSchema = new mongoose.Schema({
-  uid: { type: Schema.Types.ObjectId, ref: 'User' },
-  restaurantId: { type: Schema.Types.ObjectId, ref: 'Restaurant' },
+  uid: { type:mongoose.Schema.Types.ObjectId, ref: 'User' },
+  restaurantId: { type:mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
   text: String
 }, { timestamps: true });
 

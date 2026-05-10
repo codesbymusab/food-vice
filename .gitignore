@@ -65,3 +65,4 @@ temp/
 # =========================
 .env.*
 !.env.example
+serviceAccountKey.json

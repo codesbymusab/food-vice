@@ -1,11 +1,13 @@
 const bcrypt = require('bcrypt')
 
 class EditUser {
-    constructor(userRepo) {
+    constructor(userRepo,storageService) {
         this.userRepo = userRepo;
+        this.storageService=storageService
     }
 
     async execute(data) {
+
 
         if (!data.provider) {
             throw new Error("Provider required");
@@ -23,7 +25,7 @@ class EditUser {
             throw new Error("Username required");
         }
 
-        const {email} = data
+        const { email } = data
         const user = await this.userRepo.getByEmail(email)
 
         if (!user) {
@@ -43,6 +45,14 @@ class EditUser {
 
             if (!match) {
                 throw new Error("Incorrect password")
+            }
+
+
+            if (data.file) {
+
+                const url = await this.storageService.uploadFile(data.file, "profile");
+
+                data.profilePhoto=url
             }
 
             if (data.newPassword && data.confirmPassword) {

@@ -2,33 +2,28 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { NotificationsDropDown } from "./NotificationsDropdown";
 import { useAuth } from "../context/AuthContext";
+import { signOutUser } from "../apis/user";
 
 export function Header() {
 
     const [showNotif, setShowNotif] = useState<boolean>(false)
-    const navigate=useNavigate()
-    const {setUser}=useAuth()
-    async function onSignOutClick() {
-        
-        try {
-            const res = await fetch("http://localhost:3000/auth/signout", {
-                credentials: "include"
-            });
+    const navigate = useNavigate()
+    const { user, setUser } = useAuth()
 
-            if (res.ok) {
-                setUser(null)
-                navigate('/login')
-            }
+    async function onSignOutClick() {
+        try {
+            await signOutUser();
+            setUser(null);
+            navigate('/login');
         }
         catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
     }
 
     return (
-        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2 shadow-lg shadow-primary/20">
-            <div className="relative max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-40 bg-white dark:bg-background-dark/80 backdrop-blur-md border-primary/10 px-4 lg:px-10 py-3 border-b-primary/50 border-b-2 shadow-sm shadow-primary/20">
+            <div className="relative  flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-8">
                     <NavLink to="/home" >
                         <div className="flex items-center gap-2 text-primary">
@@ -37,7 +32,7 @@ export function Header() {
                         </div>
                     </NavLink>
 
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="flex items-center gap-6">
                         <NavLink className={({ isActive }) =>
                             `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
                         } to="/explore">
@@ -58,28 +53,30 @@ export function Header() {
 
                 <div className="flex items-center gap-3">
 
-
+                    {/* 
                     <button className={`${showNotif === true ? 'bg-primary/30 text-primary' : 'text-slate-600'} p-2 pt-4 rounded-full hover:bg-primary/10  dark:text-slate-400 hover:text-primary transition-all relative`} onClick={() => { setShowNotif((prev) => !prev) }}>
                         <span className="material-symbols-outlined">notifications</span>
                         <span className="absolute top-3 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background-light"></span>
-                    </button>
-                    <div className="h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle">
-                        <NavLink to="/profile/1">
+                    </button> */}
+                    <div className="flex justify-center items-center bg-slate-600 text-white h-8 w-8 rounded-full bg-primary/20 border-2 border-primary/50 overflow-hidden cursor-pointer hover:scale-105 transition-transform" data-alt="User profile avatar circle" onClick={() => navigate(`/profile/${user?.userId}`)}>
 
-                            <img alt="Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgnm2tnCroCcH8dVdz_ddAmq6XVHiDf1KqLzc9Z2ydIEDw83rkwra5EBoN2607TpwytYDlY4DeOcekeU2sqer_l_ePRxDp3UHs41I-pC8B-uI15CfBI68xyGzV9MDgRuauLe4Byia9wuPQym_lS0bZZgzaBR5cvEbDDK5u4Kqtm_7ULLQHbM85NrLrDYFn6djnEZON5iv724PjlbGqplMK60LAnFL8LF_IgetW071ifVh9KxJH54gT5s6mmH8te-VcKVc-9jabLGY" />
 
-                        </NavLink>
+                        <img className="w-full h-full object-cover" src={user!.profilePhoto} />
+
+
+
+
                     </div>
 
-                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-400 dark:hover:bg-slate-800 transition-colors" onClick={async ()=> await onSignOutClick()}>
+                    <button className="inline-flex items-center gap-2 px-5 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-red-100 hover:border-red-400 dark:hover:bg-slate-800 transition-colors" onClick={async () => await onSignOutClick()}>
                         <span className="material-symbols-outlined text-sm text-primary">logout</span> Sign Out
                     </button>
                 </div>
 
-                <div
+                {/* <div
                     className={`${showNotif === true ? "flex flex-col" : "hidden"} max-w-96 absolute top-10 right-12 z-50 bg-white/95 dark:bg-slate-900/50 rounded-xl p-4 shadow-sm border border-primary/50 dark:border-slate-800 overflow-y-auto w-fit`} onMouseLeave={() => setShowNotif((prev) => !prev)}>
                     <NotificationsDropDown />
-                </div>
+                </div> */}
 
             </div>
 

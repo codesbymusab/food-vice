@@ -47,7 +47,7 @@ src/
 ├── infrastructure/         # 🔵 ADAPTERS (external world)
 │   ├── database/
 │   │   ├── mongodb/
-│   │   │   ├── s/     # mongoose schemas
+│   │   │   ├── s/     # mongoosemongoose.Schemas
 │   │   │   │   ├── User.js
 │   │   │   │   ├── Review.js
 │   │   │   │   └── Restaurant.js

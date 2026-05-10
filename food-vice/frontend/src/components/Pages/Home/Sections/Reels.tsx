@@ -1,6 +1,37 @@
+import { useEffect, useState } from "react";
+import type { Reel } from "../../Reels/ReelsPage";
 import { ReelCard } from "../Cards/ReelCard";
+import { useAuth } from "../../../../context/AuthContext";
+import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { fetchRecentReels } from "../../../../apis/reels";
 
 export function Reels() {
+
+
+    const [reels, setReels] = useState<Reel[] | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string | null>(null)
+    const {user}=useAuth()
+    async function loadRecentReels() {
+        setLoading(true)
+        setError(null)
+        try {
+            const reelsData = await fetchRecentReels({ userId: user!.userId,tag: 'All' });
+            setReels(reelsData ?? null);
+        } catch (error) {
+            console.error(error);
+            setError("Unable to load reels. Please try again.");
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        loadRecentReels()
+    }, [])
+
+
+
     return (
         <section className="px-4 mb-16 bg-slate-900 -mx-4 py-12 lg:rounded-3xl lg:mx-4 text-white">
             <div className="max-w-7xl mx-auto">
@@ -10,11 +41,21 @@ export function Reels() {
                     <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Trending</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
-                <ReelCard />
+                    {loading ? (
+                        <SkeletonList count={5} />
+                    ) : error ? (
+                        <div className="col-span-full">
+                            <ErrorScreen title="Could not load reels" message={error} onRetry={loadRecentReels} />
+                        </div>
+                    ) : reels && reels.length > 0 ? (
+                        reels.slice(0,5).map((reel) => {
+                            return <ReelCard key={reel._id} reel={reel} />
+                        })
+                    ) : (
+                        <div className="col-span-full rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                            No reels are available yet.
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

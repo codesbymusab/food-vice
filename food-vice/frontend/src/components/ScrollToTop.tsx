@@ -5,6 +5,7 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
   }, [pathname]);
 

@@ -1,8 +1,8 @@
 const mongoose=require('mongoose')
 
 const SavedReelSchema = new mongoose.Schema({
-  uid: { type: Schema.Types.ObjectId, ref: 'User' },
-  reelId: { type: Schema.Types.ObjectId, ref: 'Reel' }
+  uid: { type:mongoose.Schema.Types.ObjectId, ref: 'User' },
+  reelId: { type:mongoose.Schema.Types.ObjectId, ref: 'Reel' }
 });
 
 module.exports = mongoose.model('SavedReel', SavedReelSchema);
