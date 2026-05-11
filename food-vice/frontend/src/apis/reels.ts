@@ -35,11 +35,14 @@ export type SuggestedAccount = {
     name: string,
     profilePhoto?: string
 }
+
+const API_BASE = import.meta.env.VITE_API_BASE
+
 export async function fetchRecentReels({ userId, tag }: { userId: string, tag: string | null }) {
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/recent/reels?userId=${userId}&tag=${tag ?? 'All'}`,
+            `${API_BASE}/reels/recent/reels?userId=${userId}&tag=${tag ?? 'All'}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -60,7 +63,7 @@ export async function fetchReelById({ reelId, userId }: { userId: string, reelId
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/reel/${reelId}/${userId}`,
+            `${API_BASE}/reels/reel/${reelId}/${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -81,7 +84,7 @@ export async function fetchReelById({ reelId, userId }: { userId: string, reelId
 
 export async function updateViews({ reelId }: { reelId: string }) {
     try {
-        await fetch(`http://localhost:3000/reels/${reelId}/view`, {
+        await fetch(`${API_BASE}/reels/${reelId}/view`, {
             method: "POST",
             credentials: "include"
         });
@@ -94,7 +97,7 @@ export async function updateViews({ reelId }: { reelId: string }) {
 export async function fetchComments({ userId, reelId }: { userId: string, reelId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/comments/${reelId}?userId=${userId}`,
+            `${API_BASE}/comments/${reelId}?userId=${userId}`,
             {credentials: "include"}
         );
         if (res.ok) {
@@ -111,7 +114,7 @@ export async function fetchComments({ userId, reelId }: { userId: string, reelId
 export async function postComment({ reelId, userId, newComment }: { reelId: string, userId: string, newComment: string }) {
     if (!newComment.trim()) return;
     try {
-        const res = await fetch(`http://localhost:3000/comments/${reelId}`, {
+        const res = await fetch(`${API_BASE}/comments/${reelId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, text: newComment }),
@@ -127,7 +130,7 @@ export async function postComment({ reelId, userId, newComment }: { reelId: stri
 
 export async function toggleCommentLike({ commentId, userId }: { commentId: string, userId: string }) {
     try {
-        const res = await fetch(`http://localhost:3000/like/reel/comment`, {
+        const res = await fetch(`${API_BASE}/like/reel/comment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ commentId, userId: userId }),
@@ -147,7 +150,7 @@ export async function uploadReel({ formData, userId }: { formData: FormData, use
 
         formData.append("userId", userId)
 
-        const response = await fetch("http://localhost:3000/reels/upload", {
+        const response = await fetch(`${API_BASE}/reels/upload`, {
             method: "POST",
             body: formData,
             credentials: "include"
@@ -169,7 +172,7 @@ export async function fetchPopularTags() {
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/tags/popular`,
+            `${API_BASE}/reels/tags/popular`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -189,7 +192,7 @@ export async function fetchSuggestedAccounts({ userId }: { userId: string }) {
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/suggestions/accounts?userId=${userId}`,
+            `${API_BASE}/reels/suggestions/accounts?userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -211,7 +214,7 @@ export async function fetchFollowersReels({ userId, tag }: { userId: string, tag
     try {
 
         const res = await fetch(
-            `http://localhost:3000/reels/followers/reels?userId=${userId}&tag=${tag ?? 'All'}`,
+            `${API_BASE}/reels/followers/reels?userId=${userId}&tag=${tag ?? 'All'}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -232,7 +235,7 @@ export async function fetchFollowersReels({ userId, tag }: { userId: string, tag
 export async function saveReel(userId: string, reelId: string) {
 
     try {
-        const res = await fetch("http://localhost:3000/save/reel", {
+        const res = await fetch(`${API_BASE}/save/reel`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, reelId: reelId }),
@@ -264,7 +267,7 @@ export async function toggleLikeReel({ userId, reelId }: {
 
     try {
        
-        const res = await fetch("http://localhost:3000/like/reel", {
+        const res = await fetch(`${API_BASE}/like/reel`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, reelId: reelId }),
@@ -286,7 +289,7 @@ export async function toggleLikeReel({ userId, reelId }: {
 export async function fetchReels({ reelId }: { reelId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/reels/${reelId}`,
+            `${API_BASE}/restaurant/reels/${reelId}`,
             { credentials: "include" }
         );
         if (res.ok) {

@@ -38,12 +38,12 @@ exports.loginUser = async (req, res) => {
         const authRepo = new JWTAuthRepoImpl()
         const loginUser = new LoginUser(userRepo, authRepo)
         const {user,token} = await loginUser.execute(req.body)
-
-        
+        const isProd = process.env.ENVIRONMENT === 'Production';
+      
 
         if (token) {
-            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60, sameSite: 'lax', path: '/' })
-            return res.status(201).json({ message: 'User logged in Successfully',user:user })
+            res.cookie('token', token, { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000, path: '/' })
+            return res.status(201).json({ message: 'User logged in Successfully',user:user  })
         }
         return res.status(400).json({ message: 'Login failed' })
     }
@@ -67,10 +67,12 @@ exports.googleSignIn = async (req, res) => {
         const userRepo = new UserRepoImpl()
         const googleSignIn = new GoogleSignIn(userRepo,oAuthRepo,jwtAuthRepo)
 
-         const {user,token}  = await googleSignIn.execute(req.body)
-        
+        const {user,token}  = await googleSignIn.execute(req.body)
+        const isProd = process.env.ENVIRONMENT === 'Production';
+      
+
         if (token) {
-            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60, sameSite: 'lax', path: '/' })
+            res.cookie('token', token, { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000, path: '/' })
             return res.status(201).json({ message: 'User logged in Successfully',user:user  })
         }
         return res.status(400).json({ message: 'Google sign-in failed' })

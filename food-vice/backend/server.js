@@ -27,10 +27,28 @@ dotenv.config()
 
 const app = express()
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://food-vice-d9gy.vercel.app'
+];
+
+app.use((req, res, next) => {
+  console.log('Incoming Origin:', req.headers.origin);
+  next();
+});
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('CORS not allowed'));
+  },
   credentials: true
-}))
+}));
+
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(express.json())
 app.use(cookieParser())

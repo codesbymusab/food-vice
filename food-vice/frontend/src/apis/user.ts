@@ -12,13 +12,14 @@ export interface User {
 
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE
 
 export const fetchUser = async () => {
 
 
 
     try {
-        const res = await fetch("http://localhost:3000/user/me", {
+        const res = await fetch(`${API_BASE}/user/me`, {
             credentials: "include",
         });
 
@@ -43,7 +44,7 @@ export const fetchUser = async () => {
 
 export async function loginUser({ email, password }: { email: string; password: string }) {
     try {
-        const res = await fetch("http://localhost:3000/auth/login", {
+        const res = await fetch(`${API_BASE}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -64,7 +65,7 @@ export async function loginUser({ email, password }: { email: string; password: 
 
 export async function loginWithGoogle(access_token: string) {
     try {
-        const res = await fetch("http://localhost:3000/auth/google", {
+        const res = await fetch(`${API_BASE}/auth/google`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ access_token }),
@@ -85,7 +86,7 @@ export async function loginWithGoogle(access_token: string) {
 
 export async function signUpUser({ name, username, email, password, confirmPassword }: { name: string; username: string; email: string; password: string; confirmPassword: string }) {
     try {
-        const res = await fetch("http://localhost:3000/auth/signup", {
+        const res = await fetch(`${API_BASE}/auth/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, username, email, password, confirmPassword }),
@@ -106,7 +107,7 @@ export async function signUpUser({ name, username, email, password, confirmPassw
 
 export async function signOutUser() {
     try {
-        const res = await fetch("http://localhost:3000/auth/signout", {
+        const res = await fetch(`${API_BASE}/auth/signout`, {
             credentials: "include",
         });
 
