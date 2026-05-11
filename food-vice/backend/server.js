@@ -39,6 +39,7 @@ mongodbConfig.connectDB()
 
 app.use('/auth', authRoute)
 
+app.use(verifyAuth)
 
 app.use('/user', userRoute)
 app.use('/community', communityRoute)
@@ -50,5 +51,6 @@ app.use('/reviews',reviewRoute)
 app.use('/reels',reelRoute)
 app.use('/comments',commentRoute)
 app.use('/topics',topicRoute)
+
 app.use('/ai', aiRoute)
 
