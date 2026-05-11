@@ -17,12 +17,13 @@ interface User {
   userId: string;
   email: string;
   name?: string;
-  username:string;
+  username: string;
   profilePhoto?: string;
-  address?: string,
-  bio?: string,
-  level: number,
-  dateJoined: Date
+  address?: string;
+  bio?: string;
+  level: number;
+  role?: 'user' | 'moderator' | 'admin';
+  dateJoined: Date;
 
 }
 

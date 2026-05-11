@@ -10,6 +10,10 @@ class UserRepoImpl {
         return await User.findOne({ email })
 
     }
+    async findById(userId) {
+        return await User.findById(userId).lean();
+    }
+
     async getById(userId) {
 
         return await User.aggregate([
@@ -30,7 +34,11 @@ class UserRepoImpl {
                     "profilePhoto": "$profilePhoto",
                     "level": "$level",
                     "address": "$address",
-                    "bio": "$bio"
+                    "bio": "$bio",
+                    "role": "$role",
+                    "banned": "$banned",
+                    "banReason": "$banReason",
+                    "banUntil": "$banUntil"
 
                 }
             }
@@ -62,7 +70,11 @@ class UserRepoImpl {
                     level: "$level",
                     address: "$address",
                     bio: "$bio",
-                    provider: "$provider"
+                    provider: "$provider",
+                    role: "$role",
+                    banned: "$banned",
+                    banReason: "$banReason",
+                    banUntil: "$banUntil"
                 }
             },
 
@@ -146,6 +158,33 @@ class UserRepoImpl {
         ]).exec();
 
     }
+
+    async getUsers({ role } = {}) {
+        const query = {};
+        if (role) query.role = role;
+        return await User.find(query).lean();
+    }
+
+    async setRole(userId, role) {
+        return await User.findByIdAndUpdate(userId, { role }, { new: true }).lean();
+    }
+
+    async banUser(userId, reason, until) {
+        return await User.findByIdAndUpdate(
+            userId,
+            { banned: true, banReason: reason, banUntil: until || null },
+            { new: true }
+        ).lean();
+    }
+
+    async unbanUser(userId) {
+        return await User.findByIdAndUpdate(
+            userId,
+            { banned: false, banReason: null, banUntil: null },
+            { new: true }
+        ).lean();
+    }
+
     async create(user) {
 
         return await User.create(user)

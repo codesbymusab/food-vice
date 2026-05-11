@@ -15,8 +15,16 @@ import { CreateCommunityPage } from "./components/Pages/Community/CreateCommunit
 import ExplorePage from "./components/Pages/Explore/ExplorePage";
 import { CommunityDetailPage } from "./components/Pages/Community/CommunityDetailPage";
 import { CreateThreadPage } from "./components/Pages/Community/Threads/CreateThreadPage";
+import { ReviewModerationPage } from "./components/Pages/Moderation/ReviewModerationPage";
+import { ReportsPage } from "./components/Pages/Moderation/ReportsPage";
+import { ThreadsModerationPage } from "./components/Pages/Moderation/ThreadsModerationPage";
+import { RestaurantsPage } from "./components/Pages/Admin/RestaurantsPage";
+import { UsersPage } from "./components/Pages/Admin/UsersPage";
+import { AuditLogsPage } from "./components/Pages/Admin/AuditLogsPage";
 import { PublicRoute } from "./components/PublicRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminRoute } from "./components/AdminRoute";
+import { ModeratorRoute } from "./components/ModeratorRoute";
 import { OfflineScreen } from "./components/Shared/Feedback";
 
 function AnimatedRoutes() {
@@ -74,7 +82,16 @@ function MainLayout() {
         {/* <Route path="/restaurant/:id" element={<RestaurantDetailPage key={location.pathname}  />} /> */}
         <Route path="/community/create" element={<CreateCommunityPage />} />
         <Route path="/community/:id/create-thread" element={<CreateThreadPage />} />
-
+        <Route element={<ModeratorRoute />}>
+          <Route path="/moderation/reviews" element={<ReviewModerationPage />} />
+          <Route path="/moderation/threads" element={<ThreadsModerationPage />} />
+          <Route path="/moderation/reports" element={<ReportsPage />} />
+        </Route>
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/restaurants" element={<RestaurantsPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
+        </Route>
       </Routes>
       <Footer />
     </>

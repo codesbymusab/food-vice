@@ -161,17 +161,17 @@ class ReviewRepoImpl {
     }
 
     async getRecentReviews({ limitCount = 3, userId, currentUser = false }) {
-        
-        
-        const matchStage={}
+
+
+        const matchStage = {}
 
         if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
-            
-         return await RestaurantReviews.aggregate([
-            { $match: matchStage },
-           
 
-              {
+        return await RestaurantReviews.aggregate([
+            { $match: matchStage },
+
+
+            {
                 $lookup: {
                     from: "users",
                     localField: "uid",
@@ -180,7 +180,7 @@ class ReviewRepoImpl {
                 },
             },
             { $unwind: "$user" },
-						{
+            {
                 $lookup: {
                     from: "restaurants",
                     localField: "restaurantId",
@@ -260,9 +260,9 @@ class ReviewRepoImpl {
                     _id: 1,
                     text: 1,
                     createdAt: 1,
-                    restaurantId:1,
-                  	"restaurant.name":1,
-                  	"restaurant._id":1,
+                    restaurantId: 1,
+                    "restaurant.name": 1,
+                    "restaurant._id": 1,
                     "photos._id": 1,
                     "photos.url": 1,
                     "photos.caption": 1,
@@ -275,9 +275,9 @@ class ReviewRepoImpl {
                     likeCount: 1,
                     overallRating: 1,
                 },
-                
+
             },
-             { $sort: { createdAt: -1 } },
+            { $sort: { createdAt: -1 } },
             { $limit: limitCount },
 
         ]).exec();
@@ -303,8 +303,56 @@ class ReviewRepoImpl {
             overall,
         });
     }
+
+
+
+
+    async getPending(limit = 20, filters = {}) {
+        const query = { status: filters.status || 'pending' };
+        if (filters.search) {
+            query.text = { $regex: filters.search, $options: 'i' };
+        }
+        return await RestaurantReviews.find(query)
+            .populate('uid', 'name username profilePhoto')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean();
+    }
+
+    async flagReview(reviewId, userId, reason) {
+        return await RestaurantReviews.findByIdAndUpdate(
+            reviewId,
+            {
+                $push: {
+                    flags: {
+                        userId: new mongoose.Types.ObjectId(userId),
+                        reason,
+                        createdAt: new Date()
+                    }
+                }
+            },
+            { new: true }
+        ).lean();
+    }
+
+    async moderateReview(reviewId, moderatorId, action, note) {
+        const status = action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'hidden';
+        return await RestaurantReviews.findByIdAndUpdate(
+            reviewId,
+            {
+                status,
+                $push: {
+                    moderationNotes: {
+                        moderatorId: new mongoose.Types.ObjectId(moderatorId),
+                        action,
+                        note,
+                        createdAt: new Date()
+                    }
+                }
+            },
+            { new: true }
+        ).lean();
+    }
 }
-
-
 
 module.exports = ReviewRepoImpl

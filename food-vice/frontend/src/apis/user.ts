@@ -5,11 +5,13 @@ export interface User {
     username: string;
     profilePhoto: string;
     address?: string,
-    bio?: string,
-    level: number,
-    dateJoined: Date
+    bio?: string;
+    level: number;
+    role?: 'user' | 'moderator' | 'admin';
+    dateJoined: Date;
 
 }
+
 
 export const fetchUser = async () => {
 
