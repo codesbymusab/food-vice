@@ -2,7 +2,7 @@ const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
 
-const serviceAccountPath = path.join(__dirname, "./serviceAccountKey.json");
+const serviceAccountPath = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 let bucket = null;
 
 if (fs.existsSync(serviceAccountPath)) {
