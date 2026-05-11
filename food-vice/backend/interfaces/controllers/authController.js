@@ -42,7 +42,7 @@ exports.loginUser = async (req, res) => {
         
 
         if (token) {
-            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60, sameSite: 'lax', path: '/' })
+            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'none', path: '/' })
             return res.status(201).json({ message: 'User logged in Successfully',user:user })
         }
         return res.status(400).json({ message: 'Login failed' })
