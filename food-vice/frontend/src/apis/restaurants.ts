@@ -1,5 +1,7 @@
 import type { Filter } from "../components/Pages/Explore/ExplorePage";
 
+const API_BASE = import.meta.env.VITE_API_BASE
+
 export type TopRatedRestaurant =
     {
         _id: string,
@@ -49,7 +51,7 @@ export async function fetchTopRatedRestaurants({ userId, filters, location }: { 
     }
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
+            `${API_BASE}/restaurant/toprated?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -68,7 +70,7 @@ export async function fetchTrendingRestaurants({ location,maxDistance = null }: 
     
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/trending?lat=${location?.[0]}&lon=${location?.[1]}&maxDistance=${maxDistance}`,
+            `${API_BASE}/restaurant/trending?lat=${location?.[0]}&lon=${location?.[1]}&maxDistance=${maxDistance}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -92,7 +94,7 @@ export async function fetchNearbyRestaurants({ userId, filters, location }: { us
     }
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/nearby?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
+            `${API_BASE}/restaurant/nearby?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -116,7 +118,7 @@ export async function fetchRecommendedRestaurants({ userId, filters, location }:
 
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
+            `${API_BASE}/restaurant/recommended?lat=${location?.[0]}&lon=${location?.[1]}&cuisine=${searchfilters.cuisine}&price=${searchfilters.price}&rating=${searchfilters.rating}&dist=${searchfilters.dist}&userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -133,7 +135,7 @@ export async function fetchRecommendedRestaurants({ userId, filters, location }:
 export async function saveRestaurant({ userId, restId }: { userId: string, restId: string }) {
 
     try {
-        const res = await fetch("http://localhost:3000/save/restaurant", {
+        const res = await fetch(`${API_BASE}/save/restaurant`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, restId: restId }),
@@ -158,7 +160,7 @@ export async function saveRestaurant({ userId, restId }: { userId: string, restI
 export async function fetchPhotos({ restId }: { restId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/photos/${restId}`,
+            `${API_BASE}/restaurant/photos/${restId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -176,7 +178,7 @@ export async function fetchPhotos({ restId }: { restId: string }) {
 export async function fetchRestaurantDetails({ restaurantId, location, userId }: { restaurantId: string; location: [number, number] | null; userId?: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/details/${restaurantId}?lat=${location?.[0]}&lon=${location?.[1]}&userId=${userId}`,
+            `${API_BASE}/restaurant/details/${restaurantId}?lat=${location?.[0]}&lon=${location?.[1]}&userId=${userId}`,
             { credentials: "include" }
         );
 
@@ -195,7 +197,7 @@ export async function fetchRestaurantDetails({ restaurantId, location, userId }:
 export async function fetchSimilarRestaurants({ restaurantId, location }: { restaurantId: string; location: [number, number] | null }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/restaurant/similar/${restaurantId}?lat=${location?.[0]}&lon=${location?.[1]}`,
+            `${API_BASE}/restaurant/similar/${restaurantId}?lat=${location?.[0]}&lon=${location?.[1]}`,
             { credentials: "include" }
         );
 
@@ -213,7 +215,7 @@ export async function fetchSimilarRestaurants({ restaurantId, location }: { rest
 
 export async function updateViews({ restId,userId }: { restId: string,userId:string }) {
     try {
-        await fetch(`http://localhost:3000/restaurant/${restId}/view`, {
+        await fetch(`${API_BASE}/restaurant/${restId}/view`, {
             method:"POST",
            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId}),

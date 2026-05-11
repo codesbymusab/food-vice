@@ -70,7 +70,7 @@ exports.googleSignIn = async (req, res) => {
          const {user,token}  = await googleSignIn.execute(req.body)
         
         if (token) {
-            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60, sameSite: 'lax', path: '/' })
+            res.cookie('token', token, { httpOnly: true, secure: process.env.EVIRONMENT==='Production', maxAge: 7 * 24 * 60 * 60, sameSite: 'none', path: '/' })
             return res.status(201).json({ message: 'User logged in Successfully',user:user  })
         }
         return res.status(400).json({ message: 'Google sign-in failed' })

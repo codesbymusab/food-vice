@@ -1,7 +1,8 @@
 const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
-
+const dotenv = require('dotenv')
+dotenv.config()
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 let bucket = null;
 

@@ -1,6 +1,9 @@
+const API_BASE = import.meta.env.VITE_API_BASE
+
+
 export async function fetchUserProfile(userId: string) {
     try {
-        const res = await fetch(`http://localhost:3000/user/profile/${userId}`, {
+        const res = await fetch(`${API_BASE}/user/profile/${userId}`, {
             credentials: "include",
         });
 
@@ -18,7 +21,7 @@ export async function fetchUserProfile(userId: string) {
 
 export async function fetchSavedRestaurants(userId: string) {
     try {
-        const res = await fetch(`http://localhost:3000/restaurant/saved?userId=${userId}`, {
+        const res = await fetch(`${API_BASE}/restaurant/saved?userId=${userId}`, {
             credentials: "include",
         });
 
@@ -36,7 +39,7 @@ export async function fetchSavedRestaurants(userId: string) {
 
 export async function fetchUserReels(userId: string) {
     try {
-        const res = await fetch(`http://localhost:3000/reels/${userId}`, {
+        const res = await fetch(`${API_BASE}/reels/${userId}`, {
             credentials: "include",
         });
 
@@ -54,7 +57,7 @@ export async function fetchUserReels(userId: string) {
 
 export async function fetchUserReviews(userId: string) {
     try {
-        const res = await fetch(`http://localhost:3000/reviews/user/${userId}`, {
+        const res = await fetch(`${API_BASE}/reviews/user/${userId}`, {
             credentials: "include",
         });
 
@@ -72,7 +75,7 @@ export async function fetchUserReviews(userId: string) {
 
 export async function editUserProfile(formData: FormData) {
     try {
-        const res = await fetch("http://localhost:3000/user/edit", {
+        const res = await fetch(`${API_BASE}/user/edit`, {
             method: "PUT",
             body: formData,
             credentials: "include",

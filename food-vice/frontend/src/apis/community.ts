@@ -37,6 +37,8 @@ export interface CreateCommunityData {
   coverPhoto?: File;
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE
+
 export async function createCommunity(data: CreateCommunityData): Promise<Community> {
   const formData = new FormData();
   formData.append('name', data.name);
@@ -48,7 +50,7 @@ export async function createCommunity(data: CreateCommunityData): Promise<Commun
     formData.append('coverPhoto', data.coverPhoto);
   }
 
-  const response = await fetch('http://localhost:3000/community', {
+  const response = await fetch(`${API_BASE}/community`, {
     method: 'POST',
     body: formData,
     credentials: 'include',
@@ -63,8 +65,8 @@ export async function createCommunity(data: CreateCommunityData): Promise<Commun
 
 export async function getCommunities(searchName?: string): Promise<Community[]> {
   const url = searchName
-    ? `http://localhost:3000/community?name=${encodeURIComponent(searchName)}`
-    : 'http://localhost:3000/community';
+    ? `${API_BASE}/community?name=${encodeURIComponent(searchName)}`
+    : `${API_BASE}/community`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -78,7 +80,7 @@ export async function getCommunities(searchName?: string): Promise<Community[]> 
 }
 
 export async function getJoinedCommunities(): Promise<Community[]> {
-  const response = await fetch('http://localhost:3000/community/joined', {
+  const response = await fetch(`${API_BASE}/community/joined`, {
     credentials: 'include',
   });
 
@@ -90,7 +92,7 @@ export async function getJoinedCommunities(): Promise<Community[]> {
 }
 
 export async function getCommunityById(id: string): Promise<Community> {
-  const response = await fetch(`http://localhost:3000/community/${id}`, {
+  const response = await fetch(`${API_BASE}/community/${id}`, {
     credentials: 'include',
   });
 
@@ -102,7 +104,7 @@ export async function getCommunityById(id: string): Promise<Community> {
 }
 
 export async function joinCommunity(communityId: string): Promise<CommunityMember> {
-  const response = await fetch(`http://localhost:3000/community/${communityId}/join`, {
+  const response = await fetch(`${API_BASE}/community/${communityId}/join`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -180,7 +182,7 @@ export async function createThread(data: CreateThreadData): Promise<Thread> {
     });
   }
 
-  const response = await fetch('http://localhost:3000/thread', {
+  const response = await fetch(`${API_BASE}/thread`, {
     method: 'POST',
     body: formData,
     credentials: 'include',
@@ -198,7 +200,7 @@ export async function getThreadsByCommunity(communityId: string, searchQuery?: s
   if (searchQuery) params.append('search', searchQuery);
   if (topicIds && topicIds.length > 0) params.append('topics', topicIds.join(','));
 
-  const url = `http://localhost:3000/thread/community/${communityId}${params.toString() ? `?${params.toString()}` : ''}`;
+  const url = `${API_BASE}/thread/community/${communityId}${params.toString() ? `?${params.toString()}` : ''}`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -216,7 +218,7 @@ export async function getAllThreads(searchQuery?: string, topicIds?: string[]): 
   if (searchQuery) params.append('search', searchQuery);
   if (topicIds && topicIds.length > 0) params.append('topics', topicIds.join(','));
 
-  const url = `http://localhost:3000/thread/community/all${params.toString() ? `?${params.toString()}` : ''}`;
+  const url = `${API_BASE}/thread/community/all${params.toString() ? `?${params.toString()}` : ''}`;
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -230,7 +232,7 @@ export async function getAllThreads(searchQuery?: string, topicIds?: string[]): 
 }
 
 export async function getThreadById(id: string): Promise<Thread> {
-  const response = await fetch(`http://localhost:3000/thread/${id}`, {
+  const response = await fetch(`${API_BASE}/thread/${id}`, {
     credentials: 'include',
   });
 
@@ -242,7 +244,7 @@ export async function getThreadById(id: string): Promise<Thread> {
 }
 
 export async function likeThread(threadId: string): Promise<Thread> {
-  const response = await fetch(`http://localhost:3000/thread/${threadId}/like`, {
+  const response = await fetch(`${API_BASE}/thread/${threadId}/like`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -255,7 +257,7 @@ export async function likeThread(threadId: string): Promise<Thread> {
 }
 
 export async function dislikeThread(threadId: string): Promise<Thread> {
-  const response = await fetch(`http://localhost:3000/thread/${threadId}/dislike`, {
+  const response = await fetch(`${API_BASE}/thread/${threadId}/dislike`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -277,7 +279,7 @@ export async function addComment(threadId: string, content: string, media?: File
     });
   }
 
-  const response = await fetch(`http://localhost:3000/thread/${threadId}/comment`, {
+  const response = await fetch(`${API_BASE}/thread/${threadId}/comment`, {
     method: 'POST',
     body: formData,
     credentials: 'include',
@@ -291,7 +293,7 @@ export async function addComment(threadId: string, content: string, media?: File
 }
 
 export async function getComments(threadId: string): Promise<ThreadComment[]> {
-  const response = await fetch(`http://localhost:3000/thread/${threadId}/comments`, {
+  const response = await fetch(`${API_BASE}/thread/${threadId}/comments`, {
     credentials: 'include',
   });
 
@@ -303,7 +305,7 @@ export async function getComments(threadId: string): Promise<ThreadComment[]> {
 }
 
 export async function toggleCommentLike(commentId: string): Promise<ThreadComment> {
-  const response = await fetch(`http://localhost:3000/thread/comment/${commentId}/like`, {
+  const response = await fetch(`${API_BASE}/thread/comment/${commentId}/like`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -321,7 +323,7 @@ export interface Topic {
 }
 
 export async function getTopics(): Promise<Topic[]> {
-  const response = await fetch('http://localhost:3000/topics', {
+  const response = await fetch(`${API_BASE}/topics`, {
     credentials: 'include',
   });
 

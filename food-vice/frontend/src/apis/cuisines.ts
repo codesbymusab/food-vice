@@ -1,6 +1,8 @@
+const API_BASE = import.meta.env.VITE_API_BASE
+
 export async function fetchCuisines() {
     try {
-        const res = await fetch('http://localhost:3000/restaurant/cuisines', {
+        const res = await fetch(`${API_BASE}/restaurant/cuisines`, {
             credentials: 'include',
         });
 

@@ -85,7 +85,7 @@ export interface Report {
   updatedAt: string;
 }
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const res = await fetch(`${API_BASE}${path}`, {

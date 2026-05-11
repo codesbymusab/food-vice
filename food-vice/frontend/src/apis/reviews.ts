@@ -22,6 +22,8 @@ export type Review = {
 
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE
+
 export async function toggleLikeReview(
     { userId, reviewId }: {
         userId: string,
@@ -33,7 +35,7 @@ export async function toggleLikeReview(
 
 
     try {
-        const res = await fetch("http://localhost:3000/like/review", {
+        const res = await fetch(`${API_BASE}/like/review`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId, reviewId: reviewId }),
@@ -56,7 +58,7 @@ export async function toggleLikeReview(
 export async function fetchReviews({ restId }: { restId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/reviews/${restId}`,
+            `${API_BASE}/reviews/${restId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -77,7 +79,7 @@ export async function fetchReviews({ restId }: { restId: string }) {
 export async function fetchRecentReviews({ userId }: { userId: string }) {
     try {
         const res = await fetch(
-            `http://localhost:3000/reviews/recent?userId=${userId}`,
+            `${API_BASE}/reviews/recent?userId=${userId}`,
             { credentials: "include" }
         );
         if (res.ok) {
@@ -96,7 +98,7 @@ export async function fetchRecentReviews({ userId }: { userId: string }) {
 
 export async function createReview(formData: FormData) {
     try {
-        const res = await fetch("http://localhost:3000/reviews/create", {
+        const res = await fetch(`${API_BASE}/reviews/create`, {
             method: "POST",
             body: formData,
         });
