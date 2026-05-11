@@ -4,13 +4,14 @@ export interface User {
     name?: string;
     username: string;
     profilePhoto: string;
-    address?: string;
+    address?: string,
     bio?: string;
     level: number;
     role?: 'user' | 'moderator' | 'admin';
     dateJoined: Date;
 
 }
+
 
 export const fetchUser = async () => {
 
