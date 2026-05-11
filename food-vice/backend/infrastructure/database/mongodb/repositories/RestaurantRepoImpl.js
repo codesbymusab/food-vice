@@ -988,8 +988,35 @@ class RestaurantRepoImpl {
             viewsCount: r.viewsCount || 0
         }));
     }
+
+
+
+    async getAll(filters = {}, page = 1, limit = 20) {
+        const query = {};
+        if (filters.flagged) {
+            query.flags = { $exists: true, $ne: [] };
+        }
+        if (filters.search) {
+            query.name = { $regex: filters.search, $options: 'i' };
+        }
+        return await Restaurant.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+    }
+
+    async createRestaurant(payload) {
+        return await Restaurant.create(payload);
+    }
+
+    async updateRestaurant(id, payload) {
+        return await Restaurant.findByIdAndUpdate(id, payload, { new: true }).lean();
+    }
+
+    async deleteRestaurant(id) {
+        return await Restaurant.findByIdAndDelete(id).lean();
+    }
 }
-
-
 
 module.exports = RestaurantRepoImpl

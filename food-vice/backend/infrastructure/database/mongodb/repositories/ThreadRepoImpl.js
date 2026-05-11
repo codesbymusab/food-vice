@@ -110,7 +110,51 @@ class ThreadRepoImpl {
     return await Thread.find(query).populate('uid', 'name profilePhoto').populate('media', 'url type').sort({ createdAt: -1 });
   }
 
+  async getPending(limit = 20, filters = {}) {
+    const query = { status: filters.status || 'pending' };
+    if (filters.search) {
+      query.$or = [
+        { title: { $regex: filters.search, $options: 'i' } },
+        { content: { $regex: filters.search, $options: 'i' } }
+      ];
+    }
+    return await Thread.find(query).populate('uid', 'name profilePhoto').populate('media', 'url type').sort({ createdAt: -1 }).limit(limit).lean();
+  }
 
+  async flagThread(threadId, userId, reason) {
+    return await Thread.findByIdAndUpdate(
+      threadId,
+      {
+        $push: {
+          flags: {
+            userId: userId,
+            reason,
+            createdAt: new Date()
+          }
+        }
+      },
+      { new: true }
+    ).lean();
+  }
+
+  async moderateThread(threadId, moderatorId, action, note) {
+    const status = action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'hidden';
+    return await Thread.findByIdAndUpdate(
+      threadId,
+      {
+        status,
+        $push: {
+          moderationNotes: {
+            moderatorId,
+            action,
+            note,
+            createdAt: new Date()
+          }
+        }
+      },
+      { new: true }
+    ).lean();
+  }
 }
 
 module.exports = ThreadRepoImpl;

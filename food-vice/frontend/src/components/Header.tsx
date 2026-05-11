@@ -48,6 +48,20 @@ export function Header() {
                         } to="/community">
                             Community
                         </NavLink>
+                        {(user?.role === 'moderator' || user?.role === 'admin') && (
+                          <NavLink className={({ isActive }) =>
+                              `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
+                          } to="/moderation/reviews">
+                              Moderation
+                          </NavLink>
+                        )}
+                        {user?.role === 'admin' && (
+                          <NavLink className={({ isActive }) =>
+                              `${isActive ? 'underline underline-offset-4 font-extrabold text-primary' : 'font-semibold'} text-sm hover:text-primary transition-colors`
+                          } to="/admin/restaurants">
+                              Admin
+                          </NavLink>
+                        )}
                     </nav>
                 </div>
 
