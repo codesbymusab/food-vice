@@ -30,7 +30,7 @@ const app = express()
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://food-vice-git-main-musabs-projects-96cd063b.vercel.app'
+  'https://food-vice-d9gy.vercel.app'
 ];
 
 app.use((req, res, next) => {
