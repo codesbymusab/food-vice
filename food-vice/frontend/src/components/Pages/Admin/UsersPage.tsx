@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchAdminUsers, setUserRole } from '../../../apis/admin';
 import type { User } from '../../../apis/admin';
+import { LoadingDialog } from '../../Shared/Feedback';
 
 const ROLE_OPTIONS: readonly ('user' | 'moderator' | 'admin')[] = ['user', 'moderator', 'admin'];
 
@@ -39,7 +40,7 @@ export function UsersPage() {
       <h1 className="text-2xl font-bold mb-4">User Management</h1>
       {error && <p className="text-red-600 mb-3">{error}</p>}
       {loading ? (
-        <p>Loading users...</p>
+        <LoadingDialog message="Loading users..." />
       ) : (
         <div className="space-y-4">
           {users.length === 0 ? (

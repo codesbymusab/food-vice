@@ -47,6 +47,8 @@ export function SigninPage() {
         setIsSigningIn(true)
         try {
             const user = await loginUser({ email: emailInput, password: passwordInput });
+            
+            
             if (user) {
                 setUser(user);
                 navigate('/home');

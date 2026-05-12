@@ -23,8 +23,11 @@ interface User {
   bio?: string;
   level: number;
   role?: 'user' | 'moderator' | 'admin';
-  dateJoined: Date;
-
+  dateJoined: Date;  
+  banned: boolean,
+  banReason: string,
+  banUntil: Date
+  status:string
 }
 
 
@@ -58,6 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const userData = await fetchUserApi();
+      console.log(userData)
       setUser(userData);
     } catch (err) {
       console.log(err);

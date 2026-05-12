@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 export function LoadingDialog({ message = "Checking session..." }: { message?: string }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
@@ -74,11 +72,147 @@ export function SkeletonCard({ className = "" }: { className?: string }) {
   );
 }
 
+export function SkeletonTrendingCard() {
+  return (
+    <div className="animate-pulse rounded-2xl bg-white min-w-[300px] shadow-sm">
+      <div className="h-48 rounded-t-2xl bg-slate-200 dark:bg-slate-700"></div>
+      <div className="p-5">
+        <div className="mb-3 h-6 w-3/4 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+        <div className="flex gap-2 mb-4">
+          <div className="h-4 w-16 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+          <div className="h-4 w-12 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+        </div>
+        <div className="h-4 w-full rounded-md bg-slate-200 dark:bg-slate-700 opacity-40"></div>
+      </div>
+    </div>
+  );
+}
+
+export function SkeltonReelTagsCard() {
+  return (
+    <div className="mr-10 mt-6 hidden xl:flex w-[380px] flex-col gap-10 rounded-2xl border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark overflow-y-auto sticky top-[0px] h-min">
+
+      <div className="p-6 rounded-2xl bg-primary text-white">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <span className="material-symbols-outlined text-white">tag</span>
+          Popular Tags
+        </h3>
+        <div className="flex flex-wrap gap-2">
+
+          {
+            Array.from({ length: 4 }).map(
+              (_, index) => {
+                return <span key={index} className={`px-3 py-1 border border-white/30 rounded-full text-sm font-medium bg-slate-200`}></span>
+
+              }
+            )
+          }
+
+        </div>
+      </div>
+    </div>
+  );
+}
+export function SkeletonReelCard() {
+  return (
+    <div className="max-w-[350px] h-screen max-h-[80vh] animate-pulse aspect-[9/16] rounded-2xl bg-slate-200 dark:bg-slate-700 relative mb-8 overflow-hidden">
+      <div className="absolute bottom-3 left-3 right-3">
+        <div className="flex items-center gap-4 text-xs font-medium">
+          <div className="h-3 w-12 rounded-full bg-black/20"></div>
+          <div className="h-3 w-10 rounded-full bg-black/20"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonTopRatedCard() {
+  return (
+    <div className="animate-pulse flex gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+      <div className="w-24 h-24 rounded-xl bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+      <div className="flex-1">
+        <div className="flex justify-between items-start mb-2">
+          <div className="w-3/4 h-5 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+          <div className="w-8 h-5 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+        </div>
+        <div className="w-1/2 h-3 rounded-md bg-slate-200 dark:bg-slate-700 mb-4"></div>
+        <div className="w-24 h-3 rounded-md bg-slate-200 dark:bg-slate-700 opacity-30"></div>
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonRestaurantCard() {
+  return (
+    <div className="animate-pulse group relative flex flex-col rounded-xl border border-primary/5 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden">
+      <div className="h-48 bg-slate-200 dark:bg-slate-700"></div>
+      <div className="p-4 flex flex-col flex-1">
+        <div className="flex items-center justify-between mb-1">
+          <div className="w-3/4 h-6 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+        </div>
+        <div className="w-1/2 h-4 rounded-md bg-slate-200 dark:bg-slate-700 mb-3"></div>
+        <div className="mt-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-16 h-3 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+            <div className="w-20 h-3 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+            <div className="w-12 h-3 rounded-md bg-slate-200 dark:bg-slate-700"></div>
+          </div>
+          <div className="bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center gap-1 shadow-sm px-3 py-2">
+            <div className="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+            <div className="w-8 h-4 rounded-md bg-slate-300 dark:bg-slate-600"></div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute top-2 right-2 w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700"></div>
+    </div>
+  );
+}
+
 export function SkeletonList({ count = 4 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, index) => (
         <SkeletonCard key={index} />
+      ))}
+    </div>
+  );
+}
+
+export function SkeletonTrendingList({ count = 3 }: { count?: number }) {
+  return (
+    <div className="flex overflow-x-auto gap-6 pb-6 no-scrollbar">
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonTrendingCard key={index} />
+      ))}
+    </div>
+  );
+}
+
+export function SkeletonReelGrid({ count = 5 }: { count?: number }) {
+  return (
+    <div className="mt-6 flex-1 overflow-y-auto dark:bg-black/20 px-4 md:px-6 snap-y snap-mandatory scroll-smooth">
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonReelCard key={index} />
+      ))}
+    </div>
+  );
+}
+
+export function SkeletonTopRatedList({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonTopRatedCard key={index} />
+      ))}
+    </div>
+  );
+}
+
+export function SkeletonRestaurantGrid({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonRestaurantCard key={index} />
       ))}
     </div>
   );
@@ -107,11 +241,10 @@ export function ConfirmationDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
       <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-2xl shadow-slate-900/20 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95">
         <div className="mb-6">
-          <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${
-            isDangerous 
-              ? "bg-red-100 text-red-600 dark:bg-red-900/20" 
+          <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${isDangerous
+              ? "bg-red-100 text-red-600 dark:bg-red-900/20"
               : "bg-blue-100 text-blue-600 dark:bg-blue-900/20"
-          }`}>
+            }`}>
             <span className="material-symbols-outlined">
               {isDangerous ? "warning" : "help"}
             </span>
@@ -130,11 +263,10 @@ export function ConfirmationDialog({
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-xl text-white font-bold uppercase tracking-widest text-xs shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 ${
-              isDangerous
+            className={`w-full py-3 px-4 rounded-xl text-white font-bold uppercase tracking-widest text-xs shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 ${isDangerous
                 ? "bg-red-600 hover:bg-red-700 shadow-red-600/20"
                 : "bg-primary hover:bg-orange-600 shadow-primary/20"
-            }`}
+              }`}
           >
             {isLoading ? "Processing..." : confirmText}
           </button>

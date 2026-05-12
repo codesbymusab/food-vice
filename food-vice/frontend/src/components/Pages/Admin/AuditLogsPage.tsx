@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchAuditLogs } from '../../../apis/admin';
 import type { AuditLog } from '../../../apis/admin';
+import { LoadingDialog } from '../../Shared/Feedback';
 
 export function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -27,7 +28,7 @@ export function AuditLogsPage() {
     <main className="p-6">
       <h1 className="text-2xl font-bold mb-4">Audit Logs</h1>
       {loading ? (
-        <p>Loading audit logs...</p>
+        <LoadingDialog message="Loading audit logs..." />
       ) : error ? (
         <p className="text-red-600">{error}</p>
       ) : (

@@ -1,7 +1,7 @@
 
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { LoadingDialog } from "./Shared/Feedback";
+import { ErrorScreen, LoadingDialog } from "./Shared/Feedback";
 
 
 export function ProtectedRoute(){
@@ -15,9 +15,15 @@ export function ProtectedRoute(){
     if(location.pathname === "/signup"){
        return <Navigate to="/auth/signup" replace />;
     }
+
+
     
     return <Navigate to="/auth/login" replace />;
   
+  }
+
+  if(user.status==="banned" ){
+    return <ErrorScreen title="Banned" message={user.banReason}/>
   }
 
   return <Outlet />;

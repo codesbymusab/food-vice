@@ -10,6 +10,7 @@ import type { Restaurant } from "../RestaurantDetail/RestaurantDetailPage";
 import type { Reel } from "../Reels/ReelsPage";
 import type { Review } from "../RestaurantDetail/ReviewTile";
 import { useAuth } from "../../../context/AuthContext";
+import { LoadingDialog } from "../../Shared/Feedback";
 
 type UserReels={
     saved: Reel[],
@@ -80,13 +81,13 @@ export function UserProfilePage() {
         setShowEditForm(true)
     }
 
-    if (loading) return <div>Loading...</div>
+    if (loading) return <LoadingDialog message="Loading profile..." />
 
     if (showEditForm) {
         return <EditProfilePage profile={userProfile!} setShowEditForm={setShowEditForm} fetchProfile={fetchUserProfile} />
     }
 
-    if(!userProfile) return <div>Fialed to load user</div>
+    if(!userProfile) return <LoadingDialog message="Failed to load user profile. Retrying..." />
 
     return (
 

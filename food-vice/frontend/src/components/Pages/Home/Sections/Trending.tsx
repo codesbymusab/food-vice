@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { TrendingCard } from "../Cards/TrendingCard";
 import { fetchTrendingRestaurants, type TrendingRestaurant } from "../../../../apis/restaurants";
 import { useAppLocation } from "../../../../context/LocationContext";
-import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { ErrorScreen, SkeletonTrendingList } from "../../../Shared/Feedback";
 
 export function Trending() {
 
@@ -47,7 +47,7 @@ export function Trending() {
             </div>
             {
                 loading ? (
-                    <SkeletonList count={3} />
+                    <SkeletonTrendingList count={3} />
                 ) : error ? (
                     <div className="col-span-full">
                         <ErrorScreen title="Unable to load top rated restaurants" message={error} onRetry={() => loadTrendingRestaurants(location)} />

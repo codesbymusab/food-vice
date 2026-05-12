@@ -11,6 +11,7 @@ import { Reels } from "./RestaurantReels";
 import { fetchRestaurantDetails, fetchSimilarRestaurants, saveRestaurant as saveRestaurantApi, updateViews } from "../../../apis/restaurants";
 import { fetchAISummary, type AISummary } from "../../../apis/ai";
 import type { Review } from "../../../apis/reviews";
+import { LoadingDialog } from "../../Shared/Feedback";
 
 
 export type SimilarRestaurant = {
@@ -180,9 +181,7 @@ export function RestaurantDetailPage() {
 
 
     if (!restaurantDetails) {
-        return (
-            <div>Loading....</div>
-        )
+        return <LoadingDialog message="Loading restaurant details..." />;
     }
     return (
         <main className="flex-1">

@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import axios from "axios"
+import { API_BASE } from "../../../apis/community"
 
 export function CreateCommunityPage() {
     const navigate = useNavigate()
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [category, setCategory] = useState('Recipes')
     const [guidelines, setGuidelines] = useState<string[]>([])
     const [newRule, setNewRule] = useState('')
     const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ export function CreateCommunityPage() {
                 formData.append('coverPhoto', file)
             }
 
-            await axios.post('http://localhost:3000/community', formData, {
+            await axios.post(`${API_BASE}/community`, formData, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': 'multipart/form-data'

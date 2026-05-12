@@ -92,7 +92,9 @@ class ThreadRepoImpl {
 
   async findAll(searchQuery = '', topicIds = []) {
 
-    let query = {};
+    let query = {
+      status:"approved"
+    };
 
     if (searchQuery) {
       query.$or = [
