@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import ExploreMapView from './ExploreMapView';
 import { useAuth } from '../../../context/AuthContext';
 import { useAppLocation } from '../../../context/LocationContext';
-import { ErrorScreen, SkeletonList } from '../../Shared/Feedback';
+import { ErrorScreen, SkeletonRestaurantGrid, OperationLoadingDialog } from '../../Shared/Feedback';
 import { fetchTopRatedRestaurants as loadTopRatedRestaurantsAPI, fetchRecommendedRestaurants as loadRecommendedRestaurantsAPI } from '../../../apis/restaurants';
 import { fetchCuisines } from '../../../apis/cuisines';
 import { SearchBar } from '../../SearchBar';
@@ -44,6 +44,7 @@ function ExplorePage() {
     dist: 50,
 
   })
+  const [applyingFilters, setApplyingFilters] = useState<boolean>(false);
   const navigate= useNavigate()
   const params=useParams()
   
@@ -95,9 +96,11 @@ function ExplorePage() {
 
 
   async function applyFilters() {
+    setApplyingFilters(true);
     setLoading(true);
     setError(null);
     await Promise.all([loadTopRatedRestaurants(location), loadRecommendedRestaurants(location)]);
+    setApplyingFilters(false);
   }
 
   async function loadAIRecommendations() {
@@ -148,7 +151,7 @@ function ExplorePage() {
               <div className="h-4 rounded-full bg-slate-200 animate-pulse dark:bg-slate-700"></div>
             </div>
             <div className="space-y-4">
-              <SkeletonList count={3} />
+              <SkeletonRestaurantGrid count={3} />
             </div>
           </div>
         </div>
@@ -242,14 +245,15 @@ function ExplorePage() {
                     View All
                   </a>
                 </div>
-                <div className="overflow-x-auto grid-rows-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {
-                    recommendedRestaurants && recommendedRestaurants.map((restaurant) => {
+                {loading ? (
+                  <SkeletonRestaurantGrid count={3} />
+                ) : (
+                  <div className="overflow-x-auto grid-rows-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {recommendedRestaurants && recommendedRestaurants.map((restaurant) => {
                       return <RestaurantCard key={restaurant._id} restaurant={restaurant} setTopRatedRestaurants={setRecommendedRestaurants} />
-                    })
-                  }
-
-                </div>
+                    })}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-6 pt-6">
@@ -262,9 +266,11 @@ function ExplorePage() {
                     View All
                   </a>
                 </div>
-                <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 overflow-x-auto">
-                  {
-                    recommendedRestaurants ?
+                {loading ? (
+                  <SkeletonRestaurantGrid count={3} />
+                ) : (
+                  <div className="grid grid-cols-1 grid-rows-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 overflow-x-auto">
+                    {recommendedRestaurants ?
                       topRatedRestaurants && topRatedRestaurants
                         .filter(
                           top =>
@@ -286,9 +292,9 @@ function ExplorePage() {
                           restaurant={restaurant}
                           setTopRatedRestaurants={setTopRatedRestaurants}
                         />
-                      ))
-                  }
-                </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </>
             :
@@ -300,6 +306,7 @@ function ExplorePage() {
 
       </main>
       <ExploreChatBot location={location} userId={user?.userId} />
+      {applyingFilters && <OperationLoadingDialog message="Applying filters..." />}
     
     </>
   );

@@ -3,6 +3,7 @@ import { SigninPage } from "./components/Pages/SigninPage"
 import { SignupPage } from "./components/Pages/SignupPage"
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
+import { ManagementTabs } from "./components/Shared/ManagementTabs";
 import { HomePage } from "./components/Pages/Home/HomePage";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -83,14 +84,18 @@ function MainLayout() {
         <Route path="/community/create" element={<CreateCommunityPage />} />
         <Route path="/community/:id/create-thread" element={<CreateThreadPage />} />
         <Route element={<ModeratorRoute />}>
-          <Route path="/moderation/reviews" element={<ReviewModerationPage />} />
-          <Route path="/moderation/threads" element={<ThreadsModerationPage />} />
-          <Route path="/moderation/reports" element={<ReportsPage />} />
+          <Route path="/moderation" element={<ManagementTabs />}>
+            <Route path="reviews" element={<ReviewModerationPage />} />
+            <Route path="threads" element={<ThreadsModerationPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+          </Route>
         </Route>
         <Route element={<AdminRoute />}>
-          <Route path="/admin/restaurants" element={<RestaurantsPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
+          <Route path="/admin" element={<ManagementTabs />}>
+            <Route path="restaurants" element={<RestaurantsPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="audit-logs" element={<AuditLogsPage />} />
+          </Route>
         </Route>
       </Routes>
       <Footer />

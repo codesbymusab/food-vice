@@ -5,7 +5,7 @@ import { CommunityGuidelines } from "./CommunityGuidelinesCard";
 import { CommunityCover } from "./CommunityCover";
 import { TopicsCard } from "./TopicsCard";
 import { useState, useEffect } from "react";
-import { getThreadsByCommunity } from "../../../apis/community";
+import { API_BASE, getThreadsByCommunity } from "../../../apis/community";
 import axios from "axios";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -37,7 +37,7 @@ export function CommunityDetailPage() {
 
     const fetchCommunityDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community/${id}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/community/${id}`, { withCredentials: true })
             setCommunity(response.data)
         } catch (error) {
             console.error('Error fetching community details:', error)
@@ -46,7 +46,7 @@ export function CommunityDetailPage() {
 
     const checkMembership = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community/joined?userId=${user?.userId}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/community/joined?userId=${user?.userId}`, { withCredentials: true })
             const joined = response.data.some((c: any) => c._id === id)
             setIsMember(joined)
         } catch (error) {
@@ -56,7 +56,7 @@ export function CommunityDetailPage() {
 
     const handleJoin = async () => {
         try {
-            await axios.post(`http://localhost:3000/community/${id}/join`, {}, { withCredentials: true })
+            await axios.post(`${API_BASE}/community/${id}/join`, {}, { withCredentials: true })
             setIsMember(true)
         } catch (error: any) {
             console.error('Error joining community:', error)

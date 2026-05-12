@@ -2,7 +2,7 @@ import { useState, useEffect, type ChangeEvent } from "react"
 import { useNavigate, useParams } from "react-router"
 import { CommunityGuidelines } from "../CommunityGuidelinesCard"
 import { CommunityCover } from "../CommunityCover"
-import { createThread, getTopics, type Topic } from "../../../../apis/community"
+import { API_BASE, createThread, getTopics, type Topic } from "../../../../apis/community"
 
 export function CreateThreadPage() {
     const { id } = useParams()
@@ -62,7 +62,7 @@ export function CreateThreadPage() {
 
     const fetchCommunityDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/community/${id}`, { credentials: 'include' })
+            const response = await fetch(`${API_BASE}/community/${id}`, { credentials: 'include' })
             const data = await response.json()
             setCommunity(data)
         } catch (error) {

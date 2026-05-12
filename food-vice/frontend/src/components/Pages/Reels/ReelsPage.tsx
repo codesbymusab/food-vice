@@ -3,7 +3,7 @@ import { ReelCard } from "./ReelCard";
 import { UploadReelForm } from "./UploadForm";
 import { useAuth } from "../../../context/AuthContext";
 import { UploadProgressDialog } from "./ProgressDialouge";
-import { ErrorScreen, SkeletonList } from "../../Shared/Feedback";
+import { ErrorScreen, SkeletonReelGrid, SkeltonReelTagsCard } from "../../Shared/Feedback";
 import { fetchRecentReels, fetchFollowersReels, fetchPopularTags, uploadReel as uploadReelApi, saveReel as saveReelApi, toggleLikeReel as toggleLikeReelApi, fetchReelById, fetchSuggestedAccounts, type SuggestedAccount } from "../../../apis/reels";
 import { useNavigate, useParams } from "react-router";
 
@@ -237,11 +237,13 @@ export function ReelsPage() {
                             <div key={index} className="h-12 rounded-2xl bg-slate-100 animate-pulse dark:bg-slate-800" />
                         ))}
                     </div>
+                    
                 </aside>
 
-                <section className="flex-1 p-4">
+                <section className="flex-1 flex flex-col md:flex-row min-w-0 overflow-hidden">
                     <div className="mb-6 h-12 w-56 rounded-full bg-slate-100 animate-pulse dark:bg-slate-800"></div>
-                    <SkeletonList count={6} />
+                    <SkeletonReelGrid count={6} />
+                    <SkeltonReelTagsCard />
                 </section>
             </main>
         )

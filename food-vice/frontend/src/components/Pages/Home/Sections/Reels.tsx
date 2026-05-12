@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Reel } from "../../Reels/ReelsPage";
 import { ReelCard } from "../Cards/ReelCard";
 import { useAuth } from "../../../../context/AuthContext";
-import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { ErrorScreen, SkeletonReelCard, SkeletonReelGrid } from "../../../Shared/Feedback";
 import { fetchRecentReels } from "../../../../apis/reels";
 
 export function Reels() {
@@ -11,12 +11,12 @@ export function Reels() {
     const [reels, setReels] = useState<Reel[] | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
-    const {user}=useAuth()
+    const { user } = useAuth()
     async function loadRecentReels() {
         setLoading(true)
         setError(null)
         try {
-            const reelsData = await fetchRecentReels({ userId: user!.userId,tag: 'All' });
+            const reelsData = await fetchRecentReels({ userId: user!.userId, tag: 'All' });
             setReels(reelsData ?? null);
         } catch (error) {
             console.error(error);
@@ -40,15 +40,19 @@ export function Reels() {
                     <h3 className="text-2xl font-bold">Food Reels</h3>
                     <span className="ml-auto px-3 py-1 bg-primary text-xs font-bold rounded-full uppercase tracking-tighter">Trending</span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
                     {loading ? (
-                        <SkeletonList count={5} />
+
+                        Array.from({ length: 3 }).map((_, index) => {
+                            return <SkeletonReelCard key={index} />
+                        }
+                        )
                     ) : error ? (
                         <div className="col-span-full">
                             <ErrorScreen title="Could not load reels" message={error} onRetry={loadRecentReels} />
                         </div>
                     ) : reels && reels.length > 0 ? (
-                        reels.slice(0,5).map((reel) => {
+                        reels.slice(0, 5).map((reel) => {
                             return <ReelCard key={reel._id} reel={reel} />
                         })
                     ) : (

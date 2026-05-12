@@ -37,7 +37,7 @@ export interface CreateCommunityData {
   coverPhoto?: File;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE
+export const API_BASE = import.meta.env.VITE_API_BASE
 
 export async function createCommunity(data: CreateCommunityData): Promise<Community> {
   const formData = new FormData();

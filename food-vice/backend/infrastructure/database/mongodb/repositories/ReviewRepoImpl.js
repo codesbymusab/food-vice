@@ -52,7 +52,9 @@ class ReviewRepoImpl {
     }
 
     async getReviews({ restId, userId, limitCount = 5, currentUser = false }) {
-        const matchStage = {};
+        const matchStage = {
+            status:"approved"
+        };
         if (restId) matchStage.restaurantId = new mongoose.Types.ObjectId(restId);
         if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
         if (userId && !currentUser) matchStage.uid = { $ne: new mongoose.Types.ObjectId(userId) };
@@ -163,7 +165,9 @@ class ReviewRepoImpl {
     async getRecentReviews({ limitCount = 3, userId, currentUser = false }) {
 
 
-        const matchStage = {}
+        const matchStage = {
+            status:"approved"
+        }
 
         if (userId && currentUser) matchStage.uid = new mongoose.Types.ObjectId(userId);
 

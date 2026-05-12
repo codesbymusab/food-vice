@@ -8,7 +8,7 @@ export interface User {
     bio?: string;
     level: number;
     role?: 'user' | 'moderator' | 'admin';
-    dateJoined: Date;
+
 
 }
 

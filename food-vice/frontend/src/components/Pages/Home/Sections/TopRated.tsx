@@ -2,7 +2,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { TopRatedRestaurant } from "../../Explore/RestaurantCard";
 import { TopRatedCard } from "../Cards/TopRatedCard";
 import { useAuth } from "../../../../context/AuthContext";
-import { ErrorScreen, SkeletonList } from "../../../Shared/Feedback";
+import { ErrorScreen, SkeletonTopRatedList } from "../../../Shared/Feedback";
 import { fetchTopRatedRestaurants } from "../../../../apis/restaurants";
 import type { Cuisine, Filter } from "../../Explore/ExplorePage";
 import { useAppLocation } from "../../../../context/LocationContext";
@@ -57,20 +57,7 @@ export function TopRated({ filters, cuisines, setFilters }: { cuisines: Cuisine[
             </div>
 
             {loading ? (
-                <div className="w-full flex justify-center items-center gap-3">
-                    {/* Animated Indicator */}
-                    <div className="flex gap-1">
-                        <span className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-bounce [animation-delay:-0.15s]" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce" />
-                    </div>
-
-                    {/* Heading */}
-                    <h2 className="text-2xl md:text-3xl font-black tracking-tight text-on-surface">
-                        {'Loading'}
-                        <span className="text-primary">...</span>
-                    </h2>
-                </div>
+                <SkeletonTopRatedList count={6} />
             ) : error ? (
                 <div className="col-span-full">
                     <ErrorScreen title="Unable to load top rated restaurants" message={error!} onRetry={() => loadTopRatedRestaurants(location, filters)} />

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { useAuth } from "../../../context/AuthContext";
-import { getAllThreads, type Thread } from "../../../apis/community";
+import { API_BASE, getAllThreads, type Thread } from "../../../apis/community";
 
 export type SelectedTopic = string; // Can be 'all' or topic ID
 
@@ -24,7 +24,7 @@ export function CommunitiesPage() {
 
     const fetchJoinedCommunities = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community/joined?userId=${user?.userId}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/community/joined?userId=${user?.userId}`, { withCredentials: true })
             setJoinedCommunities(response.data)
       
         } catch (error) {
@@ -34,7 +34,7 @@ export function CommunitiesPage() {
 
     const fetchRecommendedCommunities = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community/recommended?userId=${user?.userId}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/community/recommended?userId=${user?.userId}`, { withCredentials: true })
       
             setRecommendedCommunities(response.data)
         } catch (error) {

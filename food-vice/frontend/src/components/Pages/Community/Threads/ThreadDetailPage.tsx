@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router"
 import axios from "axios"
 import { useAuth } from "../../../../context/AuthContext"
-import { likeThread, dislikeThread, type ThreadComment } from "../../../../apis/community"
+import { likeThread, dislikeThread, type ThreadComment, API_BASE } from "../../../../apis/community"
 
 interface ThreadDetailData {
     _id: string;
@@ -45,7 +45,7 @@ export function ThreadDetailPage() {
 
     const fetchThreadDetails = useCallback(async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/thread/${threadId}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/thread/${threadId}`, { withCredentials: true })
         
             setThread(response.data)
         } catch (error) {
@@ -55,7 +55,7 @@ export function ThreadDetailPage() {
 
     const fetchCommunityDetails = useCallback(async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/community/${id}`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/community/${id}`, { withCredentials: true })
             setCommunity(response.data)
         } catch (error) {
             console.error('Error fetching community details:', error)
@@ -64,7 +64,7 @@ export function ThreadDetailPage() {
 
     const fetchComments = useCallback(async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/thread/${threadId}/comments`, { withCredentials: true })
+            const response = await axios.get(`${API_BASE}/thread/${threadId}/comments`, { withCredentials: true })
             setComments(response.data)
         } catch (error) {
             console.error('Error fetching comments:', error)

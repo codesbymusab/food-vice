@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createRestaurant, deleteRestaurant, fetchAdminRestaurants } from '../../../apis/admin';
 import type { Restaurant } from '../../../apis/admin';
+import { LoadingDialog } from '../../Shared/Feedback';
 
 export function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -57,7 +58,7 @@ export function RestaurantsPage() {
       </div>
       {error && <p className="text-red-600 mb-3">{error}</p>}
       {loading ? (
-        <p>Loading restaurants...</p>
+        <LoadingDialog message="Loading restaurants..." />
       ) : (
         <div className="space-y-4">
           {restaurants.length === 0 ? (
